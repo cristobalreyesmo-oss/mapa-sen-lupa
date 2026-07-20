@@ -1,7 +1,7 @@
 {
   "id": "hidrologia",
   "ok": false,
-  "updatedAt": "2026-07-20T17:44:04.760Z",
-  "error": "500 Internal Server Error {\"message\":\"Internal server error\",\"detail\":\"Error in RequestId: 51110011-80c4-41dc-b99b-027d810abc2e\"}",
+  "updatedAt": "2026-07-20T17:53:20.789Z",
+  "error": "500 Internal Server Error {\"message\":\"Internal server error\",\"detail\":\"Error in RequestId: 52ef1e7b-34b1-4d79-ae5e-b61338dbcabb\"}",
   "records": []
 }

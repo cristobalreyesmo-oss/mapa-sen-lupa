@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-07-20T17:43:57.045Z",
+  "generatedAt": "2026-07-20T17:53:12.057Z",
   "baseUrl": "https://sipub.api.coordinador.cl:443",
-  "startDate": "2026-07-20",
-  "endDate": "2026-07-20",
+  "startDate": "2026-07-19",
+  "endDate": "2026-07-19",
   "hasApiKey": true,
   "ok": true,
   "datasets": [
@@ -11,14 +11,14 @@
       "file": "data/cmg-online-latest.json",
       "ok": true,
       "records": 0,
-      "updatedAt": "2026-07-20T17:43:58.990Z"
+      "updatedAt": "2026-07-20T17:53:14.283Z"
     },
     {
       "id": "cmg-real",
       "file": "data/cmg-real-latest.json",
       "ok": true,
       "records": 0,
-      "updatedAt": "2026-07-20T17:44:00.949Z"
+      "updatedAt": "2026-07-20T17:53:16.722Z"
     },
     {
       "id": "demanda",
@@ -31,7 +31,7 @@
       "id": "hidrologia",
       "file": "data/embalse-real-last.json",
       "ok": false,
-      "error": "500 Internal Server Error {\"message\":\"Internal server error\",\"detail\":\"Error in RequestId: 51110011-80c4-41dc-b99b-027d810abc2e\"}",
+      "error": "500 Internal Server Error {\"message\":\"Internal server error\",\"detail\":\"Error in RequestId: 52ef1e7b-34b1-4d79-ae5e-b61338dbcabb\"}",
       "records": 0
     }
   ]
