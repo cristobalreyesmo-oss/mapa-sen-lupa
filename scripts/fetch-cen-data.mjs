@@ -44,6 +44,7 @@ const status = {
   baseUrl,
   startDate,
   endDate,
+  hasApiKey: Boolean(apiKey),
   ok: false,
   datasets: [],
 };
@@ -92,7 +93,12 @@ async function requestDataset(dataset) {
   }
   const headers = { accept: "application/json" };
   if (apiKey) {
+    url.searchParams.set("subscription-key", apiKey);
+    url.searchParams.set("subscription_key", apiKey);
+    url.searchParams.set("api-key", apiKey);
     headers["Ocp-Apim-Subscription-Key"] = apiKey;
+    headers["subscription-key"] = apiKey;
+    headers["Subscription-Key"] = apiKey;
     headers["x-api-key"] = apiKey;
   }
   const response = await fetch(url, { headers });
