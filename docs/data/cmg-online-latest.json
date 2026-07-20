@@ -1,7 +1,7 @@
 {
   "id": "cmg-online",
   "ok": true,
-  "updatedAt": "2026-07-20T18:31:38.706Z",
+  "updatedAt": "2026-07-20T20:11:00.605Z",
   "source": "/costo-marginal-online/v4/findByDate",
   "range": {
     "startDate": "2026-07-20",
@@ -31,9 +31,9 @@
   ],
   "sampleRows": [
     {
-      "id_info": 826,
-      "barra_info": "BA S/E LOS DOMINICOS 12KV BP1",
-      "barra_transf": "LOS_DOMINICOS_013",
+      "id_info": 381,
+      "barra_info": "BA S/E QUINQUIMO 110KV BP1-1",
+      "barra_transf": "QUINQUIMO_____110",
       "fecha": "2026-07-20",
       "hra": 0,
       "min": 0,
@@ -44,9 +44,9 @@
       "fecha_minuto": "2026-07-20 00:00"
     },
     {
-      "id_info": 994,
-      "barra_info": "BA S/E CASABLANCA 12kV BP1",
-      "barra_transf": "CASABLANCA____013",
+      "id_info": 1146,
+      "barra_info": "BA S/E LIRQUEN INDURA 66kV BP1 [No_Mostrar]",
+      "barra_transf": "L.INDURA______066",
       "fecha": "2026-07-20",
       "hra": 0,
       "min": 0,
@@ -57,9 +57,9 @@
       "fecha_minuto": "2026-07-20 00:00"
     },
     {
-      "id_info": 824,
-      "barra_info": "BA S/E LOS DOMINICOS 110KV BP1",
-      "barra_transf": "LOS_DOMINICOS_110",
+      "id_info": 4138,
+      "barra_info": "BA S/E QUINQUIMO 110 kV BP1-S2 [NO_MOSTRAR]",
+      "barra_transf": "QUINQUIMO2____110",
       "fecha": "2026-07-20",
       "hra": 0,
       "min": 0,

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-20T18:31:35.669Z",
+  "generatedAt": "2026-07-20T20:10:49.270Z",
   "baseUrl": "https://sipub.api.coordinador.cl:443",
   "startDate": "2026-07-19",
   "endDate": "2026-07-19",
@@ -16,7 +16,7 @@
       "file": "data/cmg-online-latest.json",
       "ok": true,
       "records": 0,
-      "updatedAt": "2026-07-20T18:31:38.706Z",
+      "updatedAt": "2026-07-20T20:11:00.605Z",
       "source": "/costo-marginal-online/v4/findByDate",
       "range": {
         "startDate": "2026-07-20",
