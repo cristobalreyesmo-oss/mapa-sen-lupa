@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-20T18:14:49.172Z",
+  "generatedAt": "2026-07-20T18:31:35.669Z",
   "baseUrl": "https://sipub.api.coordinador.cl:443",
   "startDate": "2026-07-19",
   "endDate": "2026-07-19",
@@ -16,46 +16,16 @@
       "file": "data/cmg-online-latest.json",
       "ok": true,
       "records": 0,
-      "updatedAt": "2026-07-20T18:14:59.678Z",
+      "updatedAt": "2026-07-20T18:31:38.706Z",
       "source": "/costo-marginal-online/v4/findByDate",
       "range": {
-        "startDate": "2026-07-18",
-        "endDate": "2026-07-18"
+        "startDate": "2026-07-20",
+        "endDate": "2026-07-20"
       },
       "attempts": [
         {
           "path": "/costo-marginal-online/v4/findByDate",
           "startDate": "2026-07-20",
-          "error": "500 Internal Server Error {\"message\": \"Internal server error: current transaction is aborted, commands ignored until end of transaction block\\n\"}"
-        },
-        {
-          "path": "/cmg-online/v4/findByDate",
-          "startDate": "2026-07-20",
-          "error": "404 Not Found Error 404: Recurso no encontrado."
-        },
-        {
-          "path": "/costos-marginales-online/v4/findByDate",
-          "startDate": "2026-07-20",
-          "error": "404 Not Found Error 404: Recurso no encontrado."
-        },
-        {
-          "path": "/costo-marginal-online/v4/findByDate",
-          "startDate": "2026-07-19",
-          "error": "500 Internal Server Error {\"message\": \"Internal server error: current transaction is aborted, commands ignored until end of transaction block\\n\"}"
-        },
-        {
-          "path": "/cmg-online/v4/findByDate",
-          "startDate": "2026-07-19",
-          "error": "404 Not Found Error 404: Recurso no encontrado."
-        },
-        {
-          "path": "/costos-marginales-online/v4/findByDate",
-          "startDate": "2026-07-19",
-          "error": "404 Not Found Error 404: Recurso no encontrado."
-        },
-        {
-          "path": "/costo-marginal-online/v4/findByDate",
-          "startDate": "2026-07-18",
           "rows": 10
         }
       ]
