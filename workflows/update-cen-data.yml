@@ -1,0 +1,33 @@
+name: Actualizar datos CEN
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/15 * * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  update-cen-data:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Descargar datos CEN
+        env:
+          CEN_API_BASE_URL: ${{ vars.CEN_API_BASE_URL }}
+          CEN_API_KEY: ${{ secrets.CEN_API_KEY }}
+        run: node scripts/fetch-cen-data.mjs
+
+      - name: Commit datos actualizados
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Actualizar datos CEN"
+          file_pattern: docs/data/*.json
