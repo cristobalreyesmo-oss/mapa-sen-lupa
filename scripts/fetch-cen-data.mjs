@@ -75,6 +75,8 @@ for (const dataset of datasets.filter((item) => enabledDatasetIds.has(item.id)))
       file: `data/${dataset.file}`,
       ok: true,
       records: normalized.records?.length ?? normalized.rawCount ?? 0,
+      rawCount: normalized.rawCount ?? null,
+      sampleKeys: normalized.sampleKeys || [],
       updatedAt: normalized.updatedAt,
       source: normalized.source,
       range: normalized.range,
@@ -257,6 +259,8 @@ function barNameFields() {
     "nombreBarraTransmision",
     "barra_transmision",
     "barraTransmision",
+    "barra_info",
+    "barra_transf",
     "bar",
     "node",
     "nodo",
@@ -272,6 +276,8 @@ function cmgValueFields() {
     "costoMarginal",
     "costo_marginal_usd",
     "costoMarginalUsd",
+    "cmg_usd_mwh_",
+    "cmg_clp_kwh_",
     "valor",
     "value",
     "usdMWh",
@@ -280,7 +286,7 @@ function cmgValueFields() {
 }
 
 function timestampFields() {
-  return ["fecha", "fecha_hora", "fechaHora", "date", "datetime", "hora", "timestamp"];
+  return ["fecha_hora", "fecha_minuto", "fechaHora", "fecha", "date", "datetime", "hora", "timestamp"];
 }
 
 function readText(row, names) {
@@ -292,7 +298,8 @@ function readText(row, names) {
 
 function readNumber(row, names) {
   for (const name of names) {
-    const value = Number(String(row?.[name] ?? "").replace(",", "."));
+    if (row?.[name] === undefined || row[name] === null || row[name] === "") continue;
+    const value = Number(String(row[name]).replace(",", "."));
     if (Number.isFinite(value)) return value;
   }
   return NaN;
