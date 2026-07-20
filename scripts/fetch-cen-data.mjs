@@ -5,7 +5,7 @@ const root = process.cwd();
 const outDir = path.join(root, "docs", "data");
 fs.mkdirSync(outDir, { recursive: true });
 
-const baseUrl = (process.env.CEN_API_BASE_URL || "https://api.coordinador.cl").replace(/\/$/, "");
+const baseUrl = (process.env.CEN_API_BASE_URL || "https://sipub.api.coordinador.cl:443").replace(/\/$/, "");
 const apiKey = process.env.CEN_API_KEY || "";
 const today = formatDate(new Date());
 const startDate = process.env.CEN_START_DATE || today;
@@ -66,7 +66,7 @@ for (const dataset of datasets) {
       id: dataset.id,
       ok: false,
       updatedAt: new Date().toISOString(),
-      error: String(error?.message || error),
+      error: describeError(error),
       records: [],
     };
     writeJson(target, fallback);
@@ -101,6 +101,15 @@ async function requestDataset(dataset) {
     throw new Error(`${response.status} ${response.statusText} ${body.slice(0, 280)}`.trim());
   }
   return response.json();
+}
+
+function describeError(error) {
+  const parts = [String(error?.message || error)];
+  if (error?.cause?.code) parts.push(`code=${error.cause.code}`);
+  if (error?.cause?.hostname) parts.push(`host=${error.cause.hostname}`);
+  if (error?.cause?.address) parts.push(`address=${error.cause.address}`);
+  if (error?.cause?.port) parts.push(`port=${error.cause.port}`);
+  return parts.join(" | ");
 }
 
 function normalizeDataset(dataset, payload) {
