@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-07-20T16:35:49.549Z",
-  "baseUrl": "https://api.coordinador.cl",
+  "generatedAt": "2026-07-20T16:55:41.003Z",
+  "baseUrl": "https://sipub.api.coordinador.cl:443",
   "startDate": "2026-07-20",
   "endDate": "2026-07-20",
   "ok": false,
@@ -9,28 +9,28 @@
       "id": "cmg-online",
       "file": "data/cmg-online-latest.json",
       "ok": false,
-      "error": "fetch failed",
+      "error": "403 Forbidden Authentication parameters missing",
       "records": 0
     },
     {
       "id": "cmg-real",
       "file": "data/cmg-real-latest.json",
       "ok": false,
-      "error": "fetch failed",
+      "error": "403 Forbidden Authentication parameters missing",
       "records": 0
     },
     {
       "id": "demanda",
       "file": "data/demanda-real-estimada.json",
       "ok": false,
-      "error": "fetch failed",
+      "error": "403 Forbidden Authentication parameters missing",
       "records": 0
     },
     {
       "id": "hidrologia",
       "file": "data/embalse-real-last.json",
       "ok": false,
-      "error": "fetch failed",
+      "error": "403 Forbidden Authentication parameters missing",
       "records": 0
     }
   ]

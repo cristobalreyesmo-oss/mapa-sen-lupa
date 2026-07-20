@@ -1,7 +1,7 @@
 {
   "id": "cmg-real",
   "ok": false,
-  "updatedAt": "2026-07-20T16:35:50.132Z",
-  "error": "fetch failed",
+  "updatedAt": "2026-07-20T16:55:42.885Z",
+  "error": "403 Forbidden Authentication parameters missing",
   "records": []
 }
