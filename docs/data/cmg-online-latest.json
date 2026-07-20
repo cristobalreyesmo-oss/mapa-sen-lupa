@@ -1,11 +1,11 @@
 {
   "id": "cmg-online",
   "ok": true,
-  "updatedAt": "2026-07-20T18:06:13.613Z",
+  "updatedAt": "2026-07-20T18:14:59.678Z",
   "source": "/costo-marginal-online/v4/findByDate",
   "range": {
-    "startDate": "2026-07-19",
-    "endDate": "2026-07-19"
+    "startDate": "2026-07-18",
+    "endDate": "2026-07-18"
   },
   "attempts": [
     {
@@ -30,6 +30,24 @@
       "path": "/costo-marginal-online/v4/findByDate",
       "startDate": "2026-07-19",
       "endDate": "2026-07-19",
+      "error": "500 Internal Server Error {\"message\": \"Internal server error: current transaction is aborted, commands ignored until end of transaction block\\n\"}"
+    },
+    {
+      "path": "/cmg-online/v4/findByDate",
+      "startDate": "2026-07-19",
+      "endDate": "2026-07-19",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/costos-marginales-online/v4/findByDate",
+      "startDate": "2026-07-19",
+      "endDate": "2026-07-19",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/costo-marginal-online/v4/findByDate",
+      "startDate": "2026-07-18",
+      "endDate": "2026-07-18",
       "rows": 10
     }
   ],
@@ -52,40 +70,40 @@
       "id_info": 968,
       "barra_info": "BA S/E SANTA ROSA SUR 110KV BP1",
       "barra_transf": "SANTA_ROSA_S__110",
-      "fecha": "2026-07-19",
+      "fecha": "2026-07-18",
       "hra": 0,
       "min": 0,
-      "cmg_clp_kwh_": 44.22426,
-      "cmg_usd_mwh_": 47.83586,
+      "cmg_clp_kwh_": 49.77143,
+      "cmg_usd_mwh_": 53.83606,
       "version": "EN LINEA",
-      "fecha_hora": "2026-07-19 00:00",
-      "fecha_minuto": "2026-07-19 00:00"
+      "fecha_hora": "2026-07-18 00:00",
+      "fecha_minuto": "2026-07-18 00:00"
     },
     {
       "id_info": 826,
       "barra_info": "BA S/E LOS DOMINICOS 12KV BP1",
       "barra_transf": "LOS_DOMINICOS_013",
-      "fecha": "2026-07-19",
+      "fecha": "2026-07-18",
       "hra": 0,
       "min": 0,
-      "cmg_clp_kwh_": 43.79959,
-      "cmg_usd_mwh_": 47.37652,
+      "cmg_clp_kwh_": 49.27869,
+      "cmg_usd_mwh_": 53.30308,
       "version": "EN LINEA",
-      "fecha_hora": "2026-07-19 00:00",
-      "fecha_minuto": "2026-07-19 00:00"
+      "fecha_hora": "2026-07-18 00:00",
+      "fecha_minuto": "2026-07-18 00:00"
     },
     {
       "id_info": 1254,
       "barra_info": "BA S/E SAUZAL 13.8KV",
       "barra_transf": "SAUZAL________013",
-      "fecha": "2026-07-19",
+      "fecha": "2026-07-18",
       "hra": 0,
       "min": 0,
-      "cmg_clp_kwh_": 43.00491,
-      "cmg_usd_mwh_": 46.51694,
+      "cmg_clp_kwh_": 48.26506,
+      "cmg_usd_mwh_": 52.20666,
       "version": "EN LINEA",
-      "fecha_hora": "2026-07-19 00:00",
-      "fecha_minuto": "2026-07-19 00:00"
+      "fecha_hora": "2026-07-18 00:00",
+      "fecha_minuto": "2026-07-18 00:00"
     }
   ],
   "records": []
