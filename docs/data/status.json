@@ -1,81 +1,60 @@
 {
-  "generatedAt": "2026-07-20T20:20:19.162Z",
+  "generatedAt": "2026-07-20T20:55:08.447Z",
   "baseUrl": "https://sipub.api.coordinador.cl:443",
   "startDate": "2026-07-19",
   "endDate": "2026-07-19",
   "lookbackDays": 2,
   "enabledDatasets": [
-    "cmg-online",
-    "cmg-real"
+    "cmg-online"
   ],
   "hasApiKey": true,
-  "ok": false,
+  "ok": true,
   "datasets": [
     {
       "id": "cmg-online",
       "file": "data/cmg-online-latest.json",
-      "ok": false,
-      "error": "429  {\"message\":\"Too Many Requests\"}",
-      "records": 0,
+      "ok": true,
+      "records": 10,
+      "rawCount": 10,
+      "sampleKeys": [
+        "id_info",
+        "barra_info",
+        "barra_transf",
+        "fecha",
+        "hra",
+        "min",
+        "cmg_clp_kwh_",
+        "cmg_usd_mwh_",
+        "version",
+        "fecha_hora",
+        "fecha_minuto"
+      ],
+      "updatedAt": "2026-07-20T20:55:20.509Z",
+      "source": "/costo-marginal-online/v4/findByDate",
+      "range": {
+        "startDate": "2026-07-19",
+        "endDate": "2026-07-19"
+      },
       "attempts": [
         {
           "path": "/costo-marginal-online/v4/findByDate",
           "startDate": "2026-07-20",
-          "error": "429  {\"message\":\"Too Many Requests\"}"
-        }
-      ]
-    },
-    {
-      "id": "cmg-real",
-      "file": "data/cmg-real-latest.json",
-      "ok": false,
-      "error": "404 Not Found Error 404: Recurso no encontrado.",
-      "records": 0,
-      "attempts": [
-        {
-          "path": "/costo-marginal-real/v4/findByDate",
-          "startDate": "2026-07-20",
-          "rows": 0
+          "error": "500 Internal Server Error {\"message\": \"Internal server error: current transaction is aborted, commands ignored until end of transaction block\\n\"}"
         },
         {
-          "path": "/cmg-real/v4/findByDate",
+          "path": "/cmg-online/v4/findByDate",
           "startDate": "2026-07-20",
           "error": "404 Not Found Error 404: Recurso no encontrado."
         },
         {
-          "path": "/costos-marginales-reales/v4/findByDate",
+          "path": "/costos-marginales-online/v4/findByDate",
           "startDate": "2026-07-20",
           "error": "404 Not Found Error 404: Recurso no encontrado."
         },
         {
-          "path": "/costo-marginal-real/v4/findByDate",
+          "path": "/costo-marginal-online/v4/findByDate",
           "startDate": "2026-07-19",
-          "rows": 0
-        },
-        {
-          "path": "/cmg-real/v4/findByDate",
-          "startDate": "2026-07-19",
-          "error": "404 Not Found Error 404: Recurso no encontrado."
-        },
-        {
-          "path": "/costos-marginales-reales/v4/findByDate",
-          "startDate": "2026-07-19",
-          "error": "404 Not Found Error 404: Recurso no encontrado."
-        },
-        {
-          "path": "/costo-marginal-real/v4/findByDate",
-          "startDate": "2026-07-18",
-          "rows": 0
-        },
-        {
-          "path": "/cmg-real/v4/findByDate",
-          "startDate": "2026-07-18",
-          "error": "404 Not Found Error 404: Recurso no encontrado."
-        },
-        {
-          "path": "/costos-marginales-reales/v4/findByDate",
-          "startDate": "2026-07-18",
-          "error": "404 Not Found Error 404: Recurso no encontrado."
+          "rows": 10
         }
       ]
     }
