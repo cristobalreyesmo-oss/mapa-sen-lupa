@@ -10,7 +10,13 @@ const apiKey = process.env.CEN_API_KEY || "";
 const defaultDate = formatDate(addDays(new Date(), -1));
 const startDate = process.env.CEN_START_DATE || defaultDate;
 const endDate = process.env.CEN_END_DATE || defaultDate;
-const lookbackDays = Number(process.env.CEN_LOOKBACK_DAYS || 10);
+const lookbackDays = Number(process.env.CEN_LOOKBACK_DAYS || 2);
+const enabledDatasetIds = new Set(
+  (process.env.CEN_DATASETS || "cmg-online,cmg-real")
+    .split(",")
+    .map((value) => value.trim())
+    .filter(Boolean),
+);
 
 const datasets = [
   {
@@ -52,12 +58,13 @@ const status = {
   startDate,
   endDate,
   lookbackDays,
+  enabledDatasets: [...enabledDatasetIds],
   hasApiKey: Boolean(apiKey),
   ok: false,
   datasets: [],
 };
 
-for (const dataset of datasets) {
+for (const dataset of datasets.filter((item) => enabledDatasetIds.has(item.id))) {
   const target = path.join(outDir, dataset.file);
   try {
     const payload = await requestDataset(dataset);
@@ -69,6 +76,9 @@ for (const dataset of datasets) {
       ok: true,
       records: normalized.records?.length ?? normalized.rawCount ?? 0,
       updatedAt: normalized.updatedAt,
+      source: normalized.source,
+      range: normalized.range,
+      attempts: summarizeAttempts(normalized.attempts || []),
     });
   } catch (error) {
     const fallback = {
@@ -86,6 +96,7 @@ for (const dataset of datasets) {
       ok: false,
       error: fallback.error,
       records: 0,
+      attempts: summarizeAttempts(fallback.attempts || []),
     });
   }
 }
@@ -102,6 +113,7 @@ async function requestDataset(dataset) {
   for (const range of ranges) {
     for (const candidatePath of paths) {
       try {
+        await delay(900);
         const json = await requestPath(dataset, candidatePath, range);
         const rows = unwrapRows(json);
         attempts.push({ path: candidatePath, startDate: range.startDate, endDate: range.endDate, rows: rows.length });
@@ -316,6 +328,19 @@ function dateRanges() {
     ranges.push({ startDate: day, endDate: day });
   }
   return ranges;
+}
+
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function summarizeAttempts(attempts) {
+  return attempts.slice(0, 12).map((attempt) => ({
+    path: attempt.path,
+    startDate: attempt.startDate,
+    rows: attempt.rows,
+    error: attempt.error,
+  }));
 }
 
 function sampleKeys(rows) {
