@@ -12,7 +12,7 @@ const startDate = process.env.CEN_START_DATE || defaultDate;
 const endDate = process.env.CEN_END_DATE || defaultDate;
 const lookbackDays = Number(process.env.CEN_LOOKBACK_DAYS || 2);
 const enabledDatasetIds = new Set(
-  (process.env.CEN_DATASETS || "cmg-online,cmg-real")
+  (process.env.CEN_DATASETS || "cmg-online")
     .split(",")
     .map((value) => value.trim())
     .filter(Boolean),
@@ -164,13 +164,22 @@ async function requestPath(dataset, candidatePath, range) {
     headers["Subscription-Key"] = apiKey;
     headers["x-api-key"] = apiKey;
   }
-  const response = await fetch(url, { headers });
+  const response = await fetchWithRetry(url, headers);
   if (!response.ok) {
     const body = await response.text().catch(() => "");
     throw new Error(`${response.status} ${response.statusText} ${body.slice(0, 280)}`.trim());
   }
   const json = await response.json();
   return json;
+}
+
+async function fetchWithRetry(url, headers) {
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const response = await fetch(url, { headers });
+    if (response.status !== 429 || attempt === 2) return response;
+    const retryAfter = Number(response.headers.get("retry-after") || 0);
+    await delay(Math.max(retryAfter * 1000, 15000 * (attempt + 1)));
+  }
 }
 
 function describeError(error) {
