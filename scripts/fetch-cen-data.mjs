@@ -10,19 +10,24 @@ const apiKey = process.env.CEN_API_KEY || "";
 const defaultDate = formatDate(addDays(new Date(), -1));
 const startDate = process.env.CEN_START_DATE || defaultDate;
 const endDate = process.env.CEN_END_DATE || defaultDate;
+const lookbackDays = Number(process.env.CEN_LOOKBACK_DAYS || 10);
 
 const datasets = [
   {
     id: "cmg-online",
     file: "cmg-online-latest.json",
     path: "/costo-marginal-online/v4/findByDate",
+    fallbackPaths: ["/cmg-online/v4/findByDate", "/costos-marginales-online/v4/findByDate"],
     mode: "latestByBar",
+    tryLookback: true,
   },
   {
     id: "cmg-real",
     file: "cmg-real-latest.json",
     path: "/costo-marginal-real/v4/findByDate",
+    fallbackPaths: ["/cmg-real/v4/findByDate", "/costos-marginales-reales/v4/findByDate"],
     mode: "latestByBar",
+    tryLookback: true,
   },
   {
     id: "demanda",
@@ -30,12 +35,14 @@ const datasets = [
     path: "/demanda/v4/findByDate",
     fallbackPaths: ["/demanda-real/v4/findByDate", "/demanda-real-estimada/v4/findByDate"],
     mode: "raw",
+    tryLookback: true,
   },
   {
     id: "hidrologia",
     file: "embalse-real-last.json",
     path: "/cotas-embalses-reales/v3/findAll",
     mode: "raw",
+    tryLookback: true,
   },
 ];
 
@@ -44,6 +51,7 @@ const status = {
   baseUrl,
   startDate,
   endDate,
+  lookbackDays,
   hasApiKey: Boolean(apiKey),
   ok: false,
   datasets: [],
@@ -68,6 +76,7 @@ for (const dataset of datasets) {
       ok: false,
       updatedAt: new Date().toISOString(),
       error: describeError(error),
+      attempts: error?.attempts || [],
       records: [],
     };
     writeJson(target, fallback);
@@ -87,23 +96,41 @@ console.log(JSON.stringify(status, null, 2));
 
 async function requestDataset(dataset) {
   const paths = [dataset.path, ...(dataset.fallbackPaths || [])];
+  const ranges = dataset.tryLookback ? dateRanges() : [{ startDate, endDate }];
   let lastError;
-  for (const candidatePath of paths) {
-    try {
-      return await requestPath(dataset, candidatePath);
-    } catch (error) {
-      lastError = error;
-      if (!String(error?.message || "").startsWith("404 ")) throw error;
+  const attempts = [];
+  for (const range of ranges) {
+    for (const candidatePath of paths) {
+      try {
+        const json = await requestPath(dataset, candidatePath, range);
+        const rows = unwrapRows(json);
+        attempts.push({ path: candidatePath, startDate: range.startDate, endDate: range.endDate, rows: rows.length });
+        if (rows.length || !dataset.tryLookback) {
+          return { __sourcePath: candidatePath, __range: range, __attempts: attempts, __payload: json };
+        }
+      } catch (error) {
+        lastError = error;
+        attempts.push({ path: candidatePath, startDate: range.startDate, endDate: range.endDate, error: describeError(error) });
+        const message = String(error?.message || "");
+        if (!message.startsWith("404 ") && !message.startsWith("500 ")) {
+          error.attempts = attempts;
+          throw error;
+        }
+      }
     }
   }
-  throw lastError;
+  if (lastError) {
+    lastError.attempts = attempts;
+    throw lastError;
+  }
+  return { __sourcePath: dataset.path, __range: ranges[0], __attempts: attempts, __payload: [] };
 }
 
-async function requestPath(dataset, candidatePath) {
+async function requestPath(dataset, candidatePath, range) {
   const url = new URL(baseUrl + candidatePath);
   if (!dataset.noDateParams) {
-    url.searchParams.set("startDate", startDate);
-    url.searchParams.set("endDate", endDate);
+    url.searchParams.set("startDate", range.startDate);
+    url.searchParams.set("endDate", range.endDate);
     url.searchParams.set("page", "0");
   }
   const headers = { accept: "application/json" };
@@ -129,9 +156,6 @@ async function requestPath(dataset, candidatePath) {
     throw new Error(`${response.status} ${response.statusText} ${body.slice(0, 280)}`.trim());
   }
   const json = await response.json();
-  if (candidatePath !== dataset.path) {
-    return { __sourcePath: candidatePath, __payload: json };
-  }
   return json;
 }
 
@@ -146,6 +170,7 @@ function describeError(error) {
 
 function normalizeDataset(dataset, payload) {
   const sourcePath = payload?.__sourcePath || dataset.path;
+  const range = payload?.__range || { startDate, endDate };
   const actualPayload = payload?.__payload || payload;
   const rows = unwrapRows(actualPayload);
   if (dataset.mode === "latestByBar") {
@@ -161,7 +186,8 @@ function normalizeDataset(dataset, payload) {
       ok: true,
       updatedAt: new Date().toISOString(),
       source: sourcePath,
-      range: { startDate, endDate },
+      range,
+      attempts: payload?.__attempts || [],
       rawCount: rows.length,
       sampleKeys: sampleKeys(rows),
       sampleRows: records.length ? [] : rows.slice(0, 3),
@@ -173,7 +199,8 @@ function normalizeDataset(dataset, payload) {
     ok: true,
     updatedAt: new Date().toISOString(),
     source: sourcePath,
-    range: dataset.noDateParams ? null : { startDate, endDate },
+    range: dataset.noDateParams ? null : range,
+    attempts: payload?.__attempts || [],
     rawCount: rows.length,
     records: rows.slice(0, 5000),
   };
@@ -277,6 +304,18 @@ function addDays(date, days) {
   const copy = new Date(date);
   copy.setUTCDate(copy.getUTCDate() + days);
   return copy;
+}
+
+function dateRanges() {
+  if (process.env.CEN_START_DATE || process.env.CEN_END_DATE) {
+    return [{ startDate, endDate }];
+  }
+  const ranges = [];
+  for (let offset = 0; offset <= lookbackDays; offset += 1) {
+    const day = formatDate(addDays(new Date(), -offset));
+    ranges.push({ startDate: day, endDate: day });
+  }
+  return ranges;
 }
 
 function sampleKeys(rows) {
