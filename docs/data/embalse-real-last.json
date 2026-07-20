@@ -1,7 +1,75 @@
 {
   "id": "hidrologia",
   "ok": false,
-  "updatedAt": "2026-07-20T17:53:20.789Z",
-  "error": "500 Internal Server Error {\"message\":\"Internal server error\",\"detail\":\"Error in RequestId: 52ef1e7b-34b1-4d79-ae5e-b61338dbcabb\"}",
+  "updatedAt": "2026-07-20T18:06:43.115Z",
+  "error": "500 Internal Server Error {\"message\":\"Internal server error\",\"detail\":\"Error in RequestId: a219b0e4-5766-45e4-a23b-3af02d425a0e\"}",
+  "attempts": [
+    {
+      "path": "/cotas-embalses-reales/v3/findAll",
+      "startDate": "2026-07-20",
+      "endDate": "2026-07-20",
+      "error": "500 Internal Server Error {\"message\":\"Internal server error\",\"detail\":\"Error in RequestId: ffa1ba67-fd09-4594-8bbd-7e0f709874c5\"}"
+    },
+    {
+      "path": "/cotas-embalses-reales/v3/findAll",
+      "startDate": "2026-07-19",
+      "endDate": "2026-07-19",
+      "error": "500 Internal Server Error {\"message\":\"Internal server error\",\"detail\":\"Error in RequestId: e6d889b2-b266-44cd-8eb1-eca19e2bd0b9\"}"
+    },
+    {
+      "path": "/cotas-embalses-reales/v3/findAll",
+      "startDate": "2026-07-18",
+      "endDate": "2026-07-18",
+      "error": "500 Internal Server Error {\"message\":\"Internal server error\",\"detail\":\"Error in RequestId: c04c4848-62da-4d76-b1b9-12875ef3e691\"}"
+    },
+    {
+      "path": "/cotas-embalses-reales/v3/findAll",
+      "startDate": "2026-07-17",
+      "endDate": "2026-07-17",
+      "error": "500 Internal Server Error {\"message\":\"Internal server error\",\"detail\":\"Error in RequestId: 1e87b8a2-4559-4d69-9994-5f9c1aae1fb5\"}"
+    },
+    {
+      "path": "/cotas-embalses-reales/v3/findAll",
+      "startDate": "2026-07-16",
+      "endDate": "2026-07-16",
+      "error": "500 Internal Server Error {\"message\":\"Internal server error\",\"detail\":\"Error in RequestId: dc001d6b-0e47-4c1e-a50d-70ccbc2552db\"}"
+    },
+    {
+      "path": "/cotas-embalses-reales/v3/findAll",
+      "startDate": "2026-07-15",
+      "endDate": "2026-07-15",
+      "error": "500 Internal Server Error {\"message\":\"Internal server error\",\"detail\":\"Error in RequestId: a4a25f5a-af1a-49dd-b488-9a03fbc77540\"}"
+    },
+    {
+      "path": "/cotas-embalses-reales/v3/findAll",
+      "startDate": "2026-07-14",
+      "endDate": "2026-07-14",
+      "error": "500 Internal Server Error {\"message\":\"Internal server error\",\"detail\":\"Error in RequestId: 921ab9d7-a607-4114-b67c-d3be07ad1acb\"}"
+    },
+    {
+      "path": "/cotas-embalses-reales/v3/findAll",
+      "startDate": "2026-07-13",
+      "endDate": "2026-07-13",
+      "error": "500 Internal Server Error {\"message\":\"Internal server error\",\"detail\":\"Error in RequestId: 57d8b1a4-7754-4900-91f2-e7e3a1f3d605\"}"
+    },
+    {
+      "path": "/cotas-embalses-reales/v3/findAll",
+      "startDate": "2026-07-12",
+      "endDate": "2026-07-12",
+      "error": "500 Internal Server Error {\"message\":\"Internal server error\",\"detail\":\"Error in RequestId: 16697f7a-0976-45ac-9ff6-1ba534e5d8a8\"}"
+    },
+    {
+      "path": "/cotas-embalses-reales/v3/findAll",
+      "startDate": "2026-07-11",
+      "endDate": "2026-07-11",
+      "error": "500 Internal Server Error {\"message\":\"Internal server error\",\"detail\":\"Error in RequestId: 286f5433-634c-4b85-8b25-200718cf7978\"}"
+    },
+    {
+      "path": "/cotas-embalses-reales/v3/findAll",
+      "startDate": "2026-07-10",
+      "endDate": "2026-07-10",
+      "error": "500 Internal Server Error {\"message\":\"Internal server error\",\"detail\":\"Error in RequestId: a219b0e4-5766-45e4-a23b-3af02d425a0e\"}"
+    }
+  ],
   "records": []
 }

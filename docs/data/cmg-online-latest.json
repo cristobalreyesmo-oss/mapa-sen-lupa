@@ -1,12 +1,38 @@
 {
   "id": "cmg-online",
   "ok": true,
-  "updatedAt": "2026-07-20T17:53:14.283Z",
+  "updatedAt": "2026-07-20T18:06:13.613Z",
   "source": "/costo-marginal-online/v4/findByDate",
   "range": {
     "startDate": "2026-07-19",
     "endDate": "2026-07-19"
   },
+  "attempts": [
+    {
+      "path": "/costo-marginal-online/v4/findByDate",
+      "startDate": "2026-07-20",
+      "endDate": "2026-07-20",
+      "error": "500 Internal Server Error {\"message\": \"Internal server error: current transaction is aborted, commands ignored until end of transaction block\\n\"}"
+    },
+    {
+      "path": "/cmg-online/v4/findByDate",
+      "startDate": "2026-07-20",
+      "endDate": "2026-07-20",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/costos-marginales-online/v4/findByDate",
+      "startDate": "2026-07-20",
+      "endDate": "2026-07-20",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/costo-marginal-online/v4/findByDate",
+      "startDate": "2026-07-19",
+      "endDate": "2026-07-19",
+      "rows": 10
+    }
+  ],
   "rawCount": 10,
   "sampleKeys": [
     "id_info",

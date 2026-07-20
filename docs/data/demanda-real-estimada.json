@@ -1,7 +1,207 @@
 {
   "id": "demanda",
   "ok": false,
-  "updatedAt": "2026-07-20T17:53:17.396Z",
+  "updatedAt": "2026-07-20T18:06:24.995Z",
   "error": "404 Not Found Error 404: Recurso no encontrado.",
+  "attempts": [
+    {
+      "path": "/demanda/v4/findByDate",
+      "startDate": "2026-07-20",
+      "endDate": "2026-07-20",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/demanda-real/v4/findByDate",
+      "startDate": "2026-07-20",
+      "endDate": "2026-07-20",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/demanda-real-estimada/v4/findByDate",
+      "startDate": "2026-07-20",
+      "endDate": "2026-07-20",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/demanda/v4/findByDate",
+      "startDate": "2026-07-19",
+      "endDate": "2026-07-19",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/demanda-real/v4/findByDate",
+      "startDate": "2026-07-19",
+      "endDate": "2026-07-19",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/demanda-real-estimada/v4/findByDate",
+      "startDate": "2026-07-19",
+      "endDate": "2026-07-19",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/demanda/v4/findByDate",
+      "startDate": "2026-07-18",
+      "endDate": "2026-07-18",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/demanda-real/v4/findByDate",
+      "startDate": "2026-07-18",
+      "endDate": "2026-07-18",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/demanda-real-estimada/v4/findByDate",
+      "startDate": "2026-07-18",
+      "endDate": "2026-07-18",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/demanda/v4/findByDate",
+      "startDate": "2026-07-17",
+      "endDate": "2026-07-17",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/demanda-real/v4/findByDate",
+      "startDate": "2026-07-17",
+      "endDate": "2026-07-17",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/demanda-real-estimada/v4/findByDate",
+      "startDate": "2026-07-17",
+      "endDate": "2026-07-17",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/demanda/v4/findByDate",
+      "startDate": "2026-07-16",
+      "endDate": "2026-07-16",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/demanda-real/v4/findByDate",
+      "startDate": "2026-07-16",
+      "endDate": "2026-07-16",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/demanda-real-estimada/v4/findByDate",
+      "startDate": "2026-07-16",
+      "endDate": "2026-07-16",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/demanda/v4/findByDate",
+      "startDate": "2026-07-15",
+      "endDate": "2026-07-15",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/demanda-real/v4/findByDate",
+      "startDate": "2026-07-15",
+      "endDate": "2026-07-15",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/demanda-real-estimada/v4/findByDate",
+      "startDate": "2026-07-15",
+      "endDate": "2026-07-15",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/demanda/v4/findByDate",
+      "startDate": "2026-07-14",
+      "endDate": "2026-07-14",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/demanda-real/v4/findByDate",
+      "startDate": "2026-07-14",
+      "endDate": "2026-07-14",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/demanda-real-estimada/v4/findByDate",
+      "startDate": "2026-07-14",
+      "endDate": "2026-07-14",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/demanda/v4/findByDate",
+      "startDate": "2026-07-13",
+      "endDate": "2026-07-13",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/demanda-real/v4/findByDate",
+      "startDate": "2026-07-13",
+      "endDate": "2026-07-13",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/demanda-real-estimada/v4/findByDate",
+      "startDate": "2026-07-13",
+      "endDate": "2026-07-13",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/demanda/v4/findByDate",
+      "startDate": "2026-07-12",
+      "endDate": "2026-07-12",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/demanda-real/v4/findByDate",
+      "startDate": "2026-07-12",
+      "endDate": "2026-07-12",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/demanda-real-estimada/v4/findByDate",
+      "startDate": "2026-07-12",
+      "endDate": "2026-07-12",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/demanda/v4/findByDate",
+      "startDate": "2026-07-11",
+      "endDate": "2026-07-11",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/demanda-real/v4/findByDate",
+      "startDate": "2026-07-11",
+      "endDate": "2026-07-11",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/demanda-real-estimada/v4/findByDate",
+      "startDate": "2026-07-11",
+      "endDate": "2026-07-11",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/demanda/v4/findByDate",
+      "startDate": "2026-07-10",
+      "endDate": "2026-07-10",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/demanda-real/v4/findByDate",
+      "startDate": "2026-07-10",
+      "endDate": "2026-07-10",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/demanda-real-estimada/v4/findByDate",
+      "startDate": "2026-07-10",
+      "endDate": "2026-07-10",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    }
+  ],
   "records": []
 }

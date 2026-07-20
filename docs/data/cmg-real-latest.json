@@ -1,14 +1,69 @@
 {
   "id": "cmg-real",
-  "ok": true,
-  "updatedAt": "2026-07-20T17:53:16.722Z",
-  "source": "/costo-marginal-real/v4/findByDate",
-  "range": {
-    "startDate": "2026-07-19",
-    "endDate": "2026-07-19"
-  },
-  "rawCount": 0,
-  "sampleKeys": [],
-  "sampleRows": [],
+  "ok": false,
+  "updatedAt": "2026-07-20T18:06:20.014Z",
+  "error": "429  {\"message\":\"Too Many Requests\"}",
+  "attempts": [
+    {
+      "path": "/costo-marginal-real/v4/findByDate",
+      "startDate": "2026-07-20",
+      "endDate": "2026-07-20",
+      "rows": 0
+    },
+    {
+      "path": "/cmg-real/v4/findByDate",
+      "startDate": "2026-07-20",
+      "endDate": "2026-07-20",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/costos-marginales-reales/v4/findByDate",
+      "startDate": "2026-07-20",
+      "endDate": "2026-07-20",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/costo-marginal-real/v4/findByDate",
+      "startDate": "2026-07-19",
+      "endDate": "2026-07-19",
+      "rows": 0
+    },
+    {
+      "path": "/cmg-real/v4/findByDate",
+      "startDate": "2026-07-19",
+      "endDate": "2026-07-19",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/costos-marginales-reales/v4/findByDate",
+      "startDate": "2026-07-19",
+      "endDate": "2026-07-19",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/costo-marginal-real/v4/findByDate",
+      "startDate": "2026-07-18",
+      "endDate": "2026-07-18",
+      "rows": 0
+    },
+    {
+      "path": "/cmg-real/v4/findByDate",
+      "startDate": "2026-07-18",
+      "endDate": "2026-07-18",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/costos-marginales-reales/v4/findByDate",
+      "startDate": "2026-07-18",
+      "endDate": "2026-07-18",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/costo-marginal-real/v4/findByDate",
+      "startDate": "2026-07-17",
+      "endDate": "2026-07-17",
+      "error": "429  {\"message\":\"Too Many Requests\"}"
+    }
+  ],
   "records": []
 }
