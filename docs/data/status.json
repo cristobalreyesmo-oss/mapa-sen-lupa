@@ -1,8 +1,9 @@
 {
-  "generatedAt": "2026-07-20T17:00:36.017Z",
+  "generatedAt": "2026-07-20T17:07:31.893Z",
   "baseUrl": "https://sipub.api.coordinador.cl:443",
   "startDate": "2026-07-20",
   "endDate": "2026-07-20",
+  "hasApiKey": true,
   "ok": false,
   "datasets": [
     {
