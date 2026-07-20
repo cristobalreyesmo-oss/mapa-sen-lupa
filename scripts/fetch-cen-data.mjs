@@ -33,9 +33,8 @@ const datasets = [
   {
     id: "hidrologia",
     file: "embalse-real-last.json",
-    path: "/embalse-real/v3/findLast",
+    path: "/cotas-embalses-reales/v3/findAll",
     mode: "raw",
-    noDateParams: true,
   },
 ];
 
@@ -90,15 +89,20 @@ async function requestDataset(dataset) {
   if (!dataset.noDateParams) {
     url.searchParams.set("startDate", startDate);
     url.searchParams.set("endDate", endDate);
+    url.searchParams.set("page", "0");
   }
   const headers = { accept: "application/json" };
   if (apiKey) {
+    url.searchParams.set("user_key", apiKey);
     url.searchParams.set("apiKey", apiKey);
+    url.searchParams.set("apikey", apiKey);
     url.searchParams.set("subscription-key", apiKey);
     url.searchParams.set("subscription_key", apiKey);
     url.searchParams.set("api-key", apiKey);
     headers.apiKey = apiKey;
     headers.ApiKey = apiKey;
+    headers.apikey = apiKey;
+    headers.Authorization = `Bearer ${apiKey}`;
     headers["Ocp-Apim-Subscription-Key"] = apiKey;
     headers["subscription-key"] = apiKey;
     headers["Subscription-Key"] = apiKey;
