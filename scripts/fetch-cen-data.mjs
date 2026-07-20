@@ -7,9 +7,9 @@ fs.mkdirSync(outDir, { recursive: true });
 
 const baseUrl = (process.env.CEN_API_BASE_URL || "https://sipub.api.coordinador.cl:443").replace(/\/$/, "");
 const apiKey = process.env.CEN_API_KEY || "";
-const today = formatDate(new Date());
-const startDate = process.env.CEN_START_DATE || today;
-const endDate = process.env.CEN_END_DATE || today;
+const defaultDate = formatDate(addDays(new Date(), -1));
+const startDate = process.env.CEN_START_DATE || defaultDate;
+const endDate = process.env.CEN_END_DATE || defaultDate;
 
 const datasets = [
   {
@@ -27,7 +27,8 @@ const datasets = [
   {
     id: "demanda",
     file: "demanda-real-estimada.json",
-    path: "/demanda-real-estimada/v4/findByDate",
+    path: "/demanda/v4/findByDate",
+    fallbackPaths: ["/demanda-real/v4/findByDate", "/demanda-real-estimada/v4/findByDate"],
     mode: "raw",
   },
   {
@@ -85,7 +86,21 @@ writeJson(path.join(outDir, "status.json"), status);
 console.log(JSON.stringify(status, null, 2));
 
 async function requestDataset(dataset) {
-  const url = new URL(baseUrl + dataset.path);
+  const paths = [dataset.path, ...(dataset.fallbackPaths || [])];
+  let lastError;
+  for (const candidatePath of paths) {
+    try {
+      return await requestPath(dataset, candidatePath);
+    } catch (error) {
+      lastError = error;
+      if (!String(error?.message || "").startsWith("404 ")) throw error;
+    }
+  }
+  throw lastError;
+}
+
+async function requestPath(dataset, candidatePath) {
+  const url = new URL(baseUrl + candidatePath);
   if (!dataset.noDateParams) {
     url.searchParams.set("startDate", startDate);
     url.searchParams.set("endDate", endDate);
@@ -113,7 +128,11 @@ async function requestDataset(dataset) {
     const body = await response.text().catch(() => "");
     throw new Error(`${response.status} ${response.statusText} ${body.slice(0, 280)}`.trim());
   }
-  return response.json();
+  const json = await response.json();
+  if (candidatePath !== dataset.path) {
+    return { __sourcePath: candidatePath, __payload: json };
+  }
+  return json;
 }
 
 function describeError(error) {
@@ -126,28 +145,34 @@ function describeError(error) {
 }
 
 function normalizeDataset(dataset, payload) {
-  const rows = unwrapRows(payload);
+  const sourcePath = payload?.__sourcePath || dataset.path;
+  const actualPayload = payload?.__payload || payload;
+  const rows = unwrapRows(actualPayload);
   if (dataset.mode === "latestByBar") {
+    const records = latestByName(rows).map((row) => ({
+      name: readText(row, barNameFields()),
+      key: normalizeKey(readText(row, barNameFields())),
+      value: readNumber(row, cmgValueFields()),
+      timestamp: readText(row, timestampFields()),
+      raw: row,
+    })).filter((row) => row.key && Number.isFinite(row.value));
     return {
       id: dataset.id,
       ok: true,
       updatedAt: new Date().toISOString(),
-      source: dataset.path,
+      source: sourcePath,
       range: { startDate, endDate },
-      records: latestByName(rows).map((row) => ({
-        name: readText(row, ["barra", "nombre_barra", "nombreBarra", "bar", "node", "nodo", "nombre"]),
-        key: normalizeKey(readText(row, ["barra", "nombre_barra", "nombreBarra", "bar", "node", "nodo", "nombre"])),
-        value: readNumber(row, ["cmg", "costo_marginal", "costoMarginal", "valor", "value", "usdMWh"]),
-        timestamp: readText(row, ["fecha", "fecha_hora", "fechaHora", "date", "datetime", "hora"]),
-        raw: row,
-      })).filter((row) => row.key && Number.isFinite(row.value)),
+      rawCount: rows.length,
+      sampleKeys: sampleKeys(rows),
+      sampleRows: records.length ? [] : rows.slice(0, 3),
+      records,
     };
   }
   return {
     id: dataset.id,
     ok: true,
     updatedAt: new Date().toISOString(),
-    source: dataset.path,
+    source: sourcePath,
     range: dataset.noDateParams ? null : { startDate, endDate },
     rawCount: rows.length,
     records: rows.slice(0, 5000),
@@ -172,16 +197,51 @@ function unwrapRows(payload) {
 function latestByName(rows) {
   const picked = new Map();
   for (const row of rows) {
-    const name = readText(row, ["barra", "nombre_barra", "nombreBarra", "bar", "node", "nodo", "nombre"]);
+    const name = readText(row, barNameFields());
     const key = normalizeKey(name);
     if (!key) continue;
-    const timestamp = readText(row, ["fecha", "fecha_hora", "fechaHora", "date", "datetime", "hora"]);
+    const timestamp = readText(row, timestampFields());
     const current = picked.get(key);
     if (!current || String(timestamp) > String(current.timestamp || "")) {
       picked.set(key, { ...row, timestamp });
     }
   }
   return [...picked.values()];
+}
+
+function barNameFields() {
+  return [
+    "barra",
+    "nombre_barra",
+    "nombreBarra",
+    "nombre_barra_transmision",
+    "nombreBarraTransmision",
+    "barra_transmision",
+    "barraTransmision",
+    "bar",
+    "node",
+    "nodo",
+    "nombre",
+    "name",
+  ];
+}
+
+function cmgValueFields() {
+  return [
+    "cmg",
+    "costo_marginal",
+    "costoMarginal",
+    "costo_marginal_usd",
+    "costoMarginalUsd",
+    "valor",
+    "value",
+    "usdMWh",
+    "usd_mwh",
+  ];
+}
+
+function timestampFields() {
+  return ["fecha", "fecha_hora", "fechaHora", "date", "datetime", "hora", "timestamp"];
 }
 
 function readText(row, names) {
@@ -211,6 +271,16 @@ function normalizeKey(value) {
 
 function formatDate(date) {
   return date.toISOString().slice(0, 10);
+}
+
+function addDays(date, days) {
+  const copy = new Date(date);
+  copy.setUTCDate(copy.getUTCDate() + days);
+  return copy;
+}
+
+function sampleKeys(rows) {
+  return [...new Set(rows.slice(0, 5).flatMap((row) => Object.keys(row || {})))].slice(0, 80);
 }
 
 function writeJson(file, value) {
