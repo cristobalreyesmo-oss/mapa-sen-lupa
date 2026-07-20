@@ -1,7 +1,11 @@
 {
   "id": "cmg-real",
-  "ok": false,
-  "updatedAt": "2026-07-20T17:23:00.645Z",
-  "error": "403 Forbidden Authentication parameters missing",
+  "ok": true,
+  "updatedAt": "2026-07-20T17:44:00.949Z",
+  "source": "/costo-marginal-real/v4/findByDate",
+  "range": {
+    "startDate": "2026-07-20",
+    "endDate": "2026-07-20"
+  },
   "records": []
 }

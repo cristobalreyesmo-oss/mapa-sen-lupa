@@ -1,7 +1,11 @@
 {
   "id": "cmg-online",
-  "ok": false,
-  "updatedAt": "2026-07-20T17:22:59.954Z",
-  "error": "403 Forbidden Authentication parameters missing",
+  "ok": true,
+  "updatedAt": "2026-07-20T17:43:58.990Z",
+  "source": "/costo-marginal-online/v4/findByDate",
+  "range": {
+    "startDate": "2026-07-20",
+    "endDate": "2026-07-20"
+  },
   "records": []
 }
