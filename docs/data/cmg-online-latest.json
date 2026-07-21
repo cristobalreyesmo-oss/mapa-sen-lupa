@@ -1,7 +1,7 @@
 {
   "id": "cmg-online",
   "ok": true,
-  "updatedAt": "2026-07-21T00:57:46.462Z",
+  "updatedAt": "2026-07-21T04:12:11.510Z",
   "source": "/costo-marginal-online/v4/findByDate",
   "range": {
     "startDate": "2026-07-20",
@@ -50,14 +50,14 @@
   "sampleRows": [],
   "records": [
     {
-      "name": "BA S/E ARENAS BLANCAS 66KV B1",
-      "key": "ba s e arenas blancas 66kv b1",
+      "name": "BA S/E DOS AMIGOS 110KV BP1",
+      "key": "ba s e dos amigos 110kv bp1",
       "value": 0,
       "timestamp": "2026-07-20 00:00",
       "raw": {
-        "id_info": 248,
-        "barra_info": "BA S/E ARENAS BLANCAS 66KV B1",
-        "barra_transf": "A.BLANCAS_____066",
+        "id_info": 3078,
+        "barra_info": "BA S/E DOS AMIGOS 110KV BP1",
+        "barra_transf": "D.AMIGOS______110",
         "fecha": "2026-07-20",
         "hra": 0,
         "min": 0,
@@ -70,14 +70,14 @@
       }
     },
     {
-      "name": "BA S/E PAINE 66KV BP1",
-      "key": "ba s e paine 66kv bp1",
+      "name": "BA S/E SANTA ROSA SUR 110KV BP1",
+      "key": "ba s e santa rosa sur 110kv bp1",
       "value": 0,
       "timestamp": "2026-07-20 00:00",
       "raw": {
-        "id_info": 1426,
-        "barra_info": "BA S/E PAINE 66KV BP1",
-        "barra_transf": "PAINE_________066",
+        "id_info": 968,
+        "barra_info": "BA S/E SANTA ROSA SUR 110KV BP1",
+        "barra_transf": "SANTA_ROSA_S__110",
         "fecha": "2026-07-20",
         "hra": 0,
         "min": 0,
@@ -90,14 +90,14 @@
       }
     },
     {
-      "name": "BA S/E ALONSO DE RIBERA 66KV BP1",
-      "key": "ba s e alonso de ribera 66kv bp1",
+      "name": "BA S/E DEGAÑ 23KV B1",
+      "key": "ba s e degan 23kv b1",
       "value": 0,
       "timestamp": "2026-07-20 00:00",
       "raw": {
-        "id_info": 244,
-        "barra_info": "BA S/E ALONSO DE RIBERA 66KV BP1",
-        "barra_transf": "A.DERIBERA____066",
+        "id_info": 64,
+        "barra_info": "BA S/E DEGAÑ 23KV B1",
+        "barra_transf": "DEGAN_________013",
         "fecha": "2026-07-20",
         "hra": 0,
         "min": 0,
@@ -110,14 +110,14 @@
       }
     },
     {
-      "name": "BA S/E PAINE 154KV BP1",
-      "key": "ba s e paine 154kv bp1",
+      "name": "BA S/E SAUZAL 13.8KV",
+      "key": "ba s e sauzal 13 8kv",
       "value": 0,
       "timestamp": "2026-07-20 00:00",
       "raw": {
-        "id_info": 195,
-        "barra_info": "BA S/E PAINE 154KV BP1",
-        "barra_transf": "PAINE_________154",
+        "id_info": 1254,
+        "barra_info": "BA S/E SAUZAL 13.8KV",
+        "barra_transf": "SAUZAL________013",
         "fecha": "2026-07-20",
         "hra": 0,
         "min": 0,
@@ -130,14 +130,14 @@
       }
     },
     {
-      "name": "BA S/E ALONSO DE RIBERA 154KV BP1",
-      "key": "ba s e alonso de ribera 154kv bp1",
+      "name": "BA S/E DEGAÑ 110KV [NO_MOSTRAR]",
+      "key": "ba s e degan 110kv no mostrar",
       "value": 0,
       "timestamp": "2026-07-20 00:00",
       "raw": {
-        "id_info": 137,
-        "barra_info": "BA S/E ALONSO DE RIBERA 154KV BP1",
-        "barra_transf": "A.DERIBERA____154",
+        "id_info": 65,
+        "barra_info": "BA S/E DEGAÑ 110KV [NO_MOSTRAR]",
+        "barra_transf": "DEGAN_________110",
         "fecha": "2026-07-20",
         "hra": 0,
         "min": 0,
@@ -150,94 +150,94 @@
       }
     },
     {
-      "name": "BA S/E PAJARITOS 12KV BP1",
-      "key": "ba s e pajaritos 12kv bp1",
-      "value": 0,
-      "timestamp": "2026-07-20 00:00",
-      "raw": {
-        "id_info": 861,
-        "barra_info": "BA S/E PAJARITOS 12KV BP1",
-        "barra_transf": "PAJARITOS_____013",
-        "fecha": "2026-07-20",
-        "hra": 0,
-        "min": 0,
-        "cmg_clp_kwh_": 0,
-        "cmg_usd_mwh_": 0,
-        "version": "EN LINEA",
-        "fecha_hora": "2026-07-20 00:00",
-        "fecha_minuto": "2026-07-20 00:00",
-        "timestamp": "2026-07-20 00:00"
-      }
-    },
-    {
-      "name": "BA S/E ALTO JAHUEL 66KV",
-      "key": "ba s e alto jahuel 66kv",
-      "value": 0,
-      "timestamp": "2026-07-20 00:00",
-      "raw": {
-        "id_info": 459,
-        "barra_info": "BA S/E ALTO JAHUEL 66KV",
-        "barra_transf": "A.JAHUEL______066",
-        "fecha": "2026-07-20",
-        "hra": 0,
-        "min": 0,
-        "cmg_clp_kwh_": 0,
-        "cmg_usd_mwh_": 0,
-        "version": "EN LINEA",
-        "fecha_hora": "2026-07-20 00:00",
-        "fecha_minuto": "2026-07-20 00:00",
-        "timestamp": "2026-07-20 00:00"
-      }
-    },
-    {
-      "name": "BA S/E PAJARITOS 110KV BP1",
-      "key": "ba s e pajaritos 110kv bp1",
-      "value": 0,
-      "timestamp": "2026-07-20 00:00",
-      "raw": {
-        "id_info": 859,
-        "barra_info": "BA S/E PAJARITOS 110KV BP1",
-        "barra_transf": "PAJARITOS_____110",
-        "fecha": "2026-07-20",
-        "hra": 0,
-        "min": 0,
-        "cmg_clp_kwh_": 0,
-        "cmg_usd_mwh_": 0,
-        "version": "EN LINEA",
-        "fecha_hora": "2026-07-20 00:00",
-        "fecha_minuto": "2026-07-20 00:00",
-        "timestamp": "2026-07-20 00:00"
-      }
-    },
-    {
-      "name": "BA S/E ALTO JAHUEL 110KV BP1",
-      "key": "ba s e alto jahuel 110kv bp1",
-      "value": 0,
-      "timestamp": "2026-07-20 00:00",
-      "raw": {
-        "id_info": 454,
-        "barra_info": "BA S/E ALTO JAHUEL 110KV BP1",
-        "barra_transf": "A.JAHUEL______110",
-        "fecha": "2026-07-20",
-        "hra": 0,
-        "min": 0,
-        "cmg_clp_kwh_": 0,
-        "cmg_usd_mwh_": 0,
-        "version": "EN LINEA",
-        "fecha_hora": "2026-07-20 00:00",
-        "fecha_minuto": "2026-07-20 00:00",
-        "timestamp": "2026-07-20 00:00"
-      }
-    },
-    {
-      "name": "PAJONAL_______110",
-      "key": "pajonal 110",
+      "name": "SAUZAL________154",
+      "key": "sauzal 154",
       "value": 0,
       "timestamp": "2026-07-20 00:00",
       "raw": {
         "id_info": null,
         "barra_info": null,
-        "barra_transf": "PAJONAL_______110",
+        "barra_transf": "SAUZAL________154",
+        "fecha": "2026-07-20",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 0,
+        "cmg_usd_mwh_": 0,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-07-20 00:00",
+        "fecha_minuto": "2026-07-20 00:00",
+        "timestamp": "2026-07-20 00:00"
+      }
+    },
+    {
+      "name": "DOLE__________066",
+      "key": "dole 066",
+      "value": 0,
+      "timestamp": "2026-07-20 00:00",
+      "raw": {
+        "id_info": null,
+        "barra_info": null,
+        "barra_transf": "DOLE__________066",
+        "fecha": "2026-07-20",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 0,
+        "cmg_usd_mwh_": 0,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-07-20 00:00",
+        "fecha_minuto": "2026-07-20 00:00",
+        "timestamp": "2026-07-20 00:00"
+      }
+    },
+    {
+      "name": "BA S/E SAUZAL 110KV BP1",
+      "key": "ba s e sauzal 110kv bp1",
+      "value": 0,
+      "timestamp": "2026-07-20 00:00",
+      "raw": {
+        "id_info": 525,
+        "barra_info": "BA S/E SAUZAL 110KV BP1",
+        "barra_transf": "SAUZAL1_______110",
+        "fecha": "2026-07-20",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 0,
+        "cmg_usd_mwh_": 0,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-07-20 00:00",
+        "fecha_minuto": "2026-07-20 00:00",
+        "timestamp": "2026-07-20 00:00"
+      }
+    },
+    {
+      "name": "BA S/E DUQUECO 23kV BP1",
+      "key": "ba s e duqueco 23kv bp1",
+      "value": 0,
+      "timestamp": "2026-07-20 00:00",
+      "raw": {
+        "id_info": 1484,
+        "barra_info": "BA S/E DUQUECO 23kV BP1",
+        "barra_transf": "DUQUECO_______023",
+        "fecha": "2026-07-20",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 0,
+        "cmg_usd_mwh_": 0,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-07-20 00:00",
+        "fecha_minuto": "2026-07-20 00:00",
+        "timestamp": "2026-07-20 00:00"
+      }
+    },
+    {
+      "name": "BA S/E SAUZAL 110KV BP2",
+      "key": "ba s e sauzal 110kv bp2",
+      "value": 0,
+      "timestamp": "2026-07-20 00:00",
+      "raw": {
+        "id_info": 1717,
+        "barra_info": "BA S/E SAUZAL 110KV BP2",
+        "barra_transf": "SAUZAL2_______110",
         "fecha": "2026-07-20",
         "hra": 0,
         "min": 0,
