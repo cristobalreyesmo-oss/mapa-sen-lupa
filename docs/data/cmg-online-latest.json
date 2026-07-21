@@ -1,13 +1,31 @@
 {
   "id": "cmg-online",
   "ok": true,
-  "updatedAt": "2026-07-20T23:29:19.485Z",
+  "updatedAt": "2026-07-21T00:57:46.462Z",
   "source": "/costo-marginal-online/v4/findByDate",
   "range": {
     "startDate": "2026-07-20",
     "endDate": "2026-07-20"
   },
   "attempts": [
+    {
+      "path": "/costo-marginal-online/v4/findByDate",
+      "startDate": "2026-07-21",
+      "endDate": "2026-07-21",
+      "rows": 0
+    },
+    {
+      "path": "/cmg-online/v4/findByDate",
+      "startDate": "2026-07-21",
+      "endDate": "2026-07-21",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/costos-marginales-online/v4/findByDate",
+      "startDate": "2026-07-21",
+      "endDate": "2026-07-21",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
     {
       "path": "/costo-marginal-online/v4/findByDate",
       "startDate": "2026-07-20",
@@ -32,6 +50,26 @@
   "sampleRows": [],
   "records": [
     {
+      "name": "BA S/E ARENAS BLANCAS 66KV B1",
+      "key": "ba s e arenas blancas 66kv b1",
+      "value": 0,
+      "timestamp": "2026-07-20 00:00",
+      "raw": {
+        "id_info": 248,
+        "barra_info": "BA S/E ARENAS BLANCAS 66KV B1",
+        "barra_transf": "A.BLANCAS_____066",
+        "fecha": "2026-07-20",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 0,
+        "cmg_usd_mwh_": 0,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-07-20 00:00",
+        "fecha_minuto": "2026-07-20 00:00",
+        "timestamp": "2026-07-20 00:00"
+      }
+    },
+    {
       "name": "BA S/E PAINE 66KV BP1",
       "key": "ba s e paine 66kv bp1",
       "value": 0,
@@ -52,14 +90,14 @@
       }
     },
     {
-      "name": "BA S/E DOS AMIGOS 110KV BP1",
-      "key": "ba s e dos amigos 110kv bp1",
+      "name": "BA S/E ALONSO DE RIBERA 66KV BP1",
+      "key": "ba s e alonso de ribera 66kv bp1",
       "value": 0,
       "timestamp": "2026-07-20 00:00",
       "raw": {
-        "id_info": 3078,
-        "barra_info": "BA S/E DOS AMIGOS 110KV BP1",
-        "barra_transf": "D.AMIGOS______110",
+        "id_info": 244,
+        "barra_info": "BA S/E ALONSO DE RIBERA 66KV BP1",
+        "barra_transf": "A.DERIBERA____066",
         "fecha": "2026-07-20",
         "hra": 0,
         "min": 0,
@@ -92,14 +130,14 @@
       }
     },
     {
-      "name": "BA S/E DEGAÑ 23KV B1",
-      "key": "ba s e degan 23kv b1",
+      "name": "BA S/E ALONSO DE RIBERA 154KV BP1",
+      "key": "ba s e alonso de ribera 154kv bp1",
       "value": 0,
       "timestamp": "2026-07-20 00:00",
       "raw": {
-        "id_info": 64,
-        "barra_info": "BA S/E DEGAÑ 23KV B1",
-        "barra_transf": "DEGAN_________013",
+        "id_info": 137,
+        "barra_info": "BA S/E ALONSO DE RIBERA 154KV BP1",
+        "barra_transf": "A.DERIBERA____154",
         "fecha": "2026-07-20",
         "hra": 0,
         "min": 0,
@@ -132,14 +170,14 @@
       }
     },
     {
-      "name": "BA S/E DEGAÑ 110KV [NO_MOSTRAR]",
-      "key": "ba s e degan 110kv no mostrar",
+      "name": "BA S/E ALTO JAHUEL 66KV",
+      "key": "ba s e alto jahuel 66kv",
       "value": 0,
       "timestamp": "2026-07-20 00:00",
       "raw": {
-        "id_info": 65,
-        "barra_info": "BA S/E DEGAÑ 110KV [NO_MOSTRAR]",
-        "barra_transf": "DEGAN_________110",
+        "id_info": 459,
+        "barra_info": "BA S/E ALTO JAHUEL 66KV",
+        "barra_transf": "A.JAHUEL______066",
         "fecha": "2026-07-20",
         "hra": 0,
         "min": 0,
@@ -172,14 +210,14 @@
       }
     },
     {
-      "name": "DOLE__________066",
-      "key": "dole 066",
+      "name": "BA S/E ALTO JAHUEL 110KV BP1",
+      "key": "ba s e alto jahuel 110kv bp1",
       "value": 0,
       "timestamp": "2026-07-20 00:00",
       "raw": {
-        "id_info": null,
-        "barra_info": null,
-        "barra_transf": "DOLE__________066",
+        "id_info": 454,
+        "barra_info": "BA S/E ALTO JAHUEL 110KV BP1",
+        "barra_transf": "A.JAHUEL______110",
         "fecha": "2026-07-20",
         "hra": 0,
         "min": 0,
@@ -200,26 +238,6 @@
         "id_info": null,
         "barra_info": null,
         "barra_transf": "PAJONAL_______110",
-        "fecha": "2026-07-20",
-        "hra": 0,
-        "min": 0,
-        "cmg_clp_kwh_": 0,
-        "cmg_usd_mwh_": 0,
-        "version": "EN LINEA",
-        "fecha_hora": "2026-07-20 00:00",
-        "fecha_minuto": "2026-07-20 00:00",
-        "timestamp": "2026-07-20 00:00"
-      }
-    },
-    {
-      "name": "BA S/E DUQUECO 23kV BP1",
-      "key": "ba s e duqueco 23kv bp1",
-      "value": 0,
-      "timestamp": "2026-07-20 00:00",
-      "raw": {
-        "id_info": 1484,
-        "barra_info": "BA S/E DUQUECO 23kV BP1",
-        "barra_transf": "DUQUECO_______023",
         "fecha": "2026-07-20",
         "hra": 0,
         "min": 0,
