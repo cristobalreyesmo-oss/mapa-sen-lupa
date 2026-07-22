@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-22T11:29:39.846Z",
+  "generatedAt": "2026-07-22T12:57:43.009Z",
   "baseUrl": "https://sipub.api.coordinador.cl:443",
   "startDate": "2026-07-21",
   "endDate": "2026-07-21",
@@ -29,16 +29,31 @@
         "fecha_hora",
         "fecha_minuto"
       ],
-      "updatedAt": "2026-07-22T11:29:56.913Z",
+      "updatedAt": "2026-07-22T12:58:05.622Z",
       "source": "/costo-marginal-online/v4/findByDate",
       "range": {
-        "startDate": "2026-07-22",
-        "endDate": "2026-07-22"
+        "startDate": "2026-07-21",
+        "endDate": "2026-07-21"
       },
       "attempts": [
         {
           "path": "/costo-marginal-online/v4/findByDate",
           "startDate": "2026-07-22",
+          "error": "500 Internal Server Error {\"message\": \"Internal server error: current transaction is aborted, commands ignored until end of transaction block\\n\"}"
+        },
+        {
+          "path": "/cmg-online/v4/findByDate",
+          "startDate": "2026-07-22",
+          "error": "404 Not Found Error 404: Recurso no encontrado."
+        },
+        {
+          "path": "/costos-marginales-online/v4/findByDate",
+          "startDate": "2026-07-22",
+          "error": "404 Not Found Error 404: Recurso no encontrado."
+        },
+        {
+          "path": "/costo-marginal-online/v4/findByDate",
+          "startDate": "2026-07-21",
           "rows": 10
         }
       ]
