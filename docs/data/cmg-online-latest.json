@@ -1,7 +1,7 @@
 {
   "id": "cmg-online",
   "ok": true,
-  "updatedAt": "2026-07-22T20:04:32.508Z",
+  "updatedAt": "2026-07-22T21:20:05.859Z",
   "source": "/costo-marginal-online/v4/findByDate",
   "range": {
     "startDate": "2026-07-22",
@@ -32,26 +32,6 @@
   "sampleRows": [],
   "records": [
     {
-      "name": "BA S/E PAINE 66KV BP1",
-      "key": "ba s e paine 66kv bp1",
-      "value": 0,
-      "timestamp": "2026-07-22 00:00",
-      "raw": {
-        "id_info": 1426,
-        "barra_info": "BA S/E PAINE 66KV BP1",
-        "barra_transf": "PAINE_________066",
-        "fecha": "2026-07-22",
-        "hra": 0,
-        "min": 0,
-        "cmg_clp_kwh_": 0,
-        "cmg_usd_mwh_": 0,
-        "version": "EN LINEA",
-        "fecha_hora": "2026-07-22 00:00",
-        "fecha_minuto": "2026-07-22 00:00",
-        "timestamp": "2026-07-22 00:00"
-      }
-    },
-    {
       "name": "BA S/E DOS AMIGOS 110KV BP1",
       "key": "ba s e dos amigos 110kv bp1",
       "value": 0,
@@ -72,14 +52,14 @@
       }
     },
     {
-      "name": "BA S/E PAINE 154KV BP1",
-      "key": "ba s e paine 154kv bp1",
+      "name": "BA S/E SANTA ROSA SUR 110KV BP1",
+      "key": "ba s e santa rosa sur 110kv bp1",
       "value": 0,
       "timestamp": "2026-07-22 00:00",
       "raw": {
-        "id_info": 195,
-        "barra_info": "BA S/E PAINE 154KV BP1",
-        "barra_transf": "PAINE_________154",
+        "id_info": 968,
+        "barra_info": "BA S/E SANTA ROSA SUR 110KV BP1",
+        "barra_transf": "SANTA_ROSA_S__110",
         "fecha": "2026-07-22",
         "hra": 0,
         "min": 0,
@@ -112,14 +92,14 @@
       }
     },
     {
-      "name": "BA S/E PAJARITOS 12KV BP1",
-      "key": "ba s e pajaritos 12kv bp1",
+      "name": "BA S/E SAUZAL 13.8KV",
+      "key": "ba s e sauzal 13 8kv",
       "value": 0,
       "timestamp": "2026-07-22 00:00",
       "raw": {
-        "id_info": 861,
-        "barra_info": "BA S/E PAJARITOS 12KV BP1",
-        "barra_transf": "PAJARITOS_____013",
+        "id_info": 1254,
+        "barra_info": "BA S/E SAUZAL 13.8KV",
+        "barra_transf": "SAUZAL________013",
         "fecha": "2026-07-22",
         "hra": 0,
         "min": 0,
@@ -152,14 +132,14 @@
       }
     },
     {
-      "name": "BA S/E PAJARITOS 110KV BP1",
-      "key": "ba s e pajaritos 110kv bp1",
+      "name": "SAUZAL________154",
+      "key": "sauzal 154",
       "value": 0,
       "timestamp": "2026-07-22 00:00",
       "raw": {
-        "id_info": 859,
-        "barra_info": "BA S/E PAJARITOS 110KV BP1",
-        "barra_transf": "PAJARITOS_____110",
+        "id_info": null,
+        "barra_info": null,
+        "barra_transf": "SAUZAL________154",
         "fecha": "2026-07-22",
         "hra": 0,
         "min": 0,
@@ -192,14 +172,14 @@
       }
     },
     {
-      "name": "PAJONAL_______110",
-      "key": "pajonal 110",
+      "name": "BA S/E SAUZAL 110KV BP1",
+      "key": "ba s e sauzal 110kv bp1",
       "value": 0,
       "timestamp": "2026-07-22 00:00",
       "raw": {
-        "id_info": null,
-        "barra_info": null,
-        "barra_transf": "PAJONAL_______110",
+        "id_info": 525,
+        "barra_info": "BA S/E SAUZAL 110KV BP1",
+        "barra_transf": "SAUZAL1_______110",
         "fecha": "2026-07-22",
         "hra": 0,
         "min": 0,
@@ -220,6 +200,26 @@
         "id_info": 1484,
         "barra_info": "BA S/E DUQUECO 23kV BP1",
         "barra_transf": "DUQUECO_______023",
+        "fecha": "2026-07-22",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 0,
+        "cmg_usd_mwh_": 0,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-07-22 00:00",
+        "fecha_minuto": "2026-07-22 00:00",
+        "timestamp": "2026-07-22 00:00"
+      }
+    },
+    {
+      "name": "BA S/E SAUZAL 110KV BP2",
+      "key": "ba s e sauzal 110kv bp2",
+      "value": 0,
+      "timestamp": "2026-07-22 00:00",
+      "raw": {
+        "id_info": 1717,
+        "barra_info": "BA S/E SAUZAL 110KV BP2",
+        "barra_transf": "SAUZAL2_______110",
         "fecha": "2026-07-22",
         "hra": 0,
         "min": 0,
