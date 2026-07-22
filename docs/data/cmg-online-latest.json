@@ -1,18 +1,14 @@
 {
   "id": "cmg-online",
-  "ok": true,
-  "updatedAt": "2026-07-22T04:30:35.346Z",
-  "source": "/costo-marginal-online/v4/findByDate",
-  "range": {
-    "startDate": "2026-07-21",
-    "endDate": "2026-07-21"
-  },
+  "ok": false,
+  "updatedAt": "2026-07-22T07:19:14.124Z",
+  "error": "404 Not Found Error 404: Recurso no encontrado.",
   "attempts": [
     {
       "path": "/costo-marginal-online/v4/findByDate",
       "startDate": "2026-07-22",
       "endDate": "2026-07-22",
-      "rows": 0
+      "error": "500 Internal Server Error {\"message\": \"Internal server error: current transaction is aborted, commands ignored until end of transaction block\\n\"}"
     },
     {
       "path": "/cmg-online/v4/findByDate",
@@ -30,224 +26,38 @@
       "path": "/costo-marginal-online/v4/findByDate",
       "startDate": "2026-07-21",
       "endDate": "2026-07-21",
-      "rows": 10
+      "error": "500 Internal Server Error {\"message\": \"Internal server error: current transaction is aborted, commands ignored until end of transaction block\\n\"}"
+    },
+    {
+      "path": "/cmg-online/v4/findByDate",
+      "startDate": "2026-07-21",
+      "endDate": "2026-07-21",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/costos-marginales-online/v4/findByDate",
+      "startDate": "2026-07-21",
+      "endDate": "2026-07-21",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/costo-marginal-online/v4/findByDate",
+      "startDate": "2026-07-20",
+      "endDate": "2026-07-20",
+      "error": "500 Internal Server Error {\"message\": \"Internal server error: current transaction is aborted, commands ignored until end of transaction block\\n\"}"
+    },
+    {
+      "path": "/cmg-online/v4/findByDate",
+      "startDate": "2026-07-20",
+      "endDate": "2026-07-20",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/costos-marginales-online/v4/findByDate",
+      "startDate": "2026-07-20",
+      "endDate": "2026-07-20",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
     }
   ],
-  "rawCount": 10,
-  "sampleKeys": [
-    "id_info",
-    "barra_info",
-    "barra_transf",
-    "fecha",
-    "hra",
-    "min",
-    "cmg_clp_kwh_",
-    "cmg_usd_mwh_",
-    "version",
-    "fecha_hora",
-    "fecha_minuto"
-  ],
-  "sampleRows": [],
-  "records": [
-    {
-      "name": "BA S/E LIRQUEN INDURA 66kV BP1 [No_Mostrar]",
-      "key": "ba s e lirquen indura 66kv bp1 no mostrar",
-      "value": 50.77842,
-      "timestamp": "2026-07-21 00:00",
-      "raw": {
-        "id_info": 1146,
-        "barra_info": "BA S/E LIRQUEN INDURA 66kV BP1 [No_Mostrar]",
-        "barra_transf": "L.INDURA______066",
-        "fecha": "2026-07-21",
-        "hra": 0,
-        "min": 0,
-        "cmg_clp_kwh_": 47.42298,
-        "cmg_usd_mwh_": 50.77842,
-        "version": "EN LINEA",
-        "fecha_hora": "2026-07-21 00:00",
-        "fecha_minuto": "2026-07-21 00:00",
-        "timestamp": "2026-07-21 00:00"
-      }
-    },
-    {
-      "name": "BA S/E ARENAS BLANCAS 66KV B1",
-      "key": "ba s e arenas blancas 66kv b1",
-      "value": 50.60616,
-      "timestamp": "2026-07-21 00:00",
-      "raw": {
-        "id_info": 248,
-        "barra_info": "BA S/E ARENAS BLANCAS 66KV B1",
-        "barra_transf": "A.BLANCAS_____066",
-        "fecha": "2026-07-21",
-        "hra": 0,
-        "min": 0,
-        "cmg_clp_kwh_": 47.2621,
-        "cmg_usd_mwh_": 50.60616,
-        "version": "EN LINEA",
-        "fecha_hora": "2026-07-21 00:00",
-        "fecha_minuto": "2026-07-21 00:00",
-        "timestamp": "2026-07-21 00:00"
-      }
-    },
-    {
-      "name": "BA S/E LOS LAGOS 13.2KV",
-      "key": "ba s e los lagos 13 2kv",
-      "value": 50.45783,
-      "timestamp": "2026-07-21 00:00",
-      "raw": {
-        "id_info": 424,
-        "barra_info": "BA S/E LOS LAGOS 13.2KV",
-        "barra_transf": "L.LAGOS_______013",
-        "fecha": "2026-07-21",
-        "hra": 0,
-        "min": 0,
-        "cmg_clp_kwh_": 47.12357,
-        "cmg_usd_mwh_": 50.45783,
-        "version": "EN LINEA",
-        "fecha_hora": "2026-07-21 00:00",
-        "fecha_minuto": "2026-07-21 00:00",
-        "timestamp": "2026-07-21 00:00"
-      }
-    },
-    {
-      "name": "BA S/E ALONSO DE RIBERA 66KV BP1",
-      "key": "ba s e alonso de ribera 66kv bp1",
-      "value": 49.52954,
-      "timestamp": "2026-07-21 00:00",
-      "raw": {
-        "id_info": 244,
-        "barra_info": "BA S/E ALONSO DE RIBERA 66KV BP1",
-        "barra_transf": "A.DERIBERA____066",
-        "fecha": "2026-07-21",
-        "hra": 0,
-        "min": 0,
-        "cmg_clp_kwh_": 46.25662,
-        "cmg_usd_mwh_": 49.52954,
-        "version": "EN LINEA",
-        "fecha_hora": "2026-07-21 00:00",
-        "fecha_minuto": "2026-07-21 00:00",
-        "timestamp": "2026-07-21 00:00"
-      }
-    },
-    {
-      "name": "BA S/E LOS LAGOS 66KV",
-      "key": "ba s e los lagos 66kv",
-      "value": 50.39562,
-      "timestamp": "2026-07-21 00:00",
-      "raw": {
-        "id_info": 425,
-        "barra_info": "BA S/E LOS LAGOS 66KV",
-        "barra_transf": "L.LAGOS_______066",
-        "fecha": "2026-07-21",
-        "hra": 0,
-        "min": 0,
-        "cmg_clp_kwh_": 47.06548,
-        "cmg_usd_mwh_": 50.39562,
-        "version": "EN LINEA",
-        "fecha_hora": "2026-07-21 00:00",
-        "fecha_minuto": "2026-07-21 00:00",
-        "timestamp": "2026-07-21 00:00"
-      }
-    },
-    {
-      "name": "BA S/E ALONSO DE RIBERA 154KV BP1",
-      "key": "ba s e alonso de ribera 154kv bp1",
-      "value": 48.9984,
-      "timestamp": "2026-07-21 00:00",
-      "raw": {
-        "id_info": 137,
-        "barra_info": "BA S/E ALONSO DE RIBERA 154KV BP1",
-        "barra_transf": "A.DERIBERA____154",
-        "fecha": "2026-07-21",
-        "hra": 0,
-        "min": 0,
-        "cmg_clp_kwh_": 45.76058,
-        "cmg_usd_mwh_": 48.9984,
-        "version": "EN LINEA",
-        "fecha_hora": "2026-07-21 00:00",
-        "fecha_minuto": "2026-07-21 00:00",
-        "timestamp": "2026-07-21 00:00"
-      }
-    },
-    {
-      "name": "BA S/E TAP OFF LA LAJA 110KV BP1",
-      "key": "ba s e tap off la laja 110kv bp1",
-      "value": 50.11809,
-      "timestamp": "2026-07-21 00:00",
-      "raw": {
-        "id_info": 3432,
-        "barra_info": "BA S/E TAP OFF LA LAJA 110KV BP1",
-        "barra_transf": "L.LAJA________110",
-        "fecha": "2026-07-21",
-        "hra": 0,
-        "min": 0,
-        "cmg_clp_kwh_": 46.80628,
-        "cmg_usd_mwh_": 50.11809,
-        "version": "EN LINEA",
-        "fecha_hora": "2026-07-21 00:00",
-        "fecha_minuto": "2026-07-21 00:00",
-        "timestamp": "2026-07-21 00:00"
-      }
-    },
-    {
-      "name": "BA S/E ALTO JAHUEL 66KV",
-      "key": "ba s e alto jahuel 66kv",
-      "value": 49.20416,
-      "timestamp": "2026-07-21 00:00",
-      "raw": {
-        "id_info": 459,
-        "barra_info": "BA S/E ALTO JAHUEL 66KV",
-        "barra_transf": "A.JAHUEL______066",
-        "fecha": "2026-07-21",
-        "hra": 0,
-        "min": 0,
-        "cmg_clp_kwh_": 45.95274,
-        "cmg_usd_mwh_": 49.20416,
-        "version": "EN LINEA",
-        "fecha_hora": "2026-07-21 00:00",
-        "fecha_minuto": "2026-07-21 00:00",
-        "timestamp": "2026-07-21 00:00"
-      }
-    },
-    {
-      "name": "L.LAJUELAS____033",
-      "key": "l lajuelas 033",
-      "value": 48.74001,
-      "timestamp": "2026-07-21 00:00",
-      "raw": {
-        "id_info": null,
-        "barra_info": null,
-        "barra_transf": "L.LAJUELAS____033",
-        "fecha": "2026-07-21",
-        "hra": 0,
-        "min": 0,
-        "cmg_clp_kwh_": 45.51927,
-        "cmg_usd_mwh_": 48.74001,
-        "version": "EN LINEA",
-        "fecha_hora": "2026-07-21 00:00",
-        "fecha_minuto": "2026-07-21 00:00",
-        "timestamp": "2026-07-21 00:00"
-      }
-    },
-    {
-      "name": "BA S/E ALTO JAHUEL 110KV BP1",
-      "key": "ba s e alto jahuel 110kv bp1",
-      "value": 49.48647,
-      "timestamp": "2026-07-21 00:00",
-      "raw": {
-        "id_info": 454,
-        "barra_info": "BA S/E ALTO JAHUEL 110KV BP1",
-        "barra_transf": "A.JAHUEL______110",
-        "fecha": "2026-07-21",
-        "hra": 0,
-        "min": 0,
-        "cmg_clp_kwh_": 46.2164,
-        "cmg_usd_mwh_": 49.48647,
-        "version": "EN LINEA",
-        "fecha_hora": "2026-07-21 00:00",
-        "fecha_minuto": "2026-07-21 00:00",
-        "timestamp": "2026-07-21 00:00"
-      }
-    }
-  ]
+  "records": []
 }

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-22T04:30:23.722Z",
+  "generatedAt": "2026-07-22T07:18:16.407Z",
   "baseUrl": "https://sipub.api.coordinador.cl:443",
   "startDate": "2026-07-21",
   "endDate": "2026-07-21",
@@ -8,38 +8,19 @@
     "cmg-online"
   ],
   "hasApiKey": true,
-  "ok": true,
+  "ok": false,
   "datasets": [
     {
       "id": "cmg-online",
       "file": "data/cmg-online-latest.json",
-      "ok": true,
-      "records": 10,
-      "rawCount": 10,
-      "sampleKeys": [
-        "id_info",
-        "barra_info",
-        "barra_transf",
-        "fecha",
-        "hra",
-        "min",
-        "cmg_clp_kwh_",
-        "cmg_usd_mwh_",
-        "version",
-        "fecha_hora",
-        "fecha_minuto"
-      ],
-      "updatedAt": "2026-07-22T04:30:35.346Z",
-      "source": "/costo-marginal-online/v4/findByDate",
-      "range": {
-        "startDate": "2026-07-21",
-        "endDate": "2026-07-21"
-      },
+      "ok": false,
+      "error": "404 Not Found Error 404: Recurso no encontrado.",
+      "records": 0,
       "attempts": [
         {
           "path": "/costo-marginal-online/v4/findByDate",
           "startDate": "2026-07-22",
-          "rows": 0
+          "error": "500 Internal Server Error {\"message\": \"Internal server error: current transaction is aborted, commands ignored until end of transaction block\\n\"}"
         },
         {
           "path": "/cmg-online/v4/findByDate",
@@ -54,7 +35,32 @@
         {
           "path": "/costo-marginal-online/v4/findByDate",
           "startDate": "2026-07-21",
-          "rows": 10
+          "error": "500 Internal Server Error {\"message\": \"Internal server error: current transaction is aborted, commands ignored until end of transaction block\\n\"}"
+        },
+        {
+          "path": "/cmg-online/v4/findByDate",
+          "startDate": "2026-07-21",
+          "error": "404 Not Found Error 404: Recurso no encontrado."
+        },
+        {
+          "path": "/costos-marginales-online/v4/findByDate",
+          "startDate": "2026-07-21",
+          "error": "404 Not Found Error 404: Recurso no encontrado."
+        },
+        {
+          "path": "/costo-marginal-online/v4/findByDate",
+          "startDate": "2026-07-20",
+          "error": "500 Internal Server Error {\"message\": \"Internal server error: current transaction is aborted, commands ignored until end of transaction block\\n\"}"
+        },
+        {
+          "path": "/cmg-online/v4/findByDate",
+          "startDate": "2026-07-20",
+          "error": "404 Not Found Error 404: Recurso no encontrado."
+        },
+        {
+          "path": "/costos-marginales-online/v4/findByDate",
+          "startDate": "2026-07-20",
+          "error": "404 Not Found Error 404: Recurso no encontrado."
         }
       ]
     }
