@@ -1,13 +1,31 @@
 {
   "id": "cmg-online",
   "ok": true,
-  "updatedAt": "2026-07-21T23:37:39.227Z",
+  "updatedAt": "2026-07-22T01:04:25.325Z",
   "source": "/costo-marginal-online/v4/findByDate",
   "range": {
     "startDate": "2026-07-21",
     "endDate": "2026-07-21"
   },
   "attempts": [
+    {
+      "path": "/costo-marginal-online/v4/findByDate",
+      "startDate": "2026-07-22",
+      "endDate": "2026-07-22",
+      "rows": 0
+    },
+    {
+      "path": "/cmg-online/v4/findByDate",
+      "startDate": "2026-07-22",
+      "endDate": "2026-07-22",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/costos-marginales-online/v4/findByDate",
+      "startDate": "2026-07-22",
+      "endDate": "2026-07-22",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
     {
       "path": "/costo-marginal-online/v4/findByDate",
       "startDate": "2026-07-21",
