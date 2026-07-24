@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-24T04:28:16.904Z",
+  "generatedAt": "2026-07-24T07:04:58.945Z",
   "baseUrl": "https://sipub.api.coordinador.cl:443",
   "startDate": "2026-07-23",
   "endDate": "2026-07-23",
@@ -29,31 +29,16 @@
         "fecha_hora",
         "fecha_minuto"
       ],
-      "updatedAt": "2026-07-24T04:28:23.125Z",
+      "updatedAt": "2026-07-24T07:05:48.692Z",
       "source": "/costo-marginal-online/v4/findByDate",
       "range": {
-        "startDate": "2026-07-23",
-        "endDate": "2026-07-23"
+        "startDate": "2026-07-24",
+        "endDate": "2026-07-24"
       },
       "attempts": [
         {
           "path": "/costo-marginal-online/v4/findByDate",
           "startDate": "2026-07-24",
-          "rows": 0
-        },
-        {
-          "path": "/cmg-online/v4/findByDate",
-          "startDate": "2026-07-24",
-          "error": "404 Not Found Error 404: Recurso no encontrado."
-        },
-        {
-          "path": "/costos-marginales-online/v4/findByDate",
-          "startDate": "2026-07-24",
-          "error": "404 Not Found Error 404: Recurso no encontrado."
-        },
-        {
-          "path": "/costo-marginal-online/v4/findByDate",
-          "startDate": "2026-07-23",
           "rows": 10
         }
       ]
