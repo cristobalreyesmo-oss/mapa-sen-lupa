@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-25T04:24:12.729Z",
+  "generatedAt": "2026-07-25T06:34:30.622Z",
   "baseUrl": "https://sipub.api.coordinador.cl:443",
   "startDate": "2026-07-24",
   "endDate": "2026-07-24",
@@ -8,19 +8,38 @@
     "cmg-online"
   ],
   "hasApiKey": true,
-  "ok": false,
+  "ok": true,
   "datasets": [
     {
       "id": "cmg-online",
       "file": "data/cmg-online-latest.json",
-      "ok": false,
-      "error": "fetch failed | code=CERT_HAS_EXPIRED",
-      "records": 0,
+      "ok": true,
+      "records": 10,
+      "rawCount": 10,
+      "sampleKeys": [
+        "id_info",
+        "barra_info",
+        "barra_transf",
+        "fecha",
+        "hra",
+        "min",
+        "cmg_clp_kwh_",
+        "cmg_usd_mwh_",
+        "version",
+        "fecha_hora",
+        "fecha_minuto"
+      ],
+      "updatedAt": "2026-07-25T06:34:33.576Z",
+      "source": "/costo-marginal-online/v4/findByDate",
+      "range": {
+        "startDate": "2026-07-25",
+        "endDate": "2026-07-25"
+      },
       "attempts": [
         {
           "path": "/costo-marginal-online/v4/findByDate",
           "startDate": "2026-07-25",
-          "error": "fetch failed | code=CERT_HAS_EXPIRED"
+          "rows": 10
         }
       ]
     }

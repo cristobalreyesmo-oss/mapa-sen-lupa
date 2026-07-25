@@ -1,15 +1,235 @@
 {
   "id": "cmg-online",
-  "ok": false,
-  "updatedAt": "2026-07-25T04:24:14.394Z",
-  "error": "fetch failed | code=CERT_HAS_EXPIRED",
+  "ok": true,
+  "updatedAt": "2026-07-25T06:34:33.576Z",
+  "source": "/costo-marginal-online/v4/findByDate",
+  "range": {
+    "startDate": "2026-07-25",
+    "endDate": "2026-07-25"
+  },
   "attempts": [
     {
       "path": "/costo-marginal-online/v4/findByDate",
       "startDate": "2026-07-25",
       "endDate": "2026-07-25",
-      "error": "fetch failed | code=CERT_HAS_EXPIRED"
+      "rows": 10
     }
   ],
-  "records": []
+  "rawCount": 10,
+  "sampleKeys": [
+    "id_info",
+    "barra_info",
+    "barra_transf",
+    "fecha",
+    "hra",
+    "min",
+    "cmg_clp_kwh_",
+    "cmg_usd_mwh_",
+    "version",
+    "fecha_hora",
+    "fecha_minuto"
+  ],
+  "sampleRows": [],
+  "records": [
+    {
+      "name": "BA S/E SANTA ROSA SUR 110KV BP1",
+      "key": "ba s e santa rosa sur 110kv bp1",
+      "value": 62.69284,
+      "timestamp": "2026-07-25 00:00",
+      "raw": {
+        "id_info": 968,
+        "barra_info": "BA S/E SANTA ROSA SUR 110KV BP1",
+        "barra_transf": "SANTA_ROSA_S__110",
+        "fecha": "2026-07-25",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 59.32247,
+        "cmg_usd_mwh_": 62.69284,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-07-25 00:00",
+        "fecha_minuto": "2026-07-25 00:00",
+        "timestamp": "2026-07-25 00:00"
+      }
+    },
+    {
+      "name": "BA S/E LOS DOMINICOS 12KV BP1",
+      "key": "ba s e los dominicos 12kv bp1",
+      "value": 62.00503,
+      "timestamp": "2026-07-25 00:00",
+      "raw": {
+        "id_info": 826,
+        "barra_info": "BA S/E LOS DOMINICOS 12KV BP1",
+        "barra_transf": "LOS_DOMINICOS_013",
+        "fecha": "2026-07-25",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 58.67163,
+        "cmg_usd_mwh_": 62.00503,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-07-25 00:00",
+        "fecha_minuto": "2026-07-25 00:00",
+        "timestamp": "2026-07-25 00:00"
+      }
+    },
+    {
+      "name": "BA S/E SAUZAL 13.8KV",
+      "key": "ba s e sauzal 13 8kv",
+      "value": 60.53968,
+      "timestamp": "2026-07-25 00:00",
+      "raw": {
+        "id_info": 1254,
+        "barra_info": "BA S/E SAUZAL 13.8KV",
+        "barra_transf": "SAUZAL________013",
+        "fecha": "2026-07-25",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 57.28506,
+        "cmg_usd_mwh_": 60.53968,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-07-25 00:00",
+        "fecha_minuto": "2026-07-25 00:00",
+        "timestamp": "2026-07-25 00:00"
+      }
+    },
+    {
+      "name": "BA S/E LOS DOMINICOS 110KV BP1",
+      "key": "ba s e los dominicos 110kv bp1",
+      "value": 61.9512,
+      "timestamp": "2026-07-25 00:00",
+      "raw": {
+        "id_info": 824,
+        "barra_info": "BA S/E LOS DOMINICOS 110KV BP1",
+        "barra_transf": "LOS_DOMINICOS_110",
+        "fecha": "2026-07-25",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 58.6207,
+        "cmg_usd_mwh_": 61.9512,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-07-25 00:00",
+        "fecha_minuto": "2026-07-25 00:00",
+        "timestamp": "2026-07-25 00:00"
+      }
+    },
+    {
+      "name": "SAUZAL________154",
+      "key": "sauzal 154",
+      "value": 61.08395,
+      "timestamp": "2026-07-25 00:00",
+      "raw": {
+        "id_info": null,
+        "barra_info": null,
+        "barra_transf": "SAUZAL________154",
+        "fecha": "2026-07-25",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 57.80008,
+        "cmg_usd_mwh_": 61.08395,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-07-25 00:00",
+        "fecha_minuto": "2026-07-25 00:00",
+        "timestamp": "2026-07-25 00:00"
+      }
+    },
+    {
+      "name": "BA S/E LOTA 13.2KV B1",
+      "key": "ba s e lota 13 2kv b1",
+      "value": 59.94756,
+      "timestamp": "2026-07-25 00:00",
+      "raw": {
+        "id_info": 1076,
+        "barra_info": "BA S/E LOTA 13.2KV B1",
+        "barra_transf": "LOTA__________013",
+        "fecha": "2026-07-25",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 56.72478,
+        "cmg_usd_mwh_": 59.94756,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-07-25 00:00",
+        "fecha_minuto": "2026-07-25 00:00",
+        "timestamp": "2026-07-25 00:00"
+      }
+    },
+    {
+      "name": "BA S/E SAUZAL 110KV BP1",
+      "key": "ba s e sauzal 110kv bp1",
+      "value": 60.61145,
+      "timestamp": "2026-07-25 00:00",
+      "raw": {
+        "id_info": 525,
+        "barra_info": "BA S/E SAUZAL 110KV BP1",
+        "barra_transf": "SAUZAL1_______110",
+        "fecha": "2026-07-25",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 57.35298,
+        "cmg_usd_mwh_": 60.61145,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-07-25 00:00",
+        "fecha_minuto": "2026-07-25 00:00",
+        "timestamp": "2026-07-25 00:00"
+      }
+    },
+    {
+      "name": "BA S/E LOTA 66KV BP",
+      "key": "ba s e lota 66kv bp",
+      "value": 59.85785,
+      "timestamp": "2026-07-25 00:00",
+      "raw": {
+        "id_info": 2428,
+        "barra_info": "BA S/E LOTA 66KV BP",
+        "barra_transf": "LOTA__________066",
+        "fecha": "2026-07-25",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 56.63989,
+        "cmg_usd_mwh_": 59.85785,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-07-25 00:00",
+        "fecha_minuto": "2026-07-25 00:00",
+        "timestamp": "2026-07-25 00:00"
+      }
+    },
+    {
+      "name": "BA S/E SAUZAL 110KV BP2",
+      "key": "ba s e sauzal 110kv bp2",
+      "value": 61.56243,
+      "timestamp": "2026-07-25 00:00",
+      "raw": {
+        "id_info": 1717,
+        "barra_info": "BA S/E SAUZAL 110KV BP2",
+        "barra_transf": "SAUZAL2_______110",
+        "fecha": "2026-07-25",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 58.25283,
+        "cmg_usd_mwh_": 61.56243,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-07-25 00:00",
+        "fecha_minuto": "2026-07-25 00:00",
+        "timestamp": "2026-07-25 00:00"
+      }
+    },
+    {
+      "name": "BA S/E MANSO DE VELASCO 15KV",
+      "key": "ba s e manso de velasco 15kv",
+      "value": 58.12336,
+      "timestamp": "2026-07-25 00:00",
+      "raw": {
+        "id_info": 189,
+        "barra_info": "BA S/E MANSO DE VELASCO 15KV",
+        "barra_transf": "M.DEVELASCO___013",
+        "fecha": "2026-07-25",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 54.99864,
+        "cmg_usd_mwh_": 58.12336,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-07-25 00:00",
+        "fecha_minuto": "2026-07-25 00:00",
+        "timestamp": "2026-07-25 00:00"
+      }
+    }
+  ]
 }
