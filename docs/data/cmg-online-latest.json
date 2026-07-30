@@ -1,13 +1,31 @@
 {
   "id": "cmg-online",
   "ok": true,
-  "updatedAt": "2026-07-29T23:39:05.684Z",
+  "updatedAt": "2026-07-30T01:01:17.374Z",
   "source": "/costo-marginal-online/v4/findByDate",
   "range": {
     "startDate": "2026-07-29",
     "endDate": "2026-07-29"
   },
   "attempts": [
+    {
+      "path": "/costo-marginal-online/v4/findByDate",
+      "startDate": "2026-07-30",
+      "endDate": "2026-07-30",
+      "rows": 0
+    },
+    {
+      "path": "/cmg-online/v4/findByDate",
+      "startDate": "2026-07-30",
+      "endDate": "2026-07-30",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/costos-marginales-online/v4/findByDate",
+      "startDate": "2026-07-30",
+      "endDate": "2026-07-30",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
     {
       "path": "/costo-marginal-online/v4/findByDate",
       "startDate": "2026-07-29",
@@ -32,26 +50,6 @@
   "sampleRows": [],
   "records": [
     {
-      "name": "BA S/E PAINE 66KV BP1",
-      "key": "ba s e paine 66kv bp1",
-      "value": 29.38749,
-      "timestamp": "2026-07-29 00:00",
-      "raw": {
-        "id_info": 1426,
-        "barra_info": "BA S/E PAINE 66KV BP1",
-        "barra_transf": "PAINE_________066",
-        "fecha": "2026-07-29",
-        "hra": 0,
-        "min": 0,
-        "cmg_clp_kwh_": 27.68095,
-        "cmg_usd_mwh_": 29.38749,
-        "version": "EN LINEA",
-        "fecha_hora": "2026-07-29 00:00",
-        "fecha_minuto": "2026-07-29 00:00",
-        "timestamp": "2026-07-29 00:00"
-      }
-    },
-    {
       "name": "BA S/E DOS AMIGOS 110KV BP1",
       "key": "ba s e dos amigos 110kv bp1",
       "value": 28.53609,
@@ -72,19 +70,19 @@
       }
     },
     {
-      "name": "BA S/E PAINE 154KV BP1",
-      "key": "ba s e paine 154kv bp1",
-      "value": 29.35911,
+      "name": "BA S/E SANTA ROSA SUR 110KV BP1",
+      "key": "ba s e santa rosa sur 110kv bp1",
+      "value": 29.55493,
       "timestamp": "2026-07-29 00:00",
       "raw": {
-        "id_info": 195,
-        "barra_info": "BA S/E PAINE 154KV BP1",
-        "barra_transf": "PAINE_________154",
+        "id_info": 968,
+        "barra_info": "BA S/E SANTA ROSA SUR 110KV BP1",
+        "barra_transf": "SANTA_ROSA_S__110",
         "fecha": "2026-07-29",
         "hra": 0,
         "min": 0,
-        "cmg_clp_kwh_": 27.65422,
-        "cmg_usd_mwh_": 29.35911,
+        "cmg_clp_kwh_": 27.83867,
+        "cmg_usd_mwh_": 29.55493,
         "version": "EN LINEA",
         "fecha_hora": "2026-07-29 00:00",
         "fecha_minuto": "2026-07-29 00:00",
@@ -112,19 +110,19 @@
       }
     },
     {
-      "name": "BA S/E PAJARITOS 12KV BP1",
-      "key": "ba s e pajaritos 12kv bp1",
-      "value": 29.39317,
+      "name": "BA S/E SAUZAL 13.8KV",
+      "key": "ba s e sauzal 13 8kv",
+      "value": 28.47082,
       "timestamp": "2026-07-29 00:00",
       "raw": {
-        "id_info": 861,
-        "barra_info": "BA S/E PAJARITOS 12KV BP1",
-        "barra_transf": "PAJARITOS_____013",
+        "id_info": 1254,
+        "barra_info": "BA S/E SAUZAL 13.8KV",
+        "barra_transf": "SAUZAL________013",
         "fecha": "2026-07-29",
         "hra": 0,
         "min": 0,
-        "cmg_clp_kwh_": 27.6863,
-        "cmg_usd_mwh_": 29.39317,
+        "cmg_clp_kwh_": 26.81751,
+        "cmg_usd_mwh_": 28.47082,
         "version": "EN LINEA",
         "fecha_hora": "2026-07-29 00:00",
         "fecha_minuto": "2026-07-29 00:00",
@@ -152,19 +150,19 @@
       }
     },
     {
-      "name": "BA S/E PAJARITOS 110KV BP1",
-      "key": "ba s e pajaritos 110kv bp1",
-      "value": 29.37046,
+      "name": "SAUZAL________154",
+      "key": "sauzal 154",
+      "value": 28.9249,
       "timestamp": "2026-07-29 00:00",
       "raw": {
-        "id_info": 859,
-        "barra_info": "BA S/E PAJARITOS 110KV BP1",
-        "barra_transf": "PAJARITOS_____110",
+        "id_info": null,
+        "barra_info": null,
+        "barra_transf": "SAUZAL________154",
         "fecha": "2026-07-29",
         "hra": 0,
         "min": 0,
-        "cmg_clp_kwh_": 27.66492,
-        "cmg_usd_mwh_": 29.37046,
+        "cmg_clp_kwh_": 27.24522,
+        "cmg_usd_mwh_": 28.9249,
         "version": "EN LINEA",
         "fecha_hora": "2026-07-29 00:00",
         "fecha_minuto": "2026-07-29 00:00",
@@ -192,19 +190,19 @@
       }
     },
     {
-      "name": "PAJONAL_______110",
-      "key": "pajonal 110",
-      "value": 28.56731,
+      "name": "BA S/E SAUZAL 110KV BP1",
+      "key": "ba s e sauzal 110kv bp1",
+      "value": 28.71488,
       "timestamp": "2026-07-29 00:00",
       "raw": {
-        "id_info": null,
-        "barra_info": null,
-        "barra_transf": "PAJONAL_______110",
+        "id_info": 525,
+        "barra_info": "BA S/E SAUZAL 110KV BP1",
+        "barra_transf": "SAUZAL1_______110",
         "fecha": "2026-07-29",
         "hra": 0,
         "min": 0,
-        "cmg_clp_kwh_": 26.9084,
-        "cmg_usd_mwh_": 28.56731,
+        "cmg_clp_kwh_": 27.04741,
+        "cmg_usd_mwh_": 28.71488,
         "version": "EN LINEA",
         "fecha_hora": "2026-07-29 00:00",
         "fecha_minuto": "2026-07-29 00:00",
@@ -225,6 +223,26 @@
         "min": 0,
         "cmg_clp_kwh_": 26.28555,
         "cmg_usd_mwh_": 27.90605,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-07-29 00:00",
+        "fecha_minuto": "2026-07-29 00:00",
+        "timestamp": "2026-07-29 00:00"
+      }
+    },
+    {
+      "name": "BA S/E SAUZAL 110KV BP2",
+      "key": "ba s e sauzal 110kv bp2",
+      "value": 27.9316,
+      "timestamp": "2026-07-29 00:00",
+      "raw": {
+        "id_info": 1717,
+        "barra_info": "BA S/E SAUZAL 110KV BP2",
+        "barra_transf": "SAUZAL2_______110",
+        "fecha": "2026-07-29",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 26.3096,
+        "cmg_usd_mwh_": 27.9316,
         "version": "EN LINEA",
         "fecha_hora": "2026-07-29 00:00",
         "fecha_minuto": "2026-07-29 00:00",
