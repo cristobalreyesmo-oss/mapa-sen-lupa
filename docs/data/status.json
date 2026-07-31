@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-31T16:23:45.441Z",
+  "generatedAt": "2026-07-31T17:59:18.504Z",
   "baseUrl": "https://sipub.api.coordinador.cl:443",
   "startDate": "2026-07-30",
   "endDate": "2026-07-30",
@@ -8,38 +8,19 @@
     "cmg-online"
   ],
   "hasApiKey": true,
-  "ok": true,
+  "ok": false,
   "datasets": [
     {
       "id": "cmg-online",
       "file": "data/cmg-online-latest.json",
-      "ok": true,
-      "records": 10,
-      "rawCount": 10,
-      "sampleKeys": [
-        "id_info",
-        "barra_info",
-        "barra_transf",
-        "fecha",
-        "hra",
-        "min",
-        "cmg_clp_kwh_",
-        "cmg_usd_mwh_",
-        "version",
-        "fecha_hora",
-        "fecha_minuto"
-      ],
-      "updatedAt": "2026-07-31T16:24:35.513Z",
-      "source": "/costo-marginal-online/v4/findByDate",
-      "range": {
-        "startDate": "2026-07-31",
-        "endDate": "2026-07-31"
-      },
+      "ok": false,
+      "error": "429  {\"message\":\"Too Many Requests\"}",
+      "records": 0,
       "attempts": [
         {
           "path": "/costo-marginal-online/v4/findByDate",
           "startDate": "2026-07-31",
-          "rows": 10
+          "error": "429  {\"message\":\"Too Many Requests\"}"
         }
       ]
     }
