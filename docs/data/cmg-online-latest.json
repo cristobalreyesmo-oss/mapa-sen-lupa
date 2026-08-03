@@ -1,7 +1,7 @@
 {
   "id": "cmg-online",
   "ok": true,
-  "updatedAt": "2026-08-03T22:31:22.083Z",
+  "updatedAt": "2026-08-03T23:44:23.741Z",
   "source": "/costo-marginal-online/v4/findByDate",
   "range": {
     "startDate": "2026-08-03",
@@ -54,7 +54,7 @@
     {
       "name": "BA S/E LIRQUEN INDURA 66kV BP1 [No_Mostrar]",
       "key": "ba s e lirquen indura 66kv bp1 no mostrar",
-      "value": 49.67204,
+      "value": 0,
       "timestamp": "2026-08-03 00:00",
       "raw": {
         "id_info": 1146,
@@ -63,8 +63,8 @@
         "fecha": "2026-08-03",
         "hra": 0,
         "min": 0,
-        "cmg_clp_kwh_": 45.93571,
-        "cmg_usd_mwh_": 49.67204,
+        "cmg_clp_kwh_": 0,
+        "cmg_usd_mwh_": 0,
         "version": "EN LINEA",
         "fecha_hora": "2026-08-03 00:00",
         "fecha_minuto": "2026-08-03 00:00",
@@ -94,7 +94,7 @@
     {
       "name": "BA S/E LOS LAGOS 13.2KV",
       "key": "ba s e los lagos 13 2kv",
-      "value": 44.5373,
+      "value": 0,
       "timestamp": "2026-08-03 00:00",
       "raw": {
         "id_info": 424,
@@ -103,8 +103,8 @@
         "fecha": "2026-08-03",
         "hra": 0,
         "min": 0,
-        "cmg_clp_kwh_": 41.18721,
-        "cmg_usd_mwh_": 44.5373,
+        "cmg_clp_kwh_": 0,
+        "cmg_usd_mwh_": 0,
         "version": "EN LINEA",
         "fecha_hora": "2026-08-03 00:00",
         "fecha_minuto": "2026-08-03 00:00",
@@ -134,7 +134,7 @@
     {
       "name": "BA S/E LOS LAGOS 66KV",
       "key": "ba s e los lagos 66kv",
-      "value": 44.45823,
+      "value": 0,
       "timestamp": "2026-08-03 00:00",
       "raw": {
         "id_info": 425,
@@ -143,8 +143,8 @@
         "fecha": "2026-08-03",
         "hra": 0,
         "min": 0,
-        "cmg_clp_kwh_": 41.11408,
-        "cmg_usd_mwh_": 44.45823,
+        "cmg_clp_kwh_": 0,
+        "cmg_usd_mwh_": 0,
         "version": "EN LINEA",
         "fecha_hora": "2026-08-03 00:00",
         "fecha_minuto": "2026-08-03 00:00",
@@ -214,7 +214,7 @@
     {
       "name": "L.LAJUELAS____033",
       "key": "l lajuelas 033",
-      "value": 48.94557,
+      "value": 0,
       "timestamp": "2026-08-03 00:00",
       "raw": {
         "id_info": null,
@@ -223,8 +223,8 @@
         "fecha": "2026-08-03",
         "hra": 0,
         "min": 0,
-        "cmg_clp_kwh_": 45.26388,
-        "cmg_usd_mwh_": 48.94557,
+        "cmg_clp_kwh_": 0,
+        "cmg_usd_mwh_": 0,
         "version": "EN LINEA",
         "fecha_hora": "2026-08-03 00:00",
         "fecha_minuto": "2026-08-03 00:00",
