@@ -1,15 +1,235 @@
 {
   "id": "cmg-online",
-  "ok": false,
-  "updatedAt": "2026-08-05T18:16:35.253Z",
-  "error": "429  {\"message\":\"Too Many Requests\"}",
+  "ok": true,
+  "updatedAt": "2026-08-05T20:01:29.728Z",
+  "source": "/costo-marginal-online/v4/findByDate",
+  "range": {
+    "startDate": "2026-08-05",
+    "endDate": "2026-08-05"
+  },
   "attempts": [
     {
       "path": "/costo-marginal-online/v4/findByDate",
       "startDate": "2026-08-05",
       "endDate": "2026-08-05",
-      "error": "429  {\"message\":\"Too Many Requests\"}"
+      "rows": 10
     }
   ],
-  "records": []
+  "rawCount": 10,
+  "sampleKeys": [
+    "id_info",
+    "barra_info",
+    "barra_transf",
+    "fecha",
+    "hra",
+    "min",
+    "cmg_clp_kwh_",
+    "cmg_usd_mwh_",
+    "version",
+    "fecha_hora",
+    "fecha_minuto"
+  ],
+  "sampleRows": [],
+  "records": [
+    {
+      "name": "BA S/E ARENAS BLANCAS 66KV B1",
+      "key": "ba s e arenas blancas 66kv b1",
+      "value": 37.28238,
+      "timestamp": "2026-08-05 00:00",
+      "raw": {
+        "id_info": 248,
+        "barra_info": "BA S/E ARENAS BLANCAS 66KV B1",
+        "barra_transf": "A.BLANCAS_____066",
+        "fecha": "2026-08-05",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 34.4821,
+        "cmg_usd_mwh_": 37.28238,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-08-05 00:00",
+        "fecha_minuto": "2026-08-05 00:00",
+        "timestamp": "2026-08-05 00:00"
+      }
+    },
+    {
+      "name": "BA S/E PAINE 66KV BP1",
+      "key": "ba s e paine 66kv bp1",
+      "value": 37.11948,
+      "timestamp": "2026-08-05 00:00",
+      "raw": {
+        "id_info": 1426,
+        "barra_info": "BA S/E PAINE 66KV BP1",
+        "barra_transf": "PAINE_________066",
+        "fecha": "2026-08-05",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 34.33144,
+        "cmg_usd_mwh_": 37.11948,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-08-05 00:00",
+        "fecha_minuto": "2026-08-05 00:00",
+        "timestamp": "2026-08-05 00:00"
+      }
+    },
+    {
+      "name": "BA S/E ALONSO DE RIBERA 66KV BP1",
+      "key": "ba s e alonso de ribera 66kv bp1",
+      "value": 36.09502,
+      "timestamp": "2026-08-05 00:00",
+      "raw": {
+        "id_info": 244,
+        "barra_info": "BA S/E ALONSO DE RIBERA 66KV BP1",
+        "barra_transf": "A.DERIBERA____066",
+        "fecha": "2026-08-05",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 33.38393,
+        "cmg_usd_mwh_": 36.09502,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-08-05 00:00",
+        "fecha_minuto": "2026-08-05 00:00",
+        "timestamp": "2026-08-05 00:00"
+      }
+    },
+    {
+      "name": "BA S/E PAINE 154KV BP1",
+      "key": "ba s e paine 154kv bp1",
+      "value": 37.04708,
+      "timestamp": "2026-08-05 00:00",
+      "raw": {
+        "id_info": 195,
+        "barra_info": "BA S/E PAINE 154KV BP1",
+        "barra_transf": "PAINE_________154",
+        "fecha": "2026-08-05",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 34.26448,
+        "cmg_usd_mwh_": 37.04708,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-08-05 00:00",
+        "fecha_minuto": "2026-08-05 00:00",
+        "timestamp": "2026-08-05 00:00"
+      }
+    },
+    {
+      "name": "BA S/E ALONSO DE RIBERA 154KV BP1",
+      "key": "ba s e alonso de ribera 154kv bp1",
+      "value": 35.68234,
+      "timestamp": "2026-08-05 00:00",
+      "raw": {
+        "id_info": 137,
+        "barra_info": "BA S/E ALONSO DE RIBERA 154KV BP1",
+        "barra_transf": "A.DERIBERA____154",
+        "fecha": "2026-08-05",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 33.00224,
+        "cmg_usd_mwh_": 35.68234,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-08-05 00:00",
+        "fecha_minuto": "2026-08-05 00:00",
+        "timestamp": "2026-08-05 00:00"
+      }
+    },
+    {
+      "name": "BA S/E PAJARITOS 12KV BP1",
+      "key": "ba s e pajaritos 12kv bp1",
+      "value": 37.18464,
+      "timestamp": "2026-08-05 00:00",
+      "raw": {
+        "id_info": 861,
+        "barra_info": "BA S/E PAJARITOS 12KV BP1",
+        "barra_transf": "PAJARITOS_____013",
+        "fecha": "2026-08-05",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 34.3917,
+        "cmg_usd_mwh_": 37.18464,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-08-05 00:00",
+        "fecha_minuto": "2026-08-05 00:00",
+        "timestamp": "2026-08-05 00:00"
+      }
+    },
+    {
+      "name": "BA S/E ALTO JAHUEL 66KV",
+      "key": "ba s e alto jahuel 66kv",
+      "value": 36.62354,
+      "timestamp": "2026-08-05 00:00",
+      "raw": {
+        "id_info": 459,
+        "barra_info": "BA S/E ALTO JAHUEL 66KV",
+        "barra_transf": "A.JAHUEL______066",
+        "fecha": "2026-08-05",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 33.87275,
+        "cmg_usd_mwh_": 36.62354,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-08-05 00:00",
+        "fecha_minuto": "2026-08-05 00:00",
+        "timestamp": "2026-08-05 00:00"
+      }
+    },
+    {
+      "name": "BA S/E PAJARITOS 110KV BP1",
+      "key": "ba s e pajaritos 110kv bp1",
+      "value": 37.15568,
+      "timestamp": "2026-08-05 00:00",
+      "raw": {
+        "id_info": 859,
+        "barra_info": "BA S/E PAJARITOS 110KV BP1",
+        "barra_transf": "PAJARITOS_____110",
+        "fecha": "2026-08-05",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 34.36492,
+        "cmg_usd_mwh_": 37.15568,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-08-05 00:00",
+        "fecha_minuto": "2026-08-05 00:00",
+        "timestamp": "2026-08-05 00:00"
+      }
+    },
+    {
+      "name": "BA S/E ALTO JAHUEL 110KV BP1",
+      "key": "ba s e alto jahuel 110kv bp1",
+      "value": 36.68146,
+      "timestamp": "2026-08-05 00:00",
+      "raw": {
+        "id_info": 454,
+        "barra_info": "BA S/E ALTO JAHUEL 110KV BP1",
+        "barra_transf": "A.JAHUEL______110",
+        "fecha": "2026-08-05",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 33.92632,
+        "cmg_usd_mwh_": 36.68146,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-08-05 00:00",
+        "fecha_minuto": "2026-08-05 00:00",
+        "timestamp": "2026-08-05 00:00"
+      }
+    },
+    {
+      "name": "PAJONAL_______110",
+      "key": "pajonal 110",
+      "value": 37.51768,
+      "timestamp": "2026-08-05 00:00",
+      "raw": {
+        "id_info": null,
+        "barra_info": null,
+        "barra_transf": "PAJONAL_______110",
+        "fecha": "2026-08-05",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 34.69973,
+        "cmg_usd_mwh_": 37.51768,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-08-05 00:00",
+        "fecha_minuto": "2026-08-05 00:00",
+        "timestamp": "2026-08-05 00:00"
+      }
+    }
+  ]
 }
