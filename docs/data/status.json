@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-08T10:48:08.511Z",
+  "generatedAt": "2026-08-08T11:17:40.426Z",
   "baseUrl": "https://sipub.api.coordinador.cl:443",
   "startDate": "2026-08-07",
   "endDate": "2026-08-07",
@@ -29,7 +29,7 @@
         "fecha_hora",
         "fecha_minuto"
       ],
-      "updatedAt": "2026-08-08T10:48:26.986Z",
+      "updatedAt": "2026-08-08T11:17:58.790Z",
       "source": "/costo-marginal-online/v4/findByDate",
       "range": {
         "startDate": "2026-08-08",
