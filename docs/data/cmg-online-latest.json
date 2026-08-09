@@ -1,35 +1,17 @@
 {
   "id": "cmg-online",
   "ok": true,
-  "updatedAt": "2026-08-09T04:07:46.955Z",
+  "updatedAt": "2026-08-09T05:16:00.453Z",
   "source": "/costo-marginal-online/v4/findByDate",
   "range": {
-    "startDate": "2026-08-08",
-    "endDate": "2026-08-08"
+    "startDate": "2026-08-09",
+    "endDate": "2026-08-09"
   },
   "attempts": [
     {
       "path": "/costo-marginal-online/v4/findByDate",
       "startDate": "2026-08-09",
       "endDate": "2026-08-09",
-      "rows": 0
-    },
-    {
-      "path": "/cmg-online/v4/findByDate",
-      "startDate": "2026-08-09",
-      "endDate": "2026-08-09",
-      "error": "404 Not Found Error 404: Recurso no encontrado."
-    },
-    {
-      "path": "/costos-marginales-online/v4/findByDate",
-      "startDate": "2026-08-09",
-      "endDate": "2026-08-09",
-      "error": "404 Not Found Error 404: Recurso no encontrado."
-    },
-    {
-      "path": "/costo-marginal-online/v4/findByDate",
-      "startDate": "2026-08-08",
-      "endDate": "2026-08-08",
       "rows": 10
     }
   ],
@@ -50,203 +32,203 @@
   "sampleRows": [],
   "records": [
     {
+      "name": "BA S/E CASABLANCA 12kV BP1",
+      "key": "ba s e casablanca 12kv bp1",
+      "value": 47.84373,
+      "timestamp": "2026-08-09 00:00",
+      "raw": {
+        "id_info": 994,
+        "barra_info": "BA S/E CASABLANCA 12kV BP1",
+        "barra_transf": "CASABLANCA____013",
+        "fecha": "2026-08-09",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 43.72247,
+        "cmg_usd_mwh_": 47.84373,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-08-09 00:00",
+        "fecha_minuto": "2026-08-09 00:00",
+        "timestamp": "2026-08-09 00:00"
+      }
+    },
+    {
       "name": "BA S/E QUINQUIMO 110KV BP1-1",
       "key": "ba s e quinquimo 110kv bp1 1",
-      "value": 14.32084,
-      "timestamp": "2026-08-08 00:00",
+      "value": 48.29427,
+      "timestamp": "2026-08-09 00:00",
       "raw": {
         "id_info": 381,
         "barra_info": "BA S/E QUINQUIMO 110KV BP1-1",
         "barra_transf": "QUINQUIMO_____110",
-        "fecha": "2026-08-08",
+        "fecha": "2026-08-09",
         "hra": 0,
         "min": 0,
-        "cmg_clp_kwh_": 13.08724,
-        "cmg_usd_mwh_": 14.32084,
+        "cmg_clp_kwh_": 44.1342,
+        "cmg_usd_mwh_": 48.29427,
         "version": "EN LINEA",
-        "fecha_hora": "2026-08-08 00:00",
-        "fecha_minuto": "2026-08-08 00:00",
-        "timestamp": "2026-08-08 00:00"
+        "fecha_hora": "2026-08-09 00:00",
+        "fecha_minuto": "2026-08-09 00:00",
+        "timestamp": "2026-08-09 00:00"
       }
     },
     {
-      "name": "BA S/E LIRQUEN INDURA 66kV BP1 [No_Mostrar]",
-      "key": "ba s e lirquen indura 66kv bp1 no mostrar",
-      "value": 13.95422,
-      "timestamp": "2026-08-08 00:00",
+      "name": "BA S/E CASABLANCA 66kV BP1",
+      "key": "ba s e casablanca 66kv bp1",
+      "value": 47.7958,
+      "timestamp": "2026-08-09 00:00",
       "raw": {
-        "id_info": 1146,
-        "barra_info": "BA S/E LIRQUEN INDURA 66kV BP1 [No_Mostrar]",
-        "barra_transf": "L.INDURA______066",
-        "fecha": "2026-08-08",
+        "id_info": 1328,
+        "barra_info": "BA S/E CASABLANCA 66kV BP1",
+        "barra_transf": "CASABLANCA____066",
+        "fecha": "2026-08-09",
         "hra": 0,
         "min": 0,
-        "cmg_clp_kwh_": 12.7522,
-        "cmg_usd_mwh_": 13.95422,
+        "cmg_clp_kwh_": 43.67867,
+        "cmg_usd_mwh_": 47.7958,
         "version": "EN LINEA",
-        "fecha_hora": "2026-08-08 00:00",
-        "fecha_minuto": "2026-08-08 00:00",
-        "timestamp": "2026-08-08 00:00"
+        "fecha_hora": "2026-08-09 00:00",
+        "fecha_minuto": "2026-08-09 00:00",
+        "timestamp": "2026-08-09 00:00"
       }
     },
     {
       "name": "BA S/E QUINQUIMO 110 kV BP1-S2 [NO_MOSTRAR]",
       "key": "ba s e quinquimo 110 bp1 s2 no mostrar",
-      "value": 15.22744,
-      "timestamp": "2026-08-08 00:00",
+      "value": 51.46244,
+      "timestamp": "2026-08-09 00:00",
       "raw": {
         "id_info": 4138,
         "barra_info": "BA S/E QUINQUIMO 110 kV BP1-S2 [NO_MOSTRAR]",
         "barra_transf": "QUINQUIMO2____110",
-        "fecha": "2026-08-08",
+        "fecha": "2026-08-09",
         "hra": 0,
         "min": 0,
-        "cmg_clp_kwh_": 13.91574,
-        "cmg_usd_mwh_": 15.22744,
+        "cmg_clp_kwh_": 47.02947,
+        "cmg_usd_mwh_": 51.46244,
         "version": "EN LINEA",
-        "fecha_hora": "2026-08-08 00:00",
-        "fecha_minuto": "2026-08-08 00:00",
-        "timestamp": "2026-08-08 00:00"
+        "fecha_hora": "2026-08-09 00:00",
+        "fecha_minuto": "2026-08-09 00:00",
+        "timestamp": "2026-08-09 00:00"
       }
     },
     {
-      "name": "BA S/E LOS LAGOS 13.2KV",
-      "key": "ba s e los lagos 13 2kv",
-      "value": 13.98122,
-      "timestamp": "2026-08-08 00:00",
+      "name": "BA S/E CASAS VIEJAS 13.2KV",
+      "key": "ba s e casas viejas 13 2kv",
+      "value": 50.94959,
+      "timestamp": "2026-08-09 00:00",
       "raw": {
-        "id_info": 424,
-        "barra_info": "BA S/E LOS LAGOS 13.2KV",
-        "barra_transf": "L.LAGOS_______013",
-        "fecha": "2026-08-08",
+        "id_info": 159,
+        "barra_info": "BA S/E CASAS VIEJAS 13.2KV",
+        "barra_transf": "CASASVIEJAS___023",
+        "fecha": "2026-08-09",
         "hra": 0,
         "min": 0,
-        "cmg_clp_kwh_": 12.77688,
-        "cmg_usd_mwh_": 13.98122,
+        "cmg_clp_kwh_": 46.56079,
+        "cmg_usd_mwh_": 50.94959,
         "version": "EN LINEA",
-        "fecha_hora": "2026-08-08 00:00",
-        "fecha_minuto": "2026-08-08 00:00",
-        "timestamp": "2026-08-08 00:00"
+        "fecha_hora": "2026-08-09 00:00",
+        "fecha_minuto": "2026-08-09 00:00",
+        "timestamp": "2026-08-09 00:00"
       }
     },
     {
       "name": "BA S/E QUINTA 13.2kV BP1",
       "key": "ba s e quinta 13 2kv bp1",
-      "value": 14.54536,
-      "timestamp": "2026-08-08 00:00",
+      "value": 48.65854,
+      "timestamp": "2026-08-09 00:00",
       "raw": {
         "id_info": 1093,
         "barra_info": "BA S/E QUINTA 13.2kV BP1",
         "barra_transf": "QUINTA________013",
-        "fecha": "2026-08-08",
+        "fecha": "2026-08-09",
         "hra": 0,
         "min": 0,
-        "cmg_clp_kwh_": 13.29242,
-        "cmg_usd_mwh_": 14.54536,
+        "cmg_clp_kwh_": 44.46709,
+        "cmg_usd_mwh_": 48.65854,
         "version": "EN LINEA",
-        "fecha_hora": "2026-08-08 00:00",
-        "fecha_minuto": "2026-08-08 00:00",
-        "timestamp": "2026-08-08 00:00"
+        "fecha_hora": "2026-08-09 00:00",
+        "fecha_minuto": "2026-08-09 00:00",
+        "timestamp": "2026-08-09 00:00"
       }
     },
     {
-      "name": "BA S/E LOS LAGOS 66KV",
-      "key": "ba s e los lagos 66kv",
-      "value": 13.93717,
-      "timestamp": "2026-08-08 00:00",
+      "name": "BA S/E CASAS VIEJAS 110KV",
+      "key": "ba s e casas viejas 110kv",
+      "value": 50.8729,
+      "timestamp": "2026-08-09 00:00",
       "raw": {
-        "id_info": 425,
-        "barra_info": "BA S/E LOS LAGOS 66KV",
-        "barra_transf": "L.LAGOS_______066",
-        "fecha": "2026-08-08",
+        "id_info": 263,
+        "barra_info": "BA S/E CASAS VIEJAS 110KV",
+        "barra_transf": "CASASVIEJAS___110",
+        "fecha": "2026-08-09",
         "hra": 0,
         "min": 0,
-        "cmg_clp_kwh_": 12.73662,
-        "cmg_usd_mwh_": 13.93717,
+        "cmg_clp_kwh_": 46.49071,
+        "cmg_usd_mwh_": 50.8729,
         "version": "EN LINEA",
-        "fecha_hora": "2026-08-08 00:00",
-        "fecha_minuto": "2026-08-08 00:00",
-        "timestamp": "2026-08-08 00:00"
+        "fecha_hora": "2026-08-09 00:00",
+        "fecha_minuto": "2026-08-09 00:00",
+        "timestamp": "2026-08-09 00:00"
       }
     },
     {
       "name": "BA S/E QUINTA 66kV BP1",
       "key": "ba s e quinta 66kv bp1",
-      "value": 14.54536,
-      "timestamp": "2026-08-08 00:00",
+      "value": 48.65854,
+      "timestamp": "2026-08-09 00:00",
       "raw": {
         "id_info": 1243,
         "barra_info": "BA S/E QUINTA 66kV BP1",
         "barra_transf": "QUINTA________066",
-        "fecha": "2026-08-08",
+        "fecha": "2026-08-09",
         "hra": 0,
         "min": 0,
-        "cmg_clp_kwh_": 13.29242,
-        "cmg_usd_mwh_": 14.54536,
+        "cmg_clp_kwh_": 44.46709,
+        "cmg_usd_mwh_": 48.65854,
         "version": "EN LINEA",
-        "fecha_hora": "2026-08-08 00:00",
-        "fecha_minuto": "2026-08-08 00:00",
-        "timestamp": "2026-08-08 00:00"
+        "fecha_hora": "2026-08-09 00:00",
+        "fecha_minuto": "2026-08-09 00:00",
+        "timestamp": "2026-08-09 00:00"
       }
     },
     {
-      "name": "BA S/E TAP OFF LA LAJA 110KV BP1",
-      "key": "ba s e tap off la laja 110kv bp1",
-      "value": 14.38052,
-      "timestamp": "2026-08-08 00:00",
+      "name": "BA S/E CASTILLA 23KV",
+      "key": "ba s e castilla 23kv",
+      "value": 46.92826,
+      "timestamp": "2026-08-09 00:00",
       "raw": {
-        "id_info": 3432,
-        "barra_info": "BA S/E TAP OFF LA LAJA 110KV BP1",
-        "barra_transf": "L.LAJA________110",
-        "fecha": "2026-08-08",
+        "id_info": 468,
+        "barra_info": "BA S/E CASTILLA 23KV",
+        "barra_transf": "CASTILLA______023",
+        "fecha": "2026-08-09",
         "hra": 0,
         "min": 0,
-        "cmg_clp_kwh_": 13.14178,
-        "cmg_usd_mwh_": 14.38052,
+        "cmg_clp_kwh_": 42.88586,
+        "cmg_usd_mwh_": 46.92826,
         "version": "EN LINEA",
-        "fecha_hora": "2026-08-08 00:00",
-        "fecha_minuto": "2026-08-08 00:00",
-        "timestamp": "2026-08-08 00:00"
+        "fecha_hora": "2026-08-09 00:00",
+        "fecha_minuto": "2026-08-09 00:00",
+        "timestamp": "2026-08-09 00:00"
       }
     },
     {
       "name": "BA S/E QUINTAY 12kV BP1",
       "key": "ba s e quintay 12kv bp1",
-      "value": 14.21,
-      "timestamp": "2026-08-08 00:00",
+      "value": 47.93,
+      "timestamp": "2026-08-09 00:00",
       "raw": {
         "id_info": 1028,
         "barra_info": "BA S/E QUINTAY 12kV BP1",
         "barra_transf": "QUINTAY_______013",
-        "fecha": "2026-08-08",
+        "fecha": "2026-08-09",
         "hra": 0,
         "min": 0,
-        "cmg_clp_kwh_": 12.98595,
-        "cmg_usd_mwh_": 14.21,
+        "cmg_clp_kwh_": 43.80131,
+        "cmg_usd_mwh_": 47.93,
         "version": "EN LINEA",
-        "fecha_hora": "2026-08-08 00:00",
-        "fecha_minuto": "2026-08-08 00:00",
-        "timestamp": "2026-08-08 00:00"
-      }
-    },
-    {
-      "name": "L.LAJUELAS____033",
-      "key": "l lajuelas 033",
-      "value": 13.60039,
-      "timestamp": "2026-08-08 00:00",
-      "raw": {
-        "id_info": null,
-        "barra_info": null,
-        "barra_transf": "L.LAJUELAS____033",
-        "fecha": "2026-08-08",
-        "hra": 0,
-        "min": 0,
-        "cmg_clp_kwh_": 12.42885,
-        "cmg_usd_mwh_": 13.60039,
-        "version": "EN LINEA",
-        "fecha_hora": "2026-08-08 00:00",
-        "fecha_minuto": "2026-08-08 00:00",
-        "timestamp": "2026-08-08 00:00"
+        "fecha_hora": "2026-08-09 00:00",
+        "fecha_minuto": "2026-08-09 00:00",
+        "timestamp": "2026-08-09 00:00"
       }
     }
   ]
