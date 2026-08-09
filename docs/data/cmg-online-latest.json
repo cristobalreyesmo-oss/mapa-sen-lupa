@@ -1,15 +1,235 @@
 {
   "id": "cmg-online",
-  "ok": false,
-  "updatedAt": "2026-08-09T07:13:23.136Z",
-  "error": "429  {\"message\":\"Too Many Requests\"}",
+  "ok": true,
+  "updatedAt": "2026-08-09T08:00:01.095Z",
+  "source": "/costo-marginal-online/v4/findByDate",
+  "range": {
+    "startDate": "2026-08-09",
+    "endDate": "2026-08-09"
+  },
   "attempts": [
     {
       "path": "/costo-marginal-online/v4/findByDate",
       "startDate": "2026-08-09",
       "endDate": "2026-08-09",
-      "error": "429  {\"message\":\"Too Many Requests\"}"
+      "rows": 10
     }
   ],
-  "records": []
+  "rawCount": 10,
+  "sampleKeys": [
+    "id_info",
+    "barra_info",
+    "barra_transf",
+    "fecha",
+    "hra",
+    "min",
+    "cmg_clp_kwh_",
+    "cmg_usd_mwh_",
+    "version",
+    "fecha_hora",
+    "fecha_minuto"
+  ],
+  "sampleRows": [],
+  "records": [
+    {
+      "name": "BA S/E PAINE 66KV BP1",
+      "key": "ba s e paine 66kv bp1",
+      "value": 47.8469,
+      "timestamp": "2026-08-09 00:00",
+      "raw": {
+        "id_info": 1426,
+        "barra_info": "BA S/E PAINE 66KV BP1",
+        "barra_transf": "PAINE_________066",
+        "fecha": "2026-08-09",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 43.72537,
+        "cmg_usd_mwh_": 47.8469,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-08-09 00:00",
+        "fecha_minuto": "2026-08-09 00:00",
+        "timestamp": "2026-08-09 00:00"
+      }
+    },
+    {
+      "name": "BA S/E DOS AMIGOS 110KV BP1",
+      "key": "ba s e dos amigos 110kv bp1",
+      "value": 46.32879,
+      "timestamp": "2026-08-09 00:00",
+      "raw": {
+        "id_info": 3078,
+        "barra_info": "BA S/E DOS AMIGOS 110KV BP1",
+        "barra_transf": "D.AMIGOS______110",
+        "fecha": "2026-08-09",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 42.33803,
+        "cmg_usd_mwh_": 46.32879,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-08-09 00:00",
+        "fecha_minuto": "2026-08-09 00:00",
+        "timestamp": "2026-08-09 00:00"
+      }
+    },
+    {
+      "name": "BA S/E PAINE 154KV BP1",
+      "key": "ba s e paine 154kv bp1",
+      "value": 47.83732,
+      "timestamp": "2026-08-09 00:00",
+      "raw": {
+        "id_info": 195,
+        "barra_info": "BA S/E PAINE 154KV BP1",
+        "barra_transf": "PAINE_________154",
+        "fecha": "2026-08-09",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 43.71662,
+        "cmg_usd_mwh_": 47.83732,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-08-09 00:00",
+        "fecha_minuto": "2026-08-09 00:00",
+        "timestamp": "2026-08-09 00:00"
+      }
+    },
+    {
+      "name": "BA S/E DEGAÑ 23KV B1",
+      "key": "ba s e degan 23kv b1",
+      "value": 44.10669,
+      "timestamp": "2026-08-09 00:00",
+      "raw": {
+        "id_info": 64,
+        "barra_info": "BA S/E DEGAÑ 23KV B1",
+        "barra_transf": "DEGAN_________013",
+        "fecha": "2026-08-09",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 40.30734,
+        "cmg_usd_mwh_": 44.10669,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-08-09 00:00",
+        "fecha_minuto": "2026-08-09 00:00",
+        "timestamp": "2026-08-09 00:00"
+      }
+    },
+    {
+      "name": "BA S/E PAJARITOS 12KV BP1",
+      "key": "ba s e pajaritos 12kv bp1",
+      "value": 48.47426,
+      "timestamp": "2026-08-09 00:00",
+      "raw": {
+        "id_info": 861,
+        "barra_info": "BA S/E PAJARITOS 12KV BP1",
+        "barra_transf": "PAJARITOS_____013",
+        "fecha": "2026-08-09",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 44.29869,
+        "cmg_usd_mwh_": 48.47426,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-08-09 00:00",
+        "fecha_minuto": "2026-08-09 00:00",
+        "timestamp": "2026-08-09 00:00"
+      }
+    },
+    {
+      "name": "BA S/E DEGAÑ 110KV [NO_MOSTRAR]",
+      "key": "ba s e degan 110kv no mostrar",
+      "value": 43.9726,
+      "timestamp": "2026-08-09 00:00",
+      "raw": {
+        "id_info": 65,
+        "barra_info": "BA S/E DEGAÑ 110KV [NO_MOSTRAR]",
+        "barra_transf": "DEGAN_________110",
+        "fecha": "2026-08-09",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 40.1848,
+        "cmg_usd_mwh_": 43.9726,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-08-09 00:00",
+        "fecha_minuto": "2026-08-09 00:00",
+        "timestamp": "2026-08-09 00:00"
+      }
+    },
+    {
+      "name": "BA S/E PAJARITOS 110KV BP1",
+      "key": "ba s e pajaritos 110kv bp1",
+      "value": 48.43116,
+      "timestamp": "2026-08-09 00:00",
+      "raw": {
+        "id_info": 859,
+        "barra_info": "BA S/E PAJARITOS 110KV BP1",
+        "barra_transf": "PAJARITOS_____110",
+        "fecha": "2026-08-09",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 44.2593,
+        "cmg_usd_mwh_": 48.43116,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-08-09 00:00",
+        "fecha_minuto": "2026-08-09 00:00",
+        "timestamp": "2026-08-09 00:00"
+      }
+    },
+    {
+      "name": "DOLE__________066",
+      "key": "dole 066",
+      "value": 48.76639,
+      "timestamp": "2026-08-09 00:00",
+      "raw": {
+        "id_info": null,
+        "barra_info": null,
+        "barra_transf": "DOLE__________066",
+        "fecha": "2026-08-09",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 44.56566,
+        "cmg_usd_mwh_": 48.76639,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-08-09 00:00",
+        "fecha_minuto": "2026-08-09 00:00",
+        "timestamp": "2026-08-09 00:00"
+      }
+    },
+    {
+      "name": "PAJONAL_______110",
+      "key": "pajonal 110",
+      "value": 46.42936,
+      "timestamp": "2026-08-09 00:00",
+      "raw": {
+        "id_info": null,
+        "barra_info": null,
+        "barra_transf": "PAJONAL_______110",
+        "fecha": "2026-08-09",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 42.42993,
+        "cmg_usd_mwh_": 46.42936,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-08-09 00:00",
+        "fecha_minuto": "2026-08-09 00:00",
+        "timestamp": "2026-08-09 00:00"
+      }
+    },
+    {
+      "name": "BA S/E DUQUECO 23kV BP1",
+      "key": "ba s e duqueco 23kv bp1",
+      "value": 43.85287,
+      "timestamp": "2026-08-09 00:00",
+      "raw": {
+        "id_info": 1484,
+        "barra_info": "BA S/E DUQUECO 23kV BP1",
+        "barra_transf": "DUQUECO_______023",
+        "fecha": "2026-08-09",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 40.07539,
+        "cmg_usd_mwh_": 43.85287,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-08-09 00:00",
+        "fecha_minuto": "2026-08-09 00:00",
+        "timestamp": "2026-08-09 00:00"
+      }
+    }
+  ]
 }
