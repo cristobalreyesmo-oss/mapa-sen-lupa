@@ -776,7 +776,7 @@
   <section id="view-gen2" class="view hidden">
     <header class="mb-4">
       <h1 class="text-headline-md font-display text-on-surface mb-1">Generación</h1>
-      <p class="text-body-md text-secondary">Centrales despachadas por el Coordinador en la ventana CEN, generación real 24 h y CMg real por nodo.</p>
+      <p class="text-body-md text-secondary">Generación real por central/tecnología y CMg asociado al nodo para la fecha de análisis.</p>
       <div id="gen2-date" class="text-caption font-label-mono text-primary mt-1">Datos: —</div>
     </header>
     <div class="grid grid-cols-4 md:grid-cols-12 gap-gutter">
@@ -829,7 +829,7 @@
             <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full block" style="background:#2b90e2"></span> Baja</span>
             <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full block" style="background:#7dd3fc"></span> Alta</span>
             <label class="flex items-center gap-2">FECHA<input id="analysis-date-gen2" type="date" class="analysis-date glass-ctrl px-2 py-1 text-label-mono text-on-surface focus:border-primary"></label>
-            <label class="flex items-center gap-2">HORA<select id="hour-select-gen2" class="glass-ctrl px-2 py-1 text-label-mono text-on-surface focus:border-primary"></select></label>
+            <label class="hidden items-center gap-2">HORA<select id="hour-select-gen2" class="glass-ctrl px-2 py-1 text-label-mono text-on-surface focus:border-primary"></select></label>
             <button id="fly-sen-gen2" class="glass glass-ctrl px-3 py-1 text-label-mono text-on-surface hover:opacity-80">Centrar en SEN</button>
           </div>
           <div class="flex flex-wrap items-center gap-2">
@@ -954,39 +954,39 @@
   <section id="view-overview" class="view">
     <header class="mb-4">
       <h1 class="text-headline-md font-display text-on-surface mb-1">Panel del Sistema Eléctrico Nacional</h1>
-      <p class="text-body-md text-secondary">Visualización operacional del SEN de Chile. Nodos y líneas del modelo con costo marginal por barra.</p>
+      <p class="text-body-md text-secondary">Topología general del SEN: centrales, subestaciones y líneas del modelo, con filtros por tensión y tecnología.</p>
       <div id="mc-date-overview" class="text-caption font-label-mono text-primary mt-1">Datos: —</div>
     </header>
     <div class="grid grid-cols-4 md:grid-cols-12 gap-gutter">
       <div class="col-span-4 md:col-span-4 bg-surface-container-lowest swiss-border p-3 flex flex-col">
-        <div class="text-label-mono text-secondary mb-2 uppercase tracking-widest swiss-border-b pb-1">Demanda en Tiempo Real</div>
+        <div class="text-label-mono text-secondary mb-2 uppercase tracking-widest swiss-border-b pb-1">Centrales</div>
         <div class="flex items-baseline gap-2 mb-2">
           <span id="kpi-demand" class="text-headline-lg text-on-surface tracking-tighter">—</span>
-          <span class="text-caption text-secondary">MW</span>
+          <span class="text-caption text-secondary">activos</span>
         </div>
         <div class="h-10 w-full mt-auto relative">
           <svg id="spark-demand" class="w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 40"></svg>
         </div>
       </div>
       <div class="col-span-4 md:col-span-4 bg-surface-container-lowest swiss-border p-3 flex flex-col">
-        <div class="text-label-mono text-secondary mb-2 uppercase tracking-widest swiss-border-b pb-1">CMg Promedio</div>
+        <div class="text-label-mono text-secondary mb-2 uppercase tracking-widest swiss-border-b pb-1">Subestaciones</div>
         <div class="flex items-baseline gap-2 mb-2">
           <span id="kpi-cmg" class="text-headline-lg text-on-surface tracking-tighter">—</span>
-          <span class="text-caption text-secondary">USD/MWh</span>
+          <span class="text-caption text-secondary">nodos</span>
         </div>
         <div class="h-10 w-full mt-auto relative">
           <svg id="spark-cmg" class="w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 40"></svg>
         </div>
       </div>
       <div class="col-span-4 md:col-span-4 bg-surface-container-lowest swiss-border p-3 flex flex-col">
-        <div class="text-label-mono text-secondary mb-2 uppercase tracking-widest swiss-border-b pb-1">Frecuencia del Sistema</div>
+        <div class="text-label-mono text-secondary mb-2 uppercase tracking-widest swiss-border-b pb-1">Líneas por Tensión</div>
         <div class="flex items-baseline gap-2 mb-2">
           <span id="kpi-freq" class="text-headline-lg text-on-surface tracking-tighter">—</span>
-          <span class="text-caption text-secondary">Hz</span>
+          <span class="text-caption text-secondary">líneas</span>
         </div>
         <div class="mt-auto flex items-center gap-2">
           <div class="w-3 h-3 bg-on-surface"></div>
-          <span class="text-caption text-secondary">Operación normal</span>
+          <span id="kpi-lines-note" class="text-caption text-secondary">—</span>
         </div>
       </div>
 
@@ -997,12 +997,11 @@
             <div id="map-status" class="text-caption font-label-mono text-secondary mt-1">Cargando MapLibre + Turf...</div>
           </div>
           <div class="flex flex-wrap items-center gap-3 text-label-mono text-secondary">
-            <span class="flex items-center gap-2"><span class="w-3 h-3 bg-primary block"></span> CMg bajo</span>
-            <span class="flex items-center gap-2"><span class="w-3 h-3 bg-on-surface block"></span> CMg medio</span>
-            <span class="flex items-center gap-2"><span class="w-3 h-3 bg-error block"></span> CMg alto</span>
+            <span class="flex items-center gap-2"><span class="w-3 h-3 bg-primary block"></span> 500 kV</span>
+            <span class="flex items-center gap-2"><span class="w-3 h-3 bg-secondary block"></span> 220 kV</span>
+            <span class="flex items-center gap-2"><span class="w-3 h-3 bg-outline-variant block"></span> 154 kV</span>
             <label class="flex items-center gap-2">FECHA<input id="analysis-date-overview" type="date" class="analysis-date glass-ctrl px-2 py-1 text-label-mono text-on-surface focus:border-primary"></label>
-            <label class="flex items-center gap-2">HORA<select id="hour-select" class="glass-ctrl px-2 py-1 text-label-mono text-on-surface focus:border-primary"></select></label>
-            <button id="filter-btn-overview" class="toggle">Filtrar nodos<span class="filter-count"></span></button>
+            <label class="hidden items-center gap-2">HORA<select id="hour-select" class="glass-ctrl px-2 py-1 text-label-mono text-on-surface focus:border-primary"></select></label>
             <button id="fly-sen" class="glass glass-ctrl px-3 py-1 text-label-mono text-on-surface hover:opacity-80">Centrar en SEN</button>
           </div>
           <div class="flex flex-wrap items-center gap-2">
@@ -1014,6 +1013,10 @@
             <button type="button" data-voltage="500" class="toggle active">500 kV</button>
             <button type="button" data-voltage="220" class="toggle active">220 kV</button>
             <button type="button" data-voltage="154" class="toggle active">154 kV</button>
+            <span class="text-label-mono text-secondary mx-1">|</span>
+            <span class="text-label-mono text-secondary">Tecnología:</span>
+            <button id="overview-tech-all" class="toggle active">Todas</button>
+            <div id="overview-techs" class="flex flex-wrap items-center gap-2"></div>
           </div>
         </div>
         <div class="ops-map-grid">
@@ -1024,21 +1027,21 @@
           </div>
           <div class="col-span-12 lg:col-span-4 ops-map-side">
             <div class="border border-outline-variant p-4">
-              <div class="text-label-mono text-secondary uppercase tracking-widest swiss-border-b pb-2 mb-3">Nodo Seleccionado</div>
-              <div id="node-name" class="text-headline-md text-on-surface font-bold">Selecciona un nodo</div>
-              <div id="node-detail" class="text-caption font-label-mono text-secondary mt-1">Click sobre una subestación para fijar su lectura CMg.</div>
+              <div class="text-label-mono text-secondary uppercase tracking-widest swiss-border-b pb-2 mb-3">Elemento Seleccionado</div>
+              <div id="node-name" class="text-headline-md text-on-surface font-bold">Selecciona un elemento</div>
+              <div id="node-detail" class="text-caption font-label-mono text-secondary mt-1">Click sobre una central, subestación o línea para inspeccionar la topología.</div>
               <div class="mt-4 flex items-baseline gap-2">
                 <span id="node-cmg" class="text-display text-on-surface tracking-tighter">—</span>
-                <span class="text-body-md text-secondary">USD/MWh</span>
+                <span class="text-body-md text-secondary">topología</span>
               </div>
             </div>
             <div class="border border-outline-variant p-4">
               <div class="flex items-center justify-between swiss-border-b pb-2 mb-3">
-                <span class="text-label-mono text-secondary uppercase tracking-widest">Perfil CMg · fecha análisis</span>
+                <span class="text-label-mono text-secondary uppercase tracking-widest">Resumen Topológico</span>
                 <span id="chart-value" class="text-headline-md font-bold text-on-surface">—</span>
               </div>
               <canvas id="cmg-chart"></canvas>
-              <div class="text-caption font-label-mono text-secondary mt-1">Eje: fecha de análisis seleccionada; usa histórico CEN cuando existe.</div>
+              <div class="text-caption font-label-mono text-secondary mt-1">Overview no mezcla CMg: usa Costos Marginales para precios nodales.</div>
             </div>
           </div>
         </div>
@@ -1069,7 +1072,7 @@
             <span class="flex items-center gap-2"><span class="w-3 h-3 bg-on-surface block"></span> CMg medio</span>
             <span class="flex items-center gap-2"><span class="w-3 h-3 bg-error block"></span> CMg alto</span>
             <label class="flex items-center gap-2">FECHA<input id="analysis-date-mc" type="date" class="analysis-date glass-ctrl px-2 py-1 text-label-mono text-on-surface focus:border-primary"></label>
-            <label class="flex items-center gap-2">HORA<select id="hour-select-mc" class="glass-ctrl px-2 py-1 text-label-mono text-on-surface focus:border-primary"></select></label>
+            <label class="hidden items-center gap-2">HORA<select id="hour-select-mc" class="glass-ctrl px-2 py-1 text-label-mono text-on-surface focus:border-primary"></select></label>
             <button id="filter-btn-marginal" class="toggle">Filtrar nodos<span class="filter-count"></span></button>
             <button id="fly-sen-mc" class="glass glass-ctrl px-3 py-1 text-label-mono text-on-surface hover:opacity-80">Centrar en SEN</button>
           </div>
@@ -1082,8 +1085,7 @@
             <div class="flex items-center gap-2">
               <button type="button" data-layer="lines" class="toggle active">Transmisión</button>
               <button type="button" data-layer="substations" class="toggle active">Subestaciones</button>
-              <button type="button" data-layer="plants" class="toggle active">Centrales</button>
-              <button type="button" data-layer="bess" class="toggle active">BESS</button>
+              <span class="text-caption font-label-mono text-secondary">Solo nodos CMg; centrales ocultas</span>
             </div>
           </div>
         </div>
@@ -1159,7 +1161,8 @@
             <span class="flex items-center gap-2"><span class="w-3 h-3 dot-medium block"></span> Medio</span>
             <span class="flex items-center gap-2"><span class="w-3 h-3 dot-high block"></span> Alto</span>
             <span class="flex items-center gap-2"><span class="w-3 h-3 dot-critical block"></span> Crítico</span>
-            <label class="flex items-center gap-2">HORA<select id="hour-select-flows" class="glass-ctrl px-2 py-1 text-label-mono text-on-surface focus:border-primary"></select></label>
+            <label class="flex items-center gap-2">FECHA<input id="analysis-date-flows" type="date" class="analysis-date glass-ctrl px-2 py-1 text-label-mono text-on-surface focus:border-primary"></label>
+            <label class="hidden items-center gap-2">HORA<select id="hour-select-flows" class="glass-ctrl px-2 py-1 text-label-mono text-on-surface focus:border-primary"></select></label>
             <button id="fly-sen-flows" class="glass glass-ctrl px-3 py-1 text-label-mono text-on-surface hover:opacity-80">Centrar en SEN</button>
           </div>
           <div class="flex flex-wrap items-center gap-3">
@@ -1328,6 +1331,7 @@
   const hoverChartKey = { overview: "", marginal: "" };
   let gen2ChartHoverKey = "";
   const genFilter = { techs: new Set(), plants: new Set(), query: "" };
+  const overviewFilter = { techs: new Set() };
   const CEN_NOT_INFORMED = "CEN no ha informado esta información";
   let genDays = 7;
   let analysisDate = "";
@@ -1513,6 +1517,16 @@
   }
   function syncAnalysisDateInputs() {
     document.querySelectorAll(".analysis-date").forEach((input) => { input.value = analysisDateOrLive() || ""; });
+  }
+  function syncHourToAnalysisWindow() {
+    const latest = cmgVisibleHours().hours.at(-1);
+    if (!latest) return;
+    const parsed = timestampHour(latest);
+    if (Number.isFinite(parsed)) hour = parsed;
+    ["hour-select", "hour-select-mc", "hour-select-flows", "hour-select-gen2"].forEach((id) => {
+      const select = document.getElementById(id);
+      if (select) select.value = String(hour);
+    });
   }
   async function loadHistoryDataset(dataset, date) {
     const month = monthKeyFromDate(date);
@@ -1934,12 +1948,28 @@
     const value = cmg(feature, hour);
     return { name: feature.name, folder: feature.folder, lon: feature.lon, lat: feature.lat, metric: value, color: cmgColor(value) };
   }
+  function topologyPointProperties(feature) {
+    const layer = layerOf(feature);
+    const tech = gen2TechLabel(feature);
+    const color = layer === "substation" ? cssVar("--on-surface", "#151c27") : (TECH_COLORS[tech] || "#8b93a1");
+    return { name: feature.name, folder: feature.folder, lon: feature.lon, lat: feature.lat, metric: layer === "substation" ? 24 : 42, color, tech };
+  }
   function makePointCollection(features) {
     return {
       type: "FeatureCollection",
       features: features.map((feature) => ({
         type: "Feature",
         properties: pointProperties(feature),
+        geometry: { type: "Point", coordinates: [feature.lon, feature.lat] },
+      })),
+    };
+  }
+  function makeTopologyPointCollection(features) {
+    return {
+      type: "FeatureCollection",
+      features: features.map((feature) => ({
+        type: "Feature",
+        properties: topologyPointProperties(feature),
         geometry: { type: "Point", coordinates: [feature.lon, feature.lat] },
       })),
     };
@@ -2007,6 +2037,10 @@
   function gen2TechLabel(feature) { return GEN2_TECH_LABELS[gen2TypeOf(feature)] || "Otros"; }
   function genUnitKey(feature) { return normalizeKey(feature.name) + "|" + feature.lat + "|" + feature.lon; }
   function genUnits() { return [...(grouped?.plants || []), ...(grouped?.bess || [])]; }
+  function overviewUnits() { return genUnits(); }
+  function overviewPassesTech(feature) { return !overviewFilter.techs.size || overviewFilter.techs.has(gen2TypeOf(feature)); }
+  function overviewPlants() { return (grouped?.plants || []).filter(overviewPassesTech); }
+  function overviewBess() { return (grouped?.bess || []).filter(overviewPassesTech); }
   function isDispatchedGenUnit(feature) {
     const entry = genEntry(feature);
     return Boolean(entry && Array.isArray(entry.values) && entry.values.some((point) => Number(point.value) > 0));
@@ -2531,6 +2565,25 @@
     else renderGen2Detail(null);
     refreshPopup("gen2");
   }
+
+  function renderOverviewTechFilter() {
+    const el = document.getElementById("overview-techs");
+    if (!el || !grouped) return;
+    const rows = Array.from(new Map(overviewUnits().map((feature) => [gen2TypeOf(feature), gen2TechLabel(feature)])).entries())
+      .sort((a, b) => a[1].localeCompare(b[1], "es"));
+    el.innerHTML = rows.map(([key, label]) =>
+      '<button class="toggle ' + (overviewFilter.techs.has(key) ? 'active' : '') + '" data-overview-tech="' + escapeHtml(key) + '">' + escapeHtml(label) + '</button>'
+    ).join("");
+    const all = document.getElementById("overview-tech-all");
+    if (all) all.classList.toggle("active", overviewFilter.techs.size === 0);
+  }
+
+  function applyOverviewFilter() {
+    renderOverviewTechFilter();
+    updateMapData(maps.overview, "overview");
+    renderKPIs();
+    refreshPopup("overview");
+  }
   function renderGen2Kpis() {
     const cmgAvg = avgCmg();
     const visible = filteredGenUnits().map((feature) => genEnergy24(feature)).filter(Number.isFinite);
@@ -2563,10 +2616,23 @@
   }
 
   function visibleSubstationsFor(viewKey) {
+    if (viewKey === "overview") return substations;
     if (viewKey === "flows") return substations;
     const ignoreFilter = viewKey === "marginal" && mcMode === "all";
     const filtered = !ignoreFilter && nodeFilter.selected.size > 0;
     return filtered ? substations.filter((f) => nodeFilter.selected.has(normalizeKey(f.name))) : substations;
+  }
+
+  function plantsForView(viewKey) {
+    if (viewKey === "marginal" || viewKey === "flows") return [];
+    if (viewKey === "overview") return overviewPlants();
+    return grouped.plants;
+  }
+
+  function bessForView(viewKey) {
+    if (viewKey === "marginal" || viewKey === "flows") return [];
+    if (viewKey === "overview") return overviewBess();
+    return grouped.bess;
   }
 
   function flowFilter() {
@@ -2598,12 +2664,14 @@
 
   function setLayerVisibility(map) {
     if (!map) return;
+    const viewKey = Object.keys(maps).find((key) => maps[key] === map) || "overview";
     const lineLayerIds = LINE_VOLTAGES.flatMap((kv) => [lineLayerId(kv), lineHitLayerId(kv)]);
+    const hasPlants = viewKey !== "marginal" && viewKey !== "flows";
     [
       ...lineLayerIds.map((id) => [id, layers.lines && voltages[id.split("-").pop()]]),
       ["sen-substations", layers.substations],
-      ["sen-plants", layers.plants],
-      ["sen-bess", layers.bess],
+      ["sen-plants", hasPlants && layers.plants],
+      ["sen-bess", hasPlants && layers.bess],
     ].forEach(([layerId, visible]) => {
       if (map.getLayer(layerId)) map.setLayoutProperty(layerId, "visibility", visible ? "visible" : "none");
     });
@@ -2612,9 +2680,10 @@
   function updateMapData(map, viewKey) {
     if (!map || !map.isStyleLoaded()) return;
     map.getSource("lines").setData(makeLineCollection(linesForView(viewKey)));
-    map.getSource("substations").setData(makePointCollection(visibleSubstationsFor(viewKey)));
-    map.getSource("plants").setData(makePointCollection(grouped.plants));
-    map.getSource("bess").setData(makePointCollection(grouped.bess));
+    const pointCollection = viewKey === "overview" ? makeTopologyPointCollection : makePointCollection;
+    map.getSource("substations").setData(pointCollection(visibleSubstationsFor(viewKey)));
+    map.getSource("plants").setData(pointCollection(plantsForView(viewKey)));
+    map.getSource("bess").setData(pointCollection(bessForView(viewKey)));
   }
 
   function initMap(viewKey) {
@@ -2633,9 +2702,9 @@
             attribution: "© OpenStreetMap contributors © CARTO",
           },
           lines: { type: "geojson", data: makeLineCollection(linesForView(viewKey)) },
-          substations: { type: "geojson", data: makePointCollection(visibleSubstationsFor(viewKey)) },
-          plants: { type: "geojson", data: makePointCollection(grouped.plants) },
-          bess: { type: "geojson", data: makePointCollection(grouped.bess) },
+          substations: { type: "geojson", data: (viewKey === "overview" ? makeTopologyPointCollection : makePointCollection)(visibleSubstationsFor(viewKey)) },
+          plants: { type: "geojson", data: (viewKey === "overview" ? makeTopologyPointCollection : makePointCollection)(plantsForView(viewKey)) },
+          bess: { type: "geojson", data: (viewKey === "overview" ? makeTopologyPointCollection : makePointCollection)(bessForView(viewKey)) },
           lens: { type: "geojson", data: { type: "FeatureCollection", features: [] } },
           ...(isFlows ? { selectedLine: { type: "geojson", data: { type: "FeatureCollection", features: [] } } } : {}),
         },
@@ -2658,8 +2727,8 @@
           { id: "sen-bess", type: "circle", source: "bess", paint: pointPaint() },
         ],
       },
-      center: isFlows ? [-70.7, -35.4] : [0, 20],
-      zoom: isFlows ? 4.5 : 1.2,
+      center: [-70.7, -35.4],
+      zoom: 4.5,
       minZoom: 1,
       maxZoom: 14,
       pixelRatio: Math.min(window.devicePixelRatio || 1, 2),
@@ -2676,7 +2745,8 @@
       if (!isFlows) renderDetail(viewKey);
     });
 
-    ["sen-substations", "sen-plants", "sen-bess"].forEach((layerId) => {
+    const pointLayers = isFlows ? ["sen-substations"] : (viewKey === "marginal" ? ["sen-substations"] : ["sen-substations", "sen-plants", "sen-bess"]);
+    pointLayers.forEach((layerId) => {
       map.on("mouseenter", layerId, () => { map.getCanvas().style.cursor = "pointer"; });
       map.on("mouseleave", layerId, () => { map.getCanvas().style.cursor = ""; });
       map.on("click", layerId, (event) => {
@@ -2757,6 +2827,10 @@
   }
 
   function updateChartHover(viewKey, feature) {
+    if (viewKey === "overview") {
+      drawOverviewTopologyChart();
+      return;
+    }
     const ref = viewRefs[viewKey];
     if (!ref || !ref.chartId) return;
     const key = feature ? feature.name + "|" + feature.lat + "|" + feature.lon : "";
@@ -2772,18 +2846,19 @@
     const center = turf.point([lon, lat]);
     const circle = turf.circle(center, LENS_RADIUS_KM, { steps: 80, units: "kilometers" });
     map.getSource("lens").setData(circle);
-    const visible = points.filter((feature) => {
+    const sourcePoints = viewKey === "overview" ? [...visibleSubstationsFor("overview"), ...overviewPlants(), ...overviewBess()] : points;
+    const visible = sourcePoints.filter((feature) => {
       const layer = layerOf(feature);
       if (layer === "substation") return layers.substations;
-      if (layer === "plant") return layers.plants;
-      if (layer === "bess") return layers.bess;
+      if (layer === "plant") return viewKey !== "marginal" && viewKey !== "flows" && layers.plants;
+      if (layer === "bess") return viewKey !== "marginal" && viewKey !== "flows" && layers.bess;
       return false;
     });
     const nearby = visible
       .map((feature) => ({
         feature,
         distance: turf.distance(center, turf.point([feature.lon, feature.lat]), { units: "kilometers" }),
-        value: cmg(feature, hour),
+        value: viewKey === "overview" ? 1 : cmg(feature, hour),
       }))
       .filter((row) => row.distance <= LENS_RADIUS_KM)
       .sort((a, b) => b.value - a.value)
@@ -2795,7 +2870,16 @@
       updateChartHover(viewKey, selected);
       return;
     }
-    readout.innerHTML = "<strong>" + nearby.length + " activos · CMg " + Math.round(nearby.reduce((s, r) => s + r.value, 0) / nearby.length) + " USD/MWh</strong><span>Mayor señal: " + nearby[0].feature.name + " (" + nearby[0].value + ")</span>";
+    if (viewKey === "overview") {
+      const counts = nearby.reduce((acc, row) => {
+        const key = featureText(row.feature);
+        acc[key] = (acc[key] || 0) + 1;
+        return acc;
+      }, {});
+      readout.innerHTML = "<strong>" + nearby.length + " activos topológicos</strong><span>" + Object.entries(counts).map(([k, v]) => k + ": " + v).join(" · ") + "</span>";
+    } else {
+      readout.innerHTML = "<strong>" + nearby.length + " activos · CMg " + Math.round(nearby.reduce((s, r) => s + r.value, 0) / nearby.length) + " USD/MWh</strong><span>Mayor señal: " + nearby[0].feature.name + " (" + nearby[0].value + ")</span>";
+    }
     const nearest = nearby.slice().sort((a, b) => a.distance - b.distance)[0];
     showHoverPopup(viewKey, nearest.feature);
     updateChartHover(viewKey, nearest.feature);
@@ -2804,7 +2888,7 @@
   function showHoverPopup(viewKey, feature) {
     const el = document.getElementById(viewRefs[viewKey].popupId);
     if (!el) return;
-    el.innerHTML = pointPopupHtml(feature);
+    el.innerHTML = viewKey === "overview" ? topologyPointPopupHtml(feature) : pointPopupHtml(feature);
     el.hidden = false;
     positionHoverPopup(viewKey, feature);
   }
@@ -2868,6 +2952,15 @@
       '<div class="popup-foot">lat ' + feature.lat.toFixed(4) + ' · lon ' + feature.lon.toFixed(4) + ' · ' + formatHour(hour) + '</div>';
   }
 
+  function topologyPointPopupHtml(feature) {
+    const kind = featureText(feature);
+    const tech = layerOf(feature) === "substation" ? "Nodo/subestación" : gen2TechLabel(feature);
+    return '<div class="popup-kicker">Topología SEN · ' + kind + '</div>' +
+      '<div class="popup-title">' + escapeHtml(feature.name) + '</div>' +
+      '<div class="popup-row"><span class="popup-dot" style="background:' + topologyPointProperties(feature).color + '"></span>' + escapeHtml(tech) + '</div>' +
+      '<div class="popup-foot">lat ' + feature.lat.toFixed(4) + ' · lon ' + feature.lon.toFixed(4) + '</div>';
+  }
+
   function linePopupHtml(name, v, km, flowInfo) {
     const flowHtml = flowInfo
       ? '<div class="popup-flow-row"><span class="popup-dot" style="background:' + flowInfo.lc + '"></span>' + flowInfo.flow + ' / ' + flowInfo.limit + ' <span class="unit">MW · ' + flowInfo.ll + '</span></div>' +
@@ -2880,7 +2973,7 @@
   }
 
   function showPointPopup(viewKey, feature) {
-    createPopup(viewKey, [feature.lon, feature.lat], pointPopupHtml(feature));
+    createPopup(viewKey, [feature.lon, feature.lat], viewKey === "overview" ? topologyPointPopupHtml(feature) : pointPopupHtml(feature));
     popupState[viewKey] = { type: "point", feature };
   }
 
@@ -2906,8 +2999,24 @@
   function renderDetail(viewKey) {
     const ref = viewRefs[viewKey];
     if (!selected) {
+      if (viewKey === "overview") {
+        document.getElementById(ref.nameId).textContent = "Selecciona un elemento";
+        document.getElementById(ref.detailId).textContent = "Click sobre una central, subestación o línea para inspeccionar la topología.";
+        document.getElementById(ref.cmgId).textContent = "—";
+        document.getElementById(ref.valueId).textContent = "Topología";
+        drawOverviewTopologyChart();
+        return;
+      }
       document.getElementById(ref.cmgId).textContent = "—";
       drawCmgChart(ref.chartId, ref.valueId);
+      return;
+    }
+    if (viewKey === "overview") {
+      document.getElementById(ref.nameId).textContent = selected.name;
+      document.getElementById(ref.detailId).textContent = featureText(selected) + " · " + (layerOf(selected) === "substation" ? "Nodo/subestación" : gen2TechLabel(selected)) + " · lat " + selected.lat.toFixed(4) + ", lon " + selected.lon.toFixed(4);
+      document.getElementById(ref.cmgId).textContent = layerOf(selected) === "substation" ? "Nodo" : gen2TechLabel(selected);
+      document.getElementById(ref.valueId).textContent = "Topología";
+      drawOverviewTopologyChart();
       return;
     }
     document.getElementById(ref.nameId).textContent = selected.name;
@@ -2918,21 +3027,68 @@
   }
 
   function renderKPIs() {
-    const cmgValues = [];
-    const demandValues = demandSeries().map((row) => Number(row.valueMWh)).filter(Number.isFinite);
-    const subs = points.filter((f) => layerOf(f) === "substation");
-    const visibleHours = cmgVisibleHours().hours;
-    for (let i = 0; i < visibleHours.length; i += 1) {
-      const values = subs.map((f) => cmgSeries(f).find((point) => point.timestamp === visibleHours[i])?.value).map(Number).filter(Number.isFinite);
-      if (values.length) cmgValues.push(Math.round(values.reduce((a, b) => a + b, 0) / values.length));
-    }
-    const currentCmg = avgCmg();
-    const demand = currentDemand();
-    document.getElementById("kpi-demand").textContent = Number.isFinite(demand) ? Math.round(demand).toLocaleString("en-US") : CEN_NOT_INFORMED;
-    document.getElementById("kpi-cmg").textContent = Number.isFinite(currentCmg) ? currentCmg.toLocaleString("en-US") : CEN_NOT_INFORMED;
-    document.getElementById("kpi-freq").textContent = CEN_NOT_INFORMED;
-    document.getElementById("spark-demand").innerHTML = sparkline(demandValues);
-    document.getElementById("spark-cmg").innerHTML = sparkline(cmgValues);
+    const overviewPlantsCount = overviewPlants().length + overviewBess().length;
+    const visibleLines = grouped.lines.filter((line) => voltages[voltage(line)] !== false);
+    const lineCounts = LINE_VOLTAGES.map((kv) => kv + " kV " + grouped.lines.filter((line) => voltage(line) === kv).length).join(" · ");
+    document.getElementById("kpi-demand").textContent = overviewPlantsCount.toLocaleString("en-US");
+    document.getElementById("kpi-cmg").textContent = grouped.substations.length.toLocaleString("en-US");
+    document.getElementById("kpi-freq").textContent = visibleLines.length.toLocaleString("en-US");
+    document.getElementById("kpi-lines-note").textContent = lineCounts;
+    document.getElementById("spark-demand").innerHTML = "";
+    document.getElementById("spark-cmg").innerHTML = "";
+    drawOverviewTopologyChart();
+  }
+
+  function drawOverviewTopologyChart() {
+    const canvas = document.getElementById("cmg-chart");
+    const valueEl = document.getElementById("chart-value");
+    if (!canvas || !grouped) return;
+    const ctx = canvas.getContext("2d");
+    const dpr = window.devicePixelRatio || 1;
+    const width = Math.max(220, canvas.clientWidth || 280);
+    const height = 230;
+    canvas.width = Math.round(width * dpr);
+    canvas.height = Math.round(height * dpr);
+    canvas.style.height = height + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, width, height);
+    const rows = [
+      ...LINE_VOLTAGES.map((kv) => ({ label: kv + " kV", value: grouped.lines.filter((line) => voltage(line) === kv).length, color: kv === "500" ? cssVar("--primary", "#003ec7") : kv === "220" ? cssVar("--secondary", "#5e5e5e") : cssVar("--outline-variant", "#c3c5d9") })),
+      { label: "Subest.", value: grouped.substations.length, color: cssVar("--on-surface", "#151c27") },
+      { label: "Centrales", value: overviewPlants().length + overviewBess().length, color: cssVar("--status-ok", "#00875f") },
+    ];
+    const max = Math.max(1, ...rows.map((row) => row.value));
+    const pad = { top: 16, right: 12, bottom: 48, left: 42 };
+    const plotW = width - pad.left - pad.right;
+    const plotH = height - pad.top - pad.bottom;
+    const gap = 8;
+    const barW = Math.max(14, (plotW - gap * (rows.length - 1)) / rows.length);
+    ctx.strokeStyle = cssVar("--outline-variant", "#c3c5d9");
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(pad.left, pad.top + plotH);
+    ctx.lineTo(width - pad.right, pad.top + plotH);
+    ctx.stroke();
+    rows.forEach((row, index) => {
+      const x = pad.left + index * (barW + gap);
+      const h = (row.value / max) * plotH;
+      ctx.fillStyle = row.color;
+      ctx.globalAlpha = 0.88;
+      ctx.fillRect(x, pad.top + plotH - h, barW, h);
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = cssVar("--on-surface", "#151c27");
+      ctx.font = "11px 'JetBrains Mono', monospace";
+      ctx.textAlign = "center";
+      ctx.fillText(String(row.value), x + barW / 2, pad.top + plotH - h - 6);
+      ctx.save();
+      ctx.translate(x + barW / 2, height - 10);
+      ctx.rotate(-Math.PI / 8);
+      ctx.fillStyle = cssVar("--secondary", "#5e5e5e");
+      ctx.font = "10px 'JetBrains Mono', monospace";
+      ctx.fillText(row.label, 0, 0);
+      ctx.restore();
+    });
+    if (valueEl) valueEl.textContent = "Modelo SEN";
   }
 
   function formatTrend(diff, prev) {
@@ -3252,13 +3408,15 @@
     }
     return genApiText();
   }
+  function topologyNote() {
+    const techs = [...new Set(overviewUnits().map(gen2TechLabel))].sort().join(", ");
+    return "Topologia del modelo KMZ (sen-data.json): " + grouped.lines.length + " lineas, " + grouped.substations.length + " subestaciones/nodos y " + genUnits().length + " centrales/BESS. Tecnologias presentes: " + (techs || "sin clasificar") + ". Basemap: CARTO © OpenStreetMap.";
+  }
   function renderSectionNotes() {
     const live = liveData.loaded || Boolean(liveData.demanda) || Boolean(liveData.flowRows.length) || Boolean(liveData.generacion);
     const mapa = "Basemap: CARTO © OpenStreetMap.";
     const api = "API del Coordinador (CEN)";
-    setNote("note-overview", live
-      ? cmgApiText() + " " + demandApiText() + " Fuente: cmg-real-latest.json/demanda-real-estimada.json. KPIs y mapa usan red del modelo KMZ (sen-data.json). Frecuencia: " + CEN_NOT_INFORMED + ". " + mapa
-      : "KPIs y mapa: red del modelo KMZ (sen-data.json); CMg, demanda y frecuencia: " + CEN_NOT_INFORMED + ". " + mapa);
+    setNote("note-overview", topologyNote());
     setNote("note-marginal", live
       ? cmgApiText() + " Fuente: cmg-online-latest.json, mapeado sobre el modelo KMZ (sen-data.json). " + mapa
       : "CMg por nodo: " + CEN_NOT_INFORMED + "; red del modelo KMZ (sen-data.json). " + mapa);
@@ -3277,11 +3435,11 @@
       ? "Fecha análisis: " + analysisDateOrLive() + " · CMg " + visibleCmgHours.length + " h informadas · desde " + shortTimestampLabel(visibleCmgHours[0]).full + " hasta " + shortTimestampLabel(visibleCmgHours[visibleCmgHours.length - 1]).full + (visible.source === "history" ? " · histórico compacto" : "") + (liveData.cmgStale ? " · ultimo dato real disponible" : "")
       : "Datos: " + CEN_NOT_INFORMED;
     document.getElementById("mc-date").textContent = text;
-    document.getElementById("mc-date-overview").textContent = text;
+    document.getElementById("mc-date-overview").textContent = "Topología SEN · modelo KMZ · filtros por tensión y tecnología";
     const statusText = hasCmgWindow
       ? (liveData.cmgStale ? "API CEN sin actualización nueva · " : "API CEN activa · ") + "CMg " + visibleCmgHours.length + " h fecha análisis · " + liveData.cmgRows.length + " barras live · " + liveData.matchedFeatures + " nodos emparejados"
       : CEN_NOT_INFORMED;
-    document.getElementById("map-status").textContent = statusText;
+    document.getElementById("map-status").textContent = grouped.lines.length + " lineas · " + grouped.substations.length + " subestaciones/nodos · " + genUnits().length + " centrales/BESS";
     document.getElementById("map-status-mc").textContent = statusText;
     document.getElementById("table-status").textContent = "Top 12 nodos · " + origin + (hasCmgWindow ? " · " + shortTimestampLabel(visibleCmgHours[0]).full + " hasta " + shortTimestampLabel(visibleCmgHours[visibleCmgHours.length - 1]).full : "");
     const gen2Date = document.getElementById("gen2-date");
@@ -3309,6 +3467,7 @@
       if (lensNode) { showLensPopup(lensNode); setLensArcs(lensNode); }
       refreshPopup("gen2");
     }
+    renderOverviewTechFilter();
     renderGen2Kpis();
     renderGen2Ranking();
     if (currentView === "gen2") renderGenerationView();
@@ -3326,6 +3485,7 @@
     analysisDate = /^\d{4}-\d{2}-\d{2}$/.test(String(date || "")) ? date : "";
     syncAnalysisDateInputs();
     await ensureAnalysisHistory();
+    syncHourToAnalysisWindow();
     resetGenFilter(true);
     refreshAll();
   }
@@ -3537,8 +3697,9 @@
       liveData.matchedFeatures = points.filter((feature) => Number.isFinite(liveCmgValue(feature))).length;
       if (!analysisDate) analysisDate = analysisDateOrLive();
       syncAnalysisDateInputs();
-      ensureAnalysisHistory().then(() => refreshAll());
+      ensureAnalysisHistory().then(() => { syncHourToAnalysisWindow(); refreshAll(); });
       updateDates();
+      syncHourToAnalysisWindow();
       refreshAll();
       if (currentView === "gen2") renderGenerationView();
     } catch (error) {
@@ -3574,6 +3735,7 @@
       bess: points.filter((feature) => layerOf(feature) === "bess"),
     };
     resetGenFilter(true);
+    renderOverviewTechFilter();
   }
 
   init();
@@ -3675,6 +3837,19 @@
     renderGenerationView();
   });
 
+  document.getElementById("overview-tech-all")?.addEventListener("click", () => {
+    overviewFilter.techs.clear();
+    applyOverviewFilter();
+  });
+  document.getElementById("overview-techs")?.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-overview-tech]");
+    if (!button) return;
+    const tech = button.dataset.overviewTech;
+    if (overviewFilter.techs.has(tech)) overviewFilter.techs.delete(tech);
+    else overviewFilter.techs.add(tech);
+    applyOverviewFilter();
+  });
+
   document.querySelectorAll("[data-layer]").forEach((button) => {
     button.addEventListener("click", () => {
       const layer = button.dataset.layer;
@@ -3697,6 +3872,10 @@
     const canvas = document.getElementById(canvasId);
     if (!canvas) return;
     canvas.addEventListener("mousemove", (event) => {
+      if (canvasId === "cmg-chart") {
+        drawOverviewTopologyChart();
+        return;
+      }
       const state = cmgChartState[canvasId];
       if (!state) return;
       const rect = canvas.getBoundingClientRect();
@@ -3705,14 +3884,18 @@
       drawCmgChart(canvasId, state.valueId, state.feature, hour);
     });
     canvas.addEventListener("mouseleave", () => {
+      if (canvasId === "cmg-chart") {
+        drawOverviewTopologyChart();
+        return;
+      }
       const state = cmgChartState[canvasId];
       if (!state) return;
       drawCmgChart(canvasId, state.valueId, state.feature);
     });
   });
 
-  document.getElementById("filter-btn-overview").addEventListener("click", openFilterModal);
-  document.getElementById("filter-btn-marginal").addEventListener("click", openFilterModal);
+  document.getElementById("filter-btn-overview")?.addEventListener("click", openFilterModal);
+  document.getElementById("filter-btn-marginal")?.addEventListener("click", openFilterModal);
   document.getElementById("filter-close").addEventListener("click", () => closeFilterModal(false));
   document.getElementById("filter-cancel").addEventListener("click", () => closeFilterModal(false));
   document.getElementById("filter-apply").addEventListener("click", () => closeFilterModal(true));
@@ -3740,7 +3923,8 @@
   let resizeTimer = null;
   function resizeVisuals() {
     Object.values(maps).forEach((map) => { if (map) map.resize(); });
-    ["overview", "marginal"].forEach((viewKey) => {
+    drawOverviewTopologyChart();
+    ["marginal"].forEach((viewKey) => {
       const ref = viewRefs[viewKey];
       const state = cmgChartState[ref.chartId];
       drawCmgChart(ref.chartId, ref.valueId, state ? state.feature : selected);
