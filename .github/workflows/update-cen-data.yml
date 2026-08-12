@@ -22,8 +22,10 @@ jobs:
 
       - name: Descargar datos CEN
         env:
-          CEN_API_BASE_URL: ${{ vars.CEN_API_BASE_URL }}
+          CEN_API_BASE_URL: "https://sipub.api.coordinador.cl:443"
           CEN_API_KEY: ${{ secrets.CEN_API_KEY }}
+          CEN_DATASETS: "cmg-online,generacion-real"
+          CEN_LOOKBACK_DAYS: "1"
         run: node scripts/fetch-cen-data.mjs
 
       - name: Commit datos actualizados

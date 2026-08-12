@@ -425,9 +425,23 @@
       color: var(--primary);
       background: var(--primary-tint);
     }
+    .gen-filter-panel { gap: 10px; }
+    .gen-filter-actions .toggle, .gen-filter-techs .toggle { flex: 1 1 calc(50% - 6px); }
+    #gen-filter-query { width: 100%; min-width: 0; }
+    .gen-filter-list { max-height: 320px; }
+    .gen-filter-row { min-height: 48px; padding: 10px 8px; }
   }
   .maplibregl-map, .maplibregl-canvas { border-radius: 0 !important; }
   .mobile-bottom-nav { display: none; }
+  .gen-filter-panel { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .gen-filter-techs, .gen-filter-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .gen-filter-list { max-height: 260px; overflow-y: auto; border: 1px solid var(--outline-variant); background: var(--surface-container-lowest); }
+  .gen-filter-row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 9px 10px; border-bottom: 1px solid var(--outline-variant); cursor: pointer; }
+  .gen-filter-row:last-child { border-bottom: 0; }
+  .gen-filter-row:hover { background: var(--surface-container-low); }
+  .gen-filter-row input { width: 18px; height: 18px; accent-color: var(--primary); }
+  #gen-filter-query { max-width: 100%; }
+  .gen-filter-row-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .maplibregl-ctrl-group {
     border-radius: 0 !important;
     box-shadow: none !important;
@@ -779,6 +793,32 @@
         <div class="flex items-baseline gap-2"><span id="k2-cmg-avg" class="text-headline-lg text-on-surface tracking-tighter">—</span><span class="text-caption text-secondary">USD/MWh</span></div>
       </div>
       <div class="col-span-4 md:col-span-12 bg-surface-container-lowest swiss-border p-3 mt-gutter">
+        <div class="flex flex-wrap justify-between items-start gap-3 swiss-border-b pb-2 mb-3">
+          <div>
+            <div class="text-headline-md text-on-surface">Filtro de Centrales</div>
+            <div id="gen-filter-status" class="text-caption font-label-mono text-secondary mt-1">Todas las tecnologias y centrales visibles.</div>
+          </div>
+          <div class="gen-filter-actions">
+            <button id="gen-filter-all" class="toggle">Seleccionar todo</button>
+            <button id="gen-filter-none" class="toggle">Limpiar centrales</button>
+            <button id="gen-filter-reset" class="toggle active">Reset</button>
+          </div>
+        </div>
+        <div class="gen-filter-panel">
+          <div>
+            <div class="text-label-mono text-secondary uppercase tracking-widest mb-2">Tecnologia</div>
+            <div id="gen-filter-techs" class="gen-filter-techs"></div>
+          </div>
+          <div>
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+              <div class="text-label-mono text-secondary uppercase tracking-widest">Centrales</div>
+              <input id="gen-filter-query" type="text" placeholder="Buscar central..." class="glass-ctrl px-3 py-1 text-label-mono text-on-surface focus:border-primary min-w-[220px]">
+            </div>
+            <div id="gen-filter-list" class="gen-filter-list"></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-span-4 md:col-span-12 bg-surface-container-lowest swiss-border p-3 mt-gutter">
         <div class="flex flex-wrap justify-between items-center swiss-border-b pb-2 mb-2 gap-3">
           <div>
             <div class="text-headline-md text-on-surface">Mapa de Generación por Nodo</div>
@@ -993,9 +1033,7 @@
                 <span id="chart-value" class="text-headline-md font-bold text-on-surface">—</span>
               </div>
               <canvas id="cmg-chart"></canvas>
-              <div class="flex justify-between text-caption font-label-mono text-secondary mt-1">
-                <span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>24:00</span>
-              </div>
+              <div class="text-caption font-label-mono text-secondary mt-1">Eje: ultimas 24 h publicadas por la API (fecha/hora UTC).</div>
             </div>
           </div>
         </div>
@@ -1065,9 +1103,7 @@
                 <span id="chart-value-mc" class="text-headline-md font-bold text-on-surface">—</span>
               </div>
               <canvas id="cmg-chart-mc"></canvas>
-              <div class="flex justify-between text-caption font-label-mono text-secondary mt-1">
-                <span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>24:00</span>
-              </div>
+              <div class="text-caption font-label-mono text-secondary mt-1">Eje: ultimas 24 h publicadas por la API (fecha/hora UTC).</div>
             </div>
           </div>
         </div>
@@ -1266,7 +1302,7 @@
   const nodeFilter = { selected: new Set() };
   const layers = { lines: true, substations: true, plants: true, bess: true };
   const voltages = { "500": true, "220": true, "154": true };
-  const liveData = { status: null, cmgOnline: new Map(), cmgRows: [], generacion: null, loaded: false, matchedFeatures: 0 };
+  const liveData = { status: null, cmgOnline: new Map(), cmgRows: [], cmgHistory: new Map(), cmgHours: [], generacion: null, loaded: false, matchedFeatures: 0 };
   let points = [];
   let substations = [];
   let grouped = null;
@@ -1285,6 +1321,7 @@
   const cmgChartState = {};
   const hoverChartKey = { overview: "", marginal: "" };
   let gen2ChartHoverKey = "";
+  const genFilter = { techs: new Set(), plants: new Set(), query: "" };
   const viewRefs = {
     overview: { mapId: "map", chartId: "cmg-chart", lensId: "lens-readout", popupId: "lens-popup", nameId: "node-name", detailId: "node-detail", cmgId: "node-cmg", valueId: "chart-value" },
     marginal: { mapId: "map-mc", chartId: "cmg-chart-mc", lensId: "lens-readout-mc", popupId: "lens-popup-mc", nameId: "node-name-mc", detailId: "node-detail-mc", cmgId: "node-cmg-mc", valueId: "chart-value-mc" },
@@ -1489,6 +1526,15 @@
   function genHourLabel(key) {
     return String(key).slice(11, 13) + "h";
   }
+  function genAxisLabel(key, index, allHours) {
+    const text = String(key || "");
+    const m = text.match(/(\d{4})-(\d{2})-(\d{2})[T\s](\d{2})/);
+    if (!m) return text;
+    const previous = index > 0 ? String((allHours || [])[index - 1] || "") : "";
+    const dayChanged = index === 0 || previous.slice(0, 10) !== text.slice(0, 10);
+    const hour = Number(m[4]);
+    return dayChanged || hour % 6 === 0 ? m[3] + "/" + m[2] + "\n" + m[4] + "h" : m[4] + "h";
+  }
   function genFullLabel(key) {
     const m = String(key).match(/(\d{4})-(\d{2})-(\d{2})[T\s](\d{2})/);
     return m ? m[3] + "/" + m[2] + " " + m[4] + ":00 UTC" : String(key);
@@ -1516,7 +1562,7 @@
     return genChart;
   }
   function buildGenOption(gen) {
-    const hours = gen.hours.map(genHourLabel);
+    const hours = gen.hours;
     const series = gen.series.map((s) => ({
       name: s.technology,
       type: "bar",
@@ -1571,7 +1617,7 @@
         data: hours,
         axisLine: { lineStyle: { color: cssVar("--outline-variant", "#c3c5d9") } },
         axisTick: { show: false },
-        axisLabel: { color: cssVar("--secondary", "#5e5e5e"), fontSize: 10, interval: 1 },
+        axisLabel: { color: cssVar("--secondary", "#5e5e5e"), fontSize: 10, interval: 1, formatter: (value, index) => genAxisLabel(value, index, gen.hours) },
       },
       yAxis: {
         type: "value",
@@ -1584,9 +1630,10 @@
     };
   }
   function renderGenSource(gen) {
-    const origin = gen && !gen.simulated ? "Generación real · API del Coordinador (CEN) · últimas " + gen.hours.length + " horas disponibles" : "Modelo de respaldo simulado · la API del Coordinador (CEN) no entregó datos de generación";
+    const origin = gen && !gen.simulated ? "Generación real · API del Coordinador (CEN) · últimas " + gen.hours.length + " h secuenciales informadas" : "Modelo de respaldo simulado · la API del Coordinador (CEN) no entregó datos de generación";
+    const windowText = gen && gen.hours && gen.hours.length ? " · desde " + genFullLabel(gen.hours[0]) + " hasta " + genFullLabel(gen.hours[gen.hours.length - 1]) : "";
     const updated = gen && gen.updatedAt ? " · actualizado " + String(gen.updatedAt).slice(0, 16).replace("T", " ") + " UTC" : "";
-    setGenText("gen-source", "Datos: " + origin + updated);
+    setGenText("gen-source", "Datos: " + origin + windowText + updated);
   }
   function renderGenKpis(gen) {
     const energy = genEnergyGWh(gen);
@@ -1717,6 +1764,20 @@
     }
     return best.score >= 2 ? best.value : NaN;
   }
+  function cmgHistoryFor(feature) {
+    if (!feature || !liveData.cmgHistory.size) return null;
+    const candidates = [feature.name, normalizeKey(feature.name), ...keyTokens(feature.name)];
+    let best = { score: 0, entry: null };
+    for (const candidate of candidates) {
+      const direct = liveData.cmgHistory.get(normalizeKey(candidate));
+      if (direct) return direct;
+    }
+    for (const [alias, entry] of liveData.cmgHistory.entries()) {
+      const score = Math.max(...candidates.map((candidate) => matchScore(normalizeKey(candidate), alias)));
+      if (score > best.score) best = { score, entry };
+    }
+    return best.score >= 2 ? best.entry : null;
+  }
   function cmgColor(value) {
     if (value > 105) return cssVar("--status-critical", "#ba1a1a");
     if (value > 65) return cssVar("--on-surface", "#151c27");
@@ -1724,6 +1785,14 @@
   }
   function formatHour(h) {
     return String(h).padStart(2, "0") + ":00";
+  }
+  function timestampHour(timestamp) {
+    const m = String(timestamp || "").match(/(\d{4})-(\d{2})-(\d{2})[T\s](\d{2})/);
+    return m ? Number(m[4]) : 0;
+  }
+  function shortTimestampLabel(timestamp) {
+    const m = String(timestamp || "").match(/(\d{4})-(\d{2})-(\d{2})[T\s](\d{2})/);
+    return m ? { date: m[3] + "/" + m[2], hour: m[4] + "h", full: m[3] + "/" + m[2] + " " + m[4] + ":00 UTC" } : { date: "", hour: String(timestamp || ""), full: String(timestamp || "") };
   }
   function demandAt(h) {
     const evening = Math.exp(-Math.pow(h - 20.5, 2) / 7) * 1650;
@@ -1738,6 +1807,19 @@
     return values.length ? Math.round(values.reduce((a, b) => a + b, 0) / values.length) : 0;
   }
   function cmgSeries(feature) {
+    const history = cmgHistoryFor(feature);
+    if (history && Array.isArray(history.values) && history.values.length) {
+      return history.values.map((point, index) => {
+        const h = timestampHour(point.timestamp);
+        const value = Number(point.value);
+        return {
+          h,
+          timestamp: point.timestamp,
+          value: Number.isFinite(value) ? Math.round(value) : simulatedCmg(feature, h || index),
+          live: Number.isFinite(value),
+        };
+      });
+    }
     const curve = [];
     for (let h = 0; h < 24; h += 1) curve.push({ h, value: simulatedCmg(feature, h) });
     const live = liveCmgValue(feature);
@@ -1816,6 +1898,32 @@
     if (folder.includes("Almacenamientos")) return "bess";
     return "other";
   }
+  const GEN2_TECH_LABELS = {
+    solar: "Solar", csp: "Solar", wind: "Eólica", hydroRun: "Hidráulica", hydroRes: "Hidráulica",
+    geo: "Geotermia", gas: "Gas Natural", coal: "Carbón", biomass: "Biomasa", biogas: "Biogás",
+    oil: "Petróleo Diésel", bess: "BESS", other: "Otros",
+  };
+  function gen2TechLabel(feature) { return GEN2_TECH_LABELS[gen2TypeOf(feature)] || "Otros"; }
+  function genUnitKey(feature) { return normalizeKey(feature.name) + "|" + feature.lat + "|" + feature.lon; }
+  function genUnits() { return [...(grouped?.plants || []), ...(grouped?.bess || [])]; }
+  function genPassesFilter(feature) {
+    return (!genFilter.techs.size || genFilter.techs.has(gen2TypeOf(feature))) && genFilter.plants.has(genUnitKey(feature));
+  }
+  function genTechFilteredUnits() {
+    return genUnits().filter((feature) => !genFilter.techs.size || genFilter.techs.has(gen2TypeOf(feature)));
+  }
+  function filteredGenUnits() { return genUnits().filter(genPassesFilter); }
+  function filteredGenPlants() { return (grouped?.plants || []).filter(genPassesFilter); }
+  function filteredGenBess() { return (grouped?.bess || []).filter(genPassesFilter); }
+  function resetGenFilter(skipRender) {
+    genFilter.techs.clear();
+    genFilter.plants.clear();
+    genUnits().forEach((feature) => genFilter.plants.add(genUnitKey(feature)));
+    genFilter.query = "";
+    const input = document.getElementById("gen-filter-query");
+    if (input) input.value = "";
+    if (!skipRender) applyGenFilter();
+  }
   const GEN2_CAP = {
     solar: [60, 220], csp: [50, 130], wind: [20, 140], hydroRun: [10, 90],
     hydroRes: [40, 320], geo: [30, 120], gas: [50, 380], coal: [100, 420],
@@ -1874,9 +1982,11 @@
     };
   }
   function computeGen2MaxMw() {
+    const plants = filteredGenPlants();
+    const bess = filteredGenBess();
     gen2MaxMw = Math.max(
-      grouped.plants.reduce((m, f) => Math.max(m, genAt(f, hour)), 1),
-      grouped.bess.reduce((m, f) => Math.max(m, genAt(f, hour)), 1)
+      plants.reduce((m, f) => Math.max(m, genAt(f, hour)), 1),
+      bess.reduce((m, f) => Math.max(m, genAt(f, hour)), 1)
     );
     gen2CmgMax = points.reduce((m, f) => Math.max(m, cmg(f, hour)), 1);
   }
@@ -1886,8 +1996,8 @@
     computeGen2MaxMw();
     map.getSource("lines").setData(makeLineCollection(grouped.lines));
     map.getSource("substations").setData(makeGen2PointCollection(grouped.substations));
-    map.getSource("plants").setData(makeGen2PointCollection(grouped.plants));
-    map.getSource("bess").setData(makeGen2PointCollection(grouped.bess));
+    map.getSource("plants").setData(makeGen2PointCollection(filteredGenPlants()));
+    map.getSource("bess").setData(makeGen2PointCollection(filteredGenBess()));
   }
   function initGen2Map() {
     computeGen2MaxMw();
@@ -1899,8 +2009,8 @@
           world: { type: "raster", tiles: BASEMAPS[currentTheme()], tileSize: 256, maxzoom: 19, attribution: "© OpenStreetMap contributors © CARTO" },
           lines: { type: "geojson", data: makeLineCollection(grouped.lines) },
           substations: { type: "geojson", data: makeGen2PointCollection(grouped.substations) },
-          plants: { type: "geojson", data: makeGen2PointCollection(grouped.plants) },
-          bess: { type: "geojson", data: makeGen2PointCollection(grouped.bess) },
+          plants: { type: "geojson", data: makeGen2PointCollection(filteredGenPlants()) },
+          bess: { type: "geojson", data: makeGen2PointCollection(filteredGenBess()) },
           lens: { type: "geojson", data: { type: "FeatureCollection", features: [] } },
           lensArcs: { type: "geojson", data: { type: "FeatureCollection", features: [] } },
         },
@@ -2253,8 +2363,47 @@
       }, delay || 350);
     });
   }
+  function renderGenFilter() {
+    const techEl = document.getElementById("gen-filter-techs");
+    const listEl = document.getElementById("gen-filter-list");
+    if (!techEl || !listEl) return;
+    const techRows = Array.from(new Map(genUnits().map((feature) => [gen2TypeOf(feature), gen2TechLabel(feature)])).entries())
+      .sort((a, b) => a[1].localeCompare(b[1], "es"));
+    techEl.innerHTML = techRows.map(([key, label]) =>
+      '<button class="toggle ' + (genFilter.techs.has(key) ? 'active' : '') + '" data-gen-tech="' + escapeHtml(key) + '">' + escapeHtml(label) + '</button>'
+    ).join("");
+    const query = normalizeKey(genFilter.query);
+    const rows = genTechFilteredUnits()
+      .filter((feature) => !query || normalizeKey(feature.name).includes(query))
+      .sort((a, b) => String(a.name).localeCompare(String(b.name), "es"));
+    listEl.innerHTML = rows.length ? rows.map((feature) => {
+      const key = genUnitKey(feature);
+      return '<label class="gen-filter-row">' +
+        '<input type="checkbox" data-gen-unit="' + escapeHtml(key) + '" ' + (genFilter.plants.has(key) ? 'checked' : '') + '>' +
+        '<span class="gen-filter-row-name text-body-sm text-on-surface">' + escapeHtml(feature.name) + '</span>' +
+        '<span class="text-caption font-label-mono text-secondary">' + escapeHtml(gen2TechLabel(feature)) + '</span>' +
+      '</label>';
+    }).join("") : '<div class="text-caption font-label-mono text-secondary p-4">Sin centrales para este filtro.</div>';
+    const status = document.getElementById("gen-filter-status");
+    if (status) {
+      const selected = filteredGenUnits().length;
+      const available = genTechFilteredUnits().length;
+      const techText = genFilter.techs.size ? genFilter.techs.size + " tecnologias" : "todas las tecnologias";
+      status.textContent = selected + " de " + available + " centrales visibles · " + techText + ".";
+    }
+  }
+  function applyGenFilter() {
+    renderGenFilter();
+    if (gen2Selected && !genPassesFilter(gen2Selected)) gen2Selected = null;
+    updateGen2MapData();
+    renderGen2Kpis();
+    renderGen2Ranking();
+    if (gen2Selected) renderGen2Detail(gen2Selected);
+    else renderGen2Detail(null);
+    refreshPopup("gen2");
+  }
   function renderGen2Kpis() {
-    const plants = grouped.plants;
+    const plants = filteredGenPlants();
     const total = plants.reduce((s, f) => s + genAt(f, hour), 0);
     let peak = 0;
     for (let h = 0; h < 24; h += 1) {
@@ -2266,13 +2415,17 @@
     document.getElementById("k2-cmg-avg").textContent = Math.round(avgCmg()).toLocaleString("en-US");
   }
   function renderGen2Ranking() {
-    const rows = grouped.plants
+    const rows = filteredGenPlants()
       .map((f) => ({ name: f.name, type: gen2TypeOf(f), mw: genAt(f, hour), color: gen2Color(genAt(f, hour)) }))
       .sort((a, b) => b.mw - a.mw)
       .slice(0, 10);
     const status = document.getElementById("gen2-ranking-status");
     if (status) status.textContent = "Top " + rows.length + " centrales · " + formatHour(hour);
     const el = document.getElementById("gen2-ranking");
+    if (!rows.length) {
+      el.innerHTML = '<div class="text-caption font-label-mono text-secondary border border-outline-variant p-4">No hay centrales para el filtro activo.</div>';
+      return;
+    }
     el.innerHTML = rows.map((row) =>
       '<div class="border border-outline-variant p-4 flex items-center justify-between gap-3">' +
         '<div class="min-w-0">' +
@@ -2689,7 +2842,7 @@
     const total = grouped.lines.length;
     const critical = grouped.lines.filter((f) => lineLoading(f, hour) > 0.9).length;
     const high = grouped.lines.filter((f) => lineLoading(f, hour) > 0.7).length;
-    return total + " líneas · " + critical + " críticas · " + high + " altas · " + (dataDate() || "s/fecha");
+    return total + " lineas · " + critical + " criticas · " + high + " altas · limites CEN + flujos simulados";
   }
 
   function renderFlowTable() {
@@ -2819,7 +2972,7 @@
     }
 
     const series = cmgSeries(node);
-    const pad = { top: 14, right: 12, bottom: 30, left: 42 };
+    const pad = { top: 14, right: 12, bottom: 42, left: 42 };
     const plotW = width - pad.left - pad.right;
     const plotH = height - pad.top - pad.bottom;
 
@@ -2844,15 +2997,15 @@
       ctx.fillText(String(Math.round(value)), pad.left - 6, y);
     }
 
-    const slot = plotW / 24;
+    const slot = plotW / series.length;
     const xs = series.map((p, i) => pad.left + slot * (i + 0.5));
     const ys = series.map((p) => pad.top + plotH - (p.value / maxV) * plotH);
-    const highlight = Number.isInteger(hoverHour) && hoverHour >= 0 && hoverHour < 24 ? hoverHour : hour;
+    const highlight = Number.isInteger(hoverHour) && hoverHour >= 0 && hoverHour < series.length ? hoverHour : Math.min(series.length - 1, hour);
 
     ctx.beginPath();
     ctx.moveTo(xs[0], pad.top + plotH);
     series.forEach((p, i) => ctx.lineTo(xs[i], ys[i]));
-    ctx.lineTo(xs[23], pad.top + plotH);
+    ctx.lineTo(xs[xs.length - 1], pad.top + plotH);
     ctx.closePath();
     ctx.fillStyle = cssVar("--primary", "#003ec7");
     ctx.globalAlpha = 0.12;
@@ -2870,7 +3023,7 @@
     ctx.lineCap = "round";
     ctx.stroke();
 
-    if (Number.isInteger(hoverHour) && hoverHour >= 0 && hoverHour < 24) {
+    if (Number.isInteger(hoverHour) && hoverHour >= 0 && hoverHour < series.length) {
       ctx.strokeStyle = cssVar("--outline", "#737688");
       ctx.setLineDash([4, 3]);
       ctx.lineWidth = 1;
@@ -2892,18 +3045,41 @@
     ctx.font = "10px 'JetBrains Mono', monospace";
     ctx.textAlign = "center";
     ctx.textBaseline = "top";
-    [0, 6, 12, 18, 23].forEach((hh) => {
-      ctx.fillText(String(hh).padStart(2, "0") + ":00", pad.left + slot * (hh + 0.5), height - 16);
+    const labelIndexes = [0, Math.floor((series.length - 1) / 3), Math.floor(((series.length - 1) * 2) / 3), series.length - 1].filter((v, i, arr) => arr.indexOf(v) === i);
+    labelIndexes.forEach((idx) => {
+      const label = series[idx].timestamp ? shortTimestampLabel(series[idx].timestamp) : { date: "", hour: String(series[idx].h).padStart(2, "0") + ":00" };
+      const x = pad.left + slot * (idx + 0.5);
+      if (label.date) ctx.fillText(label.date, x, height - 28);
+      ctx.fillText(label.hour, x, height - 16);
     });
 
-    document.getElementById(valueId).textContent = series[highlight] ? series[highlight].value : 0;
-    cmgChartState[canvasId] = { pad, slot, valueId, feature: node };
+    const selectedPoint = series[highlight];
+    const valueEl = document.getElementById(valueId);
+    valueEl.textContent = selectedPoint ? selectedPoint.value : 0;
+    if (selectedPoint && selectedPoint.timestamp) valueEl.title = shortTimestampLabel(selectedPoint.timestamp).full;
+    cmgChartState[canvasId] = { pad, slot, valueId, feature: node, length: series.length };
   }
 
   function dataDate() {
     if (liveData.cmgRows.length && liveData.cmgRows[0].timestamp) return liveData.cmgRows[0].timestamp.slice(0, 10);
     const dataset = liveData.status?.datasets?.find((d) => d.id === "cmg-online");
     return dataset?.range?.startDate || "";
+  }
+  function cmgWindowText() {
+    if (!liveData.cmgHours.length) return "";
+    return shortTimestampLabel(liveData.cmgHours[0]).full + " → " + shortTimestampLabel(liveData.cmgHours[liveData.cmgHours.length - 1]).full;
+  }
+  function cmgApiText() {
+    const range = cmgWindowText();
+    return liveData.loaded && range
+      ? "CMg API del Coordinador (CEN): ultimas " + liveData.cmgHours.length + " h secuenciales informadas, desde " + shortTimestampLabel(liveData.cmgHours[0]).full + " hasta " + shortTimestampLabel(liveData.cmgHours[liveData.cmgHours.length - 1]).full + "."
+      : "CMg simulado de respaldo: la API del Coordinador (CEN) no entrego una ventana horaria util.";
+  }
+  function genApiText() {
+    const gen = liveData.generacion && liveData.generacion.hours && liveData.generacion.hours.length ? liveData.generacion : null;
+    return gen && !gen.simulated
+      ? "Generacion real API del Coordinador (CEN): ultimas " + gen.hours.length + " h secuenciales informadas, desde " + genFullLabel(gen.hours[0]) + " hasta " + genFullLabel(gen.hours[gen.hours.length - 1]) + "."
+      : "Generacion por tecnologia simulada de respaldo: la API del Coordinador (CEN) no entrego una ventana horaria util.";
   }
 
   function setNote(id, text) {
@@ -2913,44 +3089,45 @@
   function genNote() {
     const gen = liveData.generacion && liveData.generacion.hours && liveData.generacion.hours.length ? liveData.generacion : null;
     if (gen && !gen.simulated) {
-      return "Generación por tecnología: datos reales de la API del Coordinador (CEN) · generacion-real-last-24h.json · " + gen.hours.length + " horas · actualizado " + String(gen.updatedAt || "").slice(0, 16).replace("T", " ") + " UTC.";
+      return genApiText() + " Fuente: generacion-real-last-24h.json · actualizado " + String(gen.updatedAt || "").slice(0, 16).replace("T", " ") + " UTC. Esta es generacion global del sistema, no filtrada por central.";
     }
-    return "Generación por tecnología: modelo determinista de respaldo (la API del Coordinador (CEN) no está entregando datos de generación). Cuando esté activa, la fuente será generacion-real-last-24h.json.";
+    return genApiText() + " Cuando este activa, la fuente sera generacion-real-last-24h.json.";
   }
   function renderSectionNotes() {
-    const date = dataDate();
     const live = liveData.loaded;
     const mapa = "Basemap: CARTO © OpenStreetMap.";
     const api = "API del Coordinador (CEN)";
     setNote("note-overview", live
-      ? "KPIs y mapa: red del modelo KMZ (sen-data.json) + CMg de la " + api + " · cmg-online-latest.json" + (date ? " (fecha " + date + ")" : "") + ". Demanda y frecuencia: modelo simulado por hora (la API del Coordinador no publica estas series en tiempo real). " + mapa
+      ? cmgApiText() + " Fuente: cmg-online-latest.json. KPIs y mapa usan red del modelo KMZ (sen-data.json). Demanda y frecuencia: modelo simulado por hora (la API del Coordinador no publica estas series en tiempo real). " + mapa
       : "KPIs y mapa: red del modelo KMZ (sen-data.json); CMg simulado localmente porque la " + api + " no está entregando datos (sin clave/red). Demanda y frecuencia: modelo simulado por hora. " + mapa);
     setNote("note-marginal", live
-      ? "CMg por nodo: " + api + " · cmg-online-latest.json" + (date ? " (fecha " + date + ")" : "") + ", mapeado sobre el modelo KMZ (sen-data.json). " + mapa
+      ? cmgApiText() + " Fuente: cmg-online-latest.json, mapeado sobre el modelo KMZ (sen-data.json). " + mapa
       : "CMg por nodo: simulado localmente porque la " + api + " no respondió (sin clave/red); red del modelo KMZ (sen-data.json). " + mapa);
     setNote("note-flows", "Límites físicos: reales del reporte CEN (reporte_secciones-tramos.xlsx → linea-limites.json). Flujos: modelo simulado por hora (el modelo KMZ no incluye flujos). " + mapa);
     setNote("note-generation", genNote());
-    setNote("note-gen2", "Generación por nodo: modelo determinista por tipo de central del KMZ (sen-data.json) según folder (solar, eólico, hidro, carbón, gas, etc.) con perfiles horarios; CMg: " + api + (live ? " (cmg-online-latest.json)" : " simulado de respaldo (sin API del Coordinador)") + ". " + mapa);
+    setNote("note-gen2", "Generacion por nodo: modelo deterministico por tipo de central del KMZ (sen-data.json) segun folder (solar, eolico, hidro, carbon, gas, etc.) con perfiles horarios. " + cmgApiText() + " " + mapa);
   }
 
   function updateDates() {
-    const date = dataDate();
-    const origin = liveData.loaded ? "CMg API del Coordinador" : "CMg simulado (sin API del Coordinador)";
-    const text = "Datos: " + (date || "s/fecha") + " · " + origin;
+    const hasCmgWindow = liveData.loaded && liveData.cmgHours.length;
+    const origin = hasCmgWindow ? "CMg API del Coordinador (CEN)" : "CMg simulado (sin API CEN)";
+    const text = hasCmgWindow
+      ? "Datos CEN: ultimas " + liveData.cmgHours.length + " h secuenciales · desde " + shortTimestampLabel(liveData.cmgHours[0]).full + " hasta " + shortTimestampLabel(liveData.cmgHours[liveData.cmgHours.length - 1]).full
+      : "Datos: CMg simulado de respaldo (sin ventana API CEN util)";
     document.getElementById("mc-date").textContent = text;
     document.getElementById("mc-date-overview").textContent = text;
-    const statusText = liveData.loaded
-      ? "API del Coordinador activa · " + liveData.cmgRows.length + " barras · " + liveData.matchedFeatures + " nodos emparejados · " + (date || "s/fecha")
+    const statusText = hasCmgWindow
+      ? "API CEN activa · CMg ultimas " + liveData.cmgHours.length + " h secuenciales · " + liveData.cmgRows.length + " barras · " + liveData.matchedFeatures + " nodos emparejados"
       : "API del Coordinador sin datos · usando CMg simulado de respaldo";
     document.getElementById("map-status").textContent = statusText;
     document.getElementById("map-status-mc").textContent = statusText;
-    document.getElementById("table-status").textContent = "Top 12 nodos · " + origin + (date ? " · " + date : "");
+    document.getElementById("table-status").textContent = "Top 12 nodos · " + origin + (hasCmgWindow ? " · " + shortTimestampLabel(liveData.cmgHours[0]).full + " hasta " + shortTimestampLabel(liveData.cmgHours[liveData.cmgHours.length - 1]).full : "");
     const gen2Date = document.getElementById("gen2-date");
     if (gen2Date) gen2Date.textContent = text;
     const gen2Status = document.getElementById("map-status-gen2");
     if (gen2Status) gen2Status.textContent = statusText;
     const flowsDate = document.getElementById("flow-date");
-    if (flowsDate) flowsDate.textContent = text;
+    if (flowsDate) flowsDate.textContent = "Datos: limites reales CEN por tramo · flujos horarios simulados (sin serie API 24 h de flujos)";
     const flowsStatus = document.getElementById("map-status-flows");
     if (flowsStatus) flowsStatus.textContent = flowsStatusText();
     renderSectionNotes();
@@ -3092,6 +3269,16 @@
       }
       if (Array.isArray(cmgOnline?.records)) {
         liveData.cmgRows = cmgOnline.records;
+        liveData.cmgHours = Array.isArray(cmgOnline.hours) ? cmgOnline.hours : [];
+        liveData.cmgHistory.clear();
+        if (Array.isArray(cmgOnline.history)) {
+          cmgOnline.history.forEach((row) => {
+            if (!Array.isArray(row.values) || !row.values.length) return;
+            const entry = { name: row.name, values: row.values, source: cmgOnline.source, range: cmgOnline.range };
+            const aliases = [row.key, row.name, ...(row.aliases || [])].map(normalizeKey).filter(Boolean);
+            aliases.forEach((alias) => liveData.cmgHistory.set(alias, entry));
+          });
+        }
         cmgOnline.records.forEach((row) => {
           if (Number.isFinite(Number(row.value))) {
             const entry = { value: Number(row.value), timestamp: row.timestamp, name: row.name, source: cmgOnline.source, range: cmgOnline.range };
@@ -3137,10 +3324,12 @@
       plants: points.filter((feature) => layerOf(feature) === "plant"),
       bess: points.filter((feature) => layerOf(feature) === "bess"),
     };
+    resetGenFilter(true);
   }
 
   init();
   buildHourSelects();
+  renderGenFilter();
   tickClock();
   setInterval(tickClock, 1000);
   switchView("overview");
@@ -3190,6 +3379,35 @@
     clearLineSelection();
   });
 
+  document.getElementById("gen-filter-techs").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-gen-tech]");
+    if (!button) return;
+    const tech = button.dataset.genTech;
+    if (genFilter.techs.has(tech)) genFilter.techs.delete(tech);
+    else genFilter.techs.add(tech);
+    applyGenFilter();
+  });
+  document.getElementById("gen-filter-list").addEventListener("change", (event) => {
+    if (!event.target.matches("input[data-gen-unit]")) return;
+    const key = event.target.dataset.genUnit;
+    if (event.target.checked) genFilter.plants.add(key);
+    else genFilter.plants.delete(key);
+    applyGenFilter();
+  });
+  document.getElementById("gen-filter-query").addEventListener("input", (event) => {
+    genFilter.query = event.target.value;
+    renderGenFilter();
+  });
+  document.getElementById("gen-filter-all").addEventListener("click", () => {
+    genTechFilteredUnits().forEach((feature) => genFilter.plants.add(genUnitKey(feature)));
+    applyGenFilter();
+  });
+  document.getElementById("gen-filter-none").addEventListener("click", () => {
+    genTechFilteredUnits().forEach((feature) => genFilter.plants.delete(genUnitKey(feature)));
+    applyGenFilter();
+  });
+  document.getElementById("gen-filter-reset").addEventListener("click", () => resetGenFilter(false));
+
   document.querySelectorAll("[data-layer]").forEach((button) => {
     button.addEventListener("click", () => {
       const layer = button.dataset.layer;
@@ -3216,7 +3434,7 @@
       if (!state) return;
       const rect = canvas.getBoundingClientRect();
       const hour = Math.floor((event.clientX - rect.left - state.pad.left) / state.slot);
-      if (hour < 0 || hour > 23) return;
+      if (hour < 0 || hour >= (state.length || 24)) return;
       drawCmgChart(canvasId, state.valueId, state.feature, hour);
     });
     canvas.addEventListener("mouseleave", () => {

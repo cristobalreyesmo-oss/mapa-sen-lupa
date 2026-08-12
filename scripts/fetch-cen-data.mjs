@@ -7,12 +7,13 @@ fs.mkdirSync(outDir, { recursive: true });
 
 const baseUrl = (process.env.CEN_API_BASE_URL || "https://sipub.api.coordinador.cl:443").replace(/\/$/, "");
 const apiKey = process.env.CEN_API_KEY || "";
-const defaultDate = formatDate(addDays(new Date(), -1));
-const startDate = process.env.CEN_START_DATE || defaultDate;
-const endDate = process.env.CEN_END_DATE || defaultDate;
+const defaultEndDate = formatDate(new Date());
+const defaultStartDate = formatDate(addDays(new Date(), -1));
+const startDate = process.env.CEN_START_DATE || defaultStartDate;
+const endDate = process.env.CEN_END_DATE || defaultEndDate;
 const lookbackDays = Number(process.env.CEN_LOOKBACK_DAYS || 2);
 const enabledDatasetIds = new Set(
-  (process.env.CEN_DATASETS || "cmg-online")
+  (process.env.CEN_DATASETS || "cmg-online,cmg-real,demanda,hidrologia,generacion-real")
     .split(",")
     .map((value) => value.trim())
     .filter(Boolean),
@@ -25,6 +26,7 @@ const datasets = [
     path: "/costo-marginal-online/v4/findByDate",
     fallbackPaths: ["/cmg-online/v4/findByDate", "/costos-marginales-online/v4/findByDate"],
     mode: "latestByBar",
+    rangeSpanDays: 1,
     tryLookback: true,
   },
   {
@@ -33,6 +35,7 @@ const datasets = [
     path: "/costo-marginal-real/v4/findByDate",
     fallbackPaths: ["/cmg-real/v4/findByDate", "/costos-marginales-reales/v4/findByDate"],
     mode: "latestByBar",
+    rangeSpanDays: 1,
     tryLookback: true,
   },
   {
@@ -48,6 +51,15 @@ const datasets = [
     file: "embalse-real-last.json",
     path: "/cotas-embalses-reales/v3/findAll",
     mode: "raw",
+    tryLookback: true,
+  },
+  {
+    id: "generacion-real",
+    file: "generacion-real-last-24h.json",
+    path: "/generacion-real/v4/findByDate",
+    fallbackPaths: ["/generacion/v4/findByDate", "/generacion-real/v4/findAll", "/generacion/v4/findAll"],
+    mode: "generacion",
+    rangeSpanDays: 1,
     tryLookback: true,
   },
 ];
@@ -109,7 +121,7 @@ console.log(JSON.stringify(status, null, 2));
 
 async function requestDataset(dataset) {
   const paths = [dataset.path, ...(dataset.fallbackPaths || [])];
-  const ranges = dataset.tryLookback ? dateRanges() : [{ startDate, endDate }];
+  const ranges = candidateRanges(dataset);
   let lastError;
   const attempts = [];
   for (const range of ranges) {
@@ -196,14 +208,19 @@ function normalizeDataset(dataset, payload) {
   const range = payload?.__range || { startDate, endDate };
   const actualPayload = payload?.__payload || payload;
   const rows = unwrapRows(actualPayload);
+  if (dataset.mode === "generacion") {
+    return normalizeGeneracion(rows, sourcePath, range, payload?.__attempts || []);
+  }
   if (dataset.mode === "latestByBar") {
     const records = latestByName(rows).map((row) => ({
       name: readText(row, barNameFields()),
       key: normalizeKey(readText(row, barNameFields())),
+      aliases: aliasKeysForRow(row),
       value: readNumber(row, cmgValueFields()),
       timestamp: readText(row, timestampFields()),
       raw: row,
     })).filter((row) => row.key && Number.isFinite(row.value));
+    const history = cmgHistoryByBar(rows);
     return {
       id: dataset.id,
       ok: true,
@@ -215,6 +232,8 @@ function normalizeDataset(dataset, payload) {
       sampleKeys: sampleKeys(rows),
       sampleRows: records.length ? [] : rows.slice(0, 3),
       records,
+      hours: history.hours,
+      history: history.records,
     };
   }
   return {
@@ -259,6 +278,32 @@ function latestByName(rows) {
   return [...picked.values()];
 }
 
+function cmgHistoryByBar(rows) {
+  const hourKeys = new Set();
+  const byBar = new Map();
+  for (const row of rows) {
+    const name = readText(row, barNameFields());
+    const key = normalizeKey(name);
+    const timestamp = readText(row, timestampFields());
+    const hourKey = parseHourKey(timestamp);
+    const value = readNumber(row, cmgValueFields());
+    if (!key || !hourKey || !Number.isFinite(value)) continue;
+    hourKeys.add(hourKey);
+    if (!byBar.has(key)) byBar.set(key, { name, key, aliases: aliasKeysForRow(row), values: new Map() });
+    byBar.get(key).values.set(hourKey, value);
+  }
+  const hours = [...hourKeys].sort().slice(-24);
+  return {
+    hours,
+    records: [...byBar.values()].map((bar) => ({
+      name: bar.name,
+      key: bar.key,
+      aliases: bar.aliases,
+      values: hours.map((timestamp) => ({ timestamp, value: Number.isFinite(bar.values.get(timestamp)) ? bar.values.get(timestamp) : null })),
+    })),
+  };
+}
+
 function barNameFields() {
   return [
     "barra",
@@ -298,6 +343,22 @@ function timestampFields() {
   return ["fecha_hora", "fecha_minuto", "fechaHora", "fecha", "date", "datetime", "hora", "timestamp"];
 }
 
+function aliasKeysForRow(row) {
+  const values = [
+    readText(row, ["barra_info"]),
+    readText(row, ["barra_transf"]),
+    readText(row, barNameFields()),
+  ];
+  const aliases = new Set();
+  for (const value of values) {
+    const normalized = normalizeKey(value);
+    if (normalized) aliases.add(normalized);
+    const noVoltage = normalized.replace(/\b\d{2,3}\b/g, " ").replace(/\s+/g, " ").trim();
+    if (noVoltage) aliases.add(noVoltage);
+  }
+  return [...aliases];
+}
+
 function readText(row, names) {
   for (const name of names) {
     if (row?.[name] !== undefined && row[name] !== null && row[name] !== "") return String(row[name]);
@@ -314,12 +375,116 @@ function readNumber(row, names) {
   return NaN;
 }
 
+const TECH_CANON = {
+  "hidraulica": "Hidráulica",
+  "hidro": "Hidráulica",
+  "hidroelectrico": "Hidráulica",
+  "carbon": "Carbón",
+  "carbon pulverizado": "Carbón",
+  "gas natural": "Gas Natural",
+  "gnl": "Gas Natural",
+  "gn": "Gas Natural",
+  "eolica": "Eólica",
+  "solar": "Solar",
+  "solar fv": "Solar",
+  "fotovoltaica": "Solar",
+  "solar fotovoltaica": "Solar",
+  "biomasa": "Biomasa",
+  "biogas": "Biogás",
+  "geotermia": "Geotermia",
+  "petroleo diesel": "Petróleo Diésel",
+  "diesel": "Petróleo Diésel",
+  "cogeneracion": "Cogeneración",
+  "fuel oil": "Fuel Oil",
+  "otros": "Otros",
+};
+
+function tecnologiaFields() {
+  return ["tecnologia", "tipo_tecnologia", "tipo", "fuente", "combustible", "energia_primaria", "grupo_tecnologia", "tecnologia_grupo"];
+}
+
+function generacionValueFields() {
+  return [
+    "generacion_mw",
+    "generacion_MWh",
+    "generacion_mwh",
+    "generacion",
+    "energia_mw",
+    "energia",
+    "potencia",
+    "potencia_generacion",
+    "mw",
+    "valor",
+    "value",
+    "mwh",
+  ];
+}
+
+function canonicalTech(value) {
+  const key = String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+  return TECH_CANON[key] || (key ? key.charAt(0).toUpperCase() + key.slice(1) : "Sin clasificar");
+}
+
+function parseHourKey(value) {
+  const match = String(value || "").match(/(\d{4})-(\d{2})-(\d{2})[T\s](\d{2})/);
+  return match ? `${match[1]}-${match[2]}-${match[3]} ${match[4]}` : null;
+}
+
+function normalizeGeneracion(rows, sourcePath, range, attempts) {
+  const buckets = new Map();
+  for (const row of rows) {
+    const hourKey = parseHourKey(readText(row, timestampFields()));
+    if (!hourKey) continue;
+    const mw = readNumber(row, generacionValueFields());
+    if (!Number.isFinite(mw) || mw <= 0) continue;
+    const tech = canonicalTech(readText(row, tecnologiaFields()));
+    if (!buckets.has(hourKey)) buckets.set(hourKey, new Map());
+    const byTech = buckets.get(hourKey);
+    byTech.set(tech, (byTech.get(tech) || 0) + mw);
+  }
+
+  const hourKeys = [...buckets.keys()].sort();
+  const window = hourKeys.slice(-24);
+  const techNames = new Set();
+  for (const hourKey of window) {
+    for (const tech of buckets.get(hourKey).keys()) techNames.add(tech);
+  }
+  const orderedTechs = [...techNames].sort();
+
+  const series = orderedTechs.map((tech) => ({
+    technology: tech,
+    values: window.map((hourKey) => Math.max(0, Math.round((buckets.get(hourKey).get(tech) || 0) / 10) * 10)),
+  }));
+  const total = window.map((hourKey) => {
+    let sum = 0;
+    for (const tech of orderedTechs) sum += buckets.get(hourKey).get(tech) || 0;
+    return Math.round(sum / 10) * 10;
+  });
+
+  return {
+    id: "generacion-real",
+    ok: true,
+    updatedAt: new Date().toISOString(),
+    source: sourcePath,
+    range,
+    attempts,
+    rawCount: rows.length,
+    hours: window,
+    series,
+    total,
+  };
+}
+
 function normalizeKey(value) {
   return String(value || "")
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
-    .replace(/\b(kv|barra|se|subestacion|subest)\b/g, " ")
+    .replace(/\b(kv|barra|se|subestacion|subest|ba|bp|bp1|bp2|bp3|bp4)\b/g, " ")
     .replace(/[^a-z0-9]+/g, " ")
     .trim();
 }
@@ -344,6 +509,17 @@ function dateRanges() {
     ranges.push({ startDate: day, endDate: day });
   }
   return ranges;
+}
+
+function candidateRanges(dataset) {
+  if (dataset.rangeSpanDays) {
+    const ranges = [];
+    for (let span = dataset.rangeSpanDays; span >= 1; span -= 1) {
+      ranges.push({ startDate: formatDate(addDays(new Date(), -span)), endDate });
+    }
+    return ranges;
+  }
+  return dataset.tryLookback ? dateRanges() : [{ startDate, endDate }];
 }
 
 function delay(ms) {
