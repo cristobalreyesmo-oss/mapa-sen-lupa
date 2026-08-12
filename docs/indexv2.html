@@ -828,6 +828,7 @@
             <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full block" style="background:#c3c5d9"></span> Sin generación</span>
             <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full block" style="background:#2b90e2"></span> Baja</span>
             <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full block" style="background:#7dd3fc"></span> Alta</span>
+            <label class="flex items-center gap-2">FECHA<input id="analysis-date-gen2" type="date" class="analysis-date glass-ctrl px-2 py-1 text-label-mono text-on-surface focus:border-primary"></label>
             <label class="flex items-center gap-2">HORA<select id="hour-select-gen2" class="glass-ctrl px-2 py-1 text-label-mono text-on-surface focus:border-primary"></select></label>
             <button id="fly-sen-gen2" class="glass glass-ctrl px-3 py-1 text-label-mono text-on-surface hover:opacity-80">Centrar en SEN</button>
           </div>
@@ -868,7 +869,7 @@
             </div>
             <div class="border border-outline-variant p-3 flex-1 flex flex-col">
               <div class="flex items-center justify-between swiss-border-b pb-2 mb-3">
-                <span class="text-label-mono text-secondary uppercase tracking-widest">Generación y CMg · 24 h</span>
+                <span class="text-label-mono text-secondary uppercase tracking-widest">Generación y CMg · fecha análisis</span>
                 <span id="chart-value-gen2" class="text-headline-md font-bold text-on-surface">—</span>
               </div>
               <div id="chart-gen2" class="w-full flex-1" style="min-height:240px"></div>
@@ -999,6 +1000,7 @@
             <span class="flex items-center gap-2"><span class="w-3 h-3 bg-primary block"></span> CMg bajo</span>
             <span class="flex items-center gap-2"><span class="w-3 h-3 bg-on-surface block"></span> CMg medio</span>
             <span class="flex items-center gap-2"><span class="w-3 h-3 bg-error block"></span> CMg alto</span>
+            <label class="flex items-center gap-2">FECHA<input id="analysis-date-overview" type="date" class="analysis-date glass-ctrl px-2 py-1 text-label-mono text-on-surface focus:border-primary"></label>
             <label class="flex items-center gap-2">HORA<select id="hour-select" class="glass-ctrl px-2 py-1 text-label-mono text-on-surface focus:border-primary"></select></label>
             <button id="filter-btn-overview" class="toggle">Filtrar nodos<span class="filter-count"></span></button>
             <button id="fly-sen" class="glass glass-ctrl px-3 py-1 text-label-mono text-on-surface hover:opacity-80">Centrar en SEN</button>
@@ -1032,11 +1034,11 @@
             </div>
             <div class="border border-outline-variant p-4">
               <div class="flex items-center justify-between swiss-border-b pb-2 mb-3">
-                <span class="text-label-mono text-secondary uppercase tracking-widest">Perfil CMg · 24 h</span>
+                <span class="text-label-mono text-secondary uppercase tracking-widest">Perfil CMg · fecha análisis</span>
                 <span id="chart-value" class="text-headline-md font-bold text-on-surface">—</span>
               </div>
               <canvas id="cmg-chart"></canvas>
-              <div class="text-caption font-label-mono text-secondary mt-1">Eje: ultimas 24 h publicadas por la API (fecha/hora UTC).</div>
+              <div class="text-caption font-label-mono text-secondary mt-1">Eje: fecha de análisis seleccionada; usa histórico CEN cuando existe.</div>
             </div>
           </div>
         </div>
@@ -1066,6 +1068,7 @@
             <span class="flex items-center gap-2"><span class="w-3 h-3 bg-primary block"></span> CMg bajo</span>
             <span class="flex items-center gap-2"><span class="w-3 h-3 bg-on-surface block"></span> CMg medio</span>
             <span class="flex items-center gap-2"><span class="w-3 h-3 bg-error block"></span> CMg alto</span>
+            <label class="flex items-center gap-2">FECHA<input id="analysis-date-mc" type="date" class="analysis-date glass-ctrl px-2 py-1 text-label-mono text-on-surface focus:border-primary"></label>
             <label class="flex items-center gap-2">HORA<select id="hour-select-mc" class="glass-ctrl px-2 py-1 text-label-mono text-on-surface focus:border-primary"></select></label>
             <button id="filter-btn-marginal" class="toggle">Filtrar nodos<span class="filter-count"></span></button>
             <button id="fly-sen-mc" class="glass glass-ctrl px-3 py-1 text-label-mono text-on-surface hover:opacity-80">Centrar en SEN</button>
@@ -1102,11 +1105,11 @@
             </div>
             <div class="border border-outline-variant p-4">
               <div class="flex items-center justify-between swiss-border-b pb-2 mb-3">
-                <span class="text-label-mono text-secondary uppercase tracking-widest">Perfil CMg · 24 h</span>
+                <span class="text-label-mono text-secondary uppercase tracking-widest">Perfil CMg · fecha análisis</span>
                 <span id="chart-value-mc" class="text-headline-md font-bold text-on-surface">—</span>
               </div>
               <canvas id="cmg-chart-mc"></canvas>
-              <div class="text-caption font-label-mono text-secondary mt-1">Eje: ultimas 24 h publicadas por la API (fecha/hora UTC).</div>
+              <div class="text-caption font-label-mono text-secondary mt-1">Eje: fecha de análisis seleccionada; usa histórico CEN cuando existe.</div>
             </div>
           </div>
         </div>
@@ -1327,6 +1330,9 @@
   const genFilter = { techs: new Set(), plants: new Set(), query: "" };
   const CEN_NOT_INFORMED = "CEN no ha informado esta información";
   let genDays = 7;
+  let analysisDate = "";
+  let historyLoading = null;
+  const historyCache = { cmg: new Map(), generacion: new Map() };
   const viewRefs = {
     overview: { mapId: "map", chartId: "cmg-chart", lensId: "lens-readout", popupId: "lens-popup", nameId: "node-name", detailId: "node-detail", cmgId: "node-cmg", valueId: "chart-value" },
     marginal: { mapId: "map-mc", chartId: "cmg-chart-mc", lensId: "lens-readout-mc", popupId: "lens-popup-mc", nameId: "node-name-mc", detailId: "node-detail-mc", cmgId: "node-cmg-mc", valueId: "chart-value-mc" },
@@ -1491,6 +1497,59 @@
   function genFullLabel(key) {
     const m = String(key).match(/(\d{4})-(\d{2})-(\d{2})[T\s](\d{2})/);
     return m ? m[3] + "/" + m[2] + " " + m[4] + ":00 UTC" : String(key);
+  }
+  function monthKeyFromDate(date) {
+    const match = String(date || "").match(/^(\d{4})-(\d{2})/);
+    return match ? match[1] + "-" + match[2] : "";
+  }
+  function analysisDateOrLive() {
+    if (analysisDate) return analysisDate;
+    const latest = [...(liveData.cmgHours || []), ...(liveData.genHours || [])].sort().at(-1);
+    return latest ? latest.slice(0, 10) : dataDate();
+  }
+  function selectedDayHours(hours) {
+    const date = analysisDateOrLive();
+    return (hours || []).filter((timestamp) => String(timestamp || "").slice(0, 10) === date).sort();
+  }
+  function syncAnalysisDateInputs() {
+    document.querySelectorAll(".analysis-date").forEach((input) => { input.value = analysisDateOrLive() || ""; });
+  }
+  async function loadHistoryDataset(dataset, date) {
+    const month = monthKeyFromDate(date);
+    if (!month) return null;
+    if (historyCache[dataset].has(month)) return historyCache[dataset].get(month);
+    const data = await fetchJson("./data/history/" + dataset + "/" + month + ".json");
+    historyCache[dataset].set(month, data || null);
+    return data || null;
+  }
+  function compactSeriesForFeature(data, entityKey, feature) {
+    if (!data || !Array.isArray(data.hours) || !Array.isArray(data[entityKey]) || !Array.isArray(data.values)) return null;
+    const candidates = [feature.name, normalizeKey(feature.name), ...keyTokens(feature.name)];
+    let best = { score: 0, index: -1 };
+    for (let i = 0; i < data[entityKey].length; i += 1) {
+      const row = data[entityKey][i] || {};
+      const aliases = [row.key, row.name, ...(row.aliases || [])].map(normalizeKey).filter(Boolean);
+      if (aliases.some((alias) => candidates.some((candidate) => normalizeKey(candidate) === alias))) return { hours: data.hours, values: data.values[i] || [], meta: row };
+      const score = Math.max(0, ...aliases.flatMap((alias) => candidates.map((candidate) => matchScore(normalizeKey(candidate), alias))));
+      if (score > best.score) best = { score, index: i };
+    }
+    return best.score >= 2 && best.index >= 0 ? { hours: data.hours, values: data.values[best.index] || [], meta: data[entityKey][best.index] } : null;
+  }
+  async function ensureAnalysisHistory() {
+    const date = analysisDateOrLive();
+    if (!date) return;
+    if (historyLoading) return historyLoading;
+    historyLoading = Promise.all([loadHistoryDataset("cmg", date), loadHistoryDataset("generacion", date)]).finally(() => { historyLoading = null; });
+    return historyLoading;
+  }
+  function cmgVisibleHours() {
+    const date = analysisDateOrLive();
+    const historical = historyCache.cmg.get(monthKeyFromDate(date));
+    const historyHours = selectedDayHours(historical?.hours || []);
+    if (historyHours.length) return { hours: historyHours, source: "history" };
+    const liveHours = selectedDayHours(liveData.cmgHours || []);
+    if (liveHours.length) return { hours: liveHours, source: "live" };
+    return !analysisDate || analysisDate === dataDate() ? { hours: liveData.cmgHours.slice(-24), source: "live" } : { hours: [], source: "none" };
   }
   function genPerTech(gen) {
     return gen.series
@@ -1706,7 +1765,10 @@
     };
   }
   function cmg(feature, h) {
-    const liveValue = liveCmgValue(feature);
+    const points = cmgSeries(feature);
+    const exact = points.find((point) => point.h === h && Number.isFinite(Number(point.value)));
+    if (exact) return Math.round(exact.value);
+    const liveValue = !analysisDate || analysisDate === dataDate() ? liveCmgValue(feature) : NaN;
     if (Number.isFinite(liveValue)) return Math.round(liveValue);
     return NaN;
   }
@@ -1761,6 +1823,10 @@
     }
     return best.score >= 2 ? best.entry : null;
   }
+  function compactCmgHistoryFor(feature) {
+    const data = historyCache.cmg.get(monthKeyFromDate(analysisDateOrLive()));
+    return compactSeriesForFeature(data, "nodes", feature);
+  }
   function liveFlowValue(feature) {
     if (!feature || !liveData.flows.size) return null;
     const key = normalizeKey(feature.name);
@@ -1788,6 +1854,22 @@
       if (score > best.score) best = { score, row };
     }
     return best.score >= 2 ? best.row : null;
+  }
+  function compactGenEntry(feature) {
+    const data = historyCache.generacion.get(monthKeyFromDate(analysisDateOrLive()));
+    const series = compactSeriesForFeature(data, "plants", feature);
+    if (!series) return null;
+    return {
+      name: series.meta?.name || feature.name,
+      key: series.meta?.key || normalizeKey(feature.name),
+      technology: series.meta?.technology || gen2TechLabel(feature),
+      values: series.hours.map((timestamp, index) => ({ timestamp, value: series.values[index] })).filter((point) => String(point.timestamp).slice(0, 10) === analysisDateOrLive()),
+    };
+  }
+  function genEntry(feature) {
+    const historical = compactGenEntry(feature);
+    if (historical && historical.values.some((point) => Number.isFinite(Number(point.value)))) return historical;
+    return liveGenEntry(feature);
   }
   function demandSeries() {
     if (Array.isArray(liveData.demanda?.values)) return liveData.demanda.values.slice(-24);
@@ -1820,9 +1902,22 @@
     return values.length ? Math.round(values.reduce((a, b) => a + b, 0) / values.length) : NaN;
   }
   function cmgSeries(feature) {
+    const date = analysisDateOrLive();
+    const compact = compactCmgHistoryFor(feature);
+    if (compact) {
+      const points = compact.hours.map((timestamp, index) => ({ timestamp, value: compact.values[index] }))
+        .filter((point) => String(point.timestamp).slice(0, 10) === date)
+        .map((point) => {
+          const value = Number(point.value);
+          return { h: timestampHour(point.timestamp), timestamp: point.timestamp, value: Number.isFinite(value) ? Math.round(value) : null, live: false };
+        });
+      if (points.some((point) => Number.isFinite(Number(point.value)))) return points;
+    }
     const history = cmgHistoryFor(feature);
     if (history && Array.isArray(history.values) && history.values.length) {
-      return history.values.slice(-24).map((point, index) => {
+      const dayPoints = history.values.filter((point) => String(point.timestamp || "").slice(0, 10) === date);
+      const source = dayPoints.length ? dayPoints : (!analysisDate || analysisDate === dataDate() ? history.values.slice(-24) : []);
+      return source.map((point, index) => {
         const h = timestampHour(point.timestamp);
         const value = Number(point.value);
         return {
@@ -1913,7 +2008,7 @@
   function genUnitKey(feature) { return normalizeKey(feature.name) + "|" + feature.lat + "|" + feature.lon; }
   function genUnits() { return [...(grouped?.plants || []), ...(grouped?.bess || [])]; }
   function isDispatchedGenUnit(feature) {
-    const entry = liveGenEntry(feature);
+    const entry = genEntry(feature);
     return Boolean(entry && Array.isArray(entry.values) && entry.values.some((point) => Number(point.value) > 0));
   }
   function dispatchedGenUnits() { return genUnits().filter(isDispatchedGenUnit); }
@@ -1936,17 +2031,21 @@
     if (!skipRender) applyGenFilter();
   }
   function genAt(feature, h) {
-    const entry = liveGenEntry(feature);
+    const entry = genEntry(feature);
     if (!entry || !Array.isArray(entry.values) || !entry.values.length) return NaN;
-    const exact = entry.values.find((point) => timestampHour(point.timestamp) === h && Number.isFinite(Number(point.value)));
+    const date = analysisDateOrLive();
+    const exact = entry.values.find((point) => String(point.timestamp || "").slice(0, 10) === date && timestampHour(point.timestamp) === h && Number.isFinite(Number(point.value)));
     if (exact) return Number(exact.value);
-    const latest = [...entry.values].reverse().find((point) => Number.isFinite(Number(point.value)));
+    const latest = [...entry.values].reverse().find((point) => (!analysisDate || String(point.timestamp || "").slice(0, 10) === date) && Number.isFinite(Number(point.value)));
     return latest ? Number(latest.value) : NaN;
   }
   function genEnergy24(feature) {
-    const entry = liveGenEntry(feature);
+    const entry = genEntry(feature);
     if (!entry || !Array.isArray(entry.values)) return NaN;
-    const values = entry.values.slice(-24).map((point) => Number(point.value)).filter(Number.isFinite);
+    const date = analysisDateOrLive();
+    const dayValues = entry.values.filter((point) => String(point.timestamp || "").slice(0, 10) === date);
+    const source = dayValues.length ? dayValues : (!analysisDate || analysisDate === dataDate() ? entry.values.slice(-24) : []);
+    const values = source.map((point) => Number(point.value)).filter(Number.isFinite);
     return values.length ? values.reduce((sum, value) => sum + Math.max(0, value), 0) : NaN;
   }
   function gen2Color(mw) {
@@ -2224,7 +2323,7 @@
     el.innerHTML =
       '<div class="popup-kicker">' + featureText(feature) + ' · ' + formatHour(hour) + '</div>' +
       '<div class="popup-title">' + escapeHtml(feature.name) + '</div>' +
-      '<div class="popup-row"><span class="popup-dot" style="background:#2b90e2"></span>' + (Number.isFinite(Number(mw)) ? Math.round(mw).toLocaleString("en-US") : CEN_NOT_INFORMED) + ' <span class="unit">MWh 24 h</span></div>' +
+      '<div class="popup-row"><span class="popup-dot" style="background:#2b90e2"></span>' + (Number.isFinite(Number(mw)) ? Math.round(mw).toLocaleString("en-US") : CEN_NOT_INFORMED) + ' <span class="unit">MWh fecha</span></div>' +
       '<div class="popup-flow-row"><span class="popup-dot" style="background:#f97316"></span>' + c.toLocaleString("en-US") + ' <span class="unit">USD/MWh</span></div>';
     el.hidden = false;
     positionLensPopup(feature);
@@ -2261,7 +2360,7 @@
     const c = cmg(feature, hour);
     return '<div class="popup-kicker">' + kicker + '</div>' +
       '<div class="popup-title">' + feature.name + '</div>' +
-      '<div class="popup-row"><span class="popup-dot" style="background:' + gen2Color(mw) + '"></span>' + (Number.isFinite(Number(mw)) ? Math.round(mw).toLocaleString("en-US") : CEN_NOT_INFORMED) + ' <span class="unit">MWh 24 h</span></div>' +
+      '<div class="popup-row"><span class="popup-dot" style="background:' + gen2Color(mw) + '"></span>' + (Number.isFinite(Number(mw)) ? Math.round(mw).toLocaleString("en-US") : CEN_NOT_INFORMED) + ' <span class="unit">MWh fecha</span></div>' +
       '<div class="popup-flow-row">' + (Number.isFinite(c) ? c : CEN_NOT_INFORMED) + ' <span class="unit">USD/MWh</span></div>' +
       '<div class="popup-foot">lat ' + feature.lat.toFixed(4) + ' · lon ' + feature.lon.toFixed(4) + '</div>';
   }
@@ -2285,7 +2384,7 @@
     const cmgValue = cmg(feature, hour);
     document.getElementById("node-gen-gen2").textContent = Number.isFinite(Number(mw)) ? Math.round(mw).toLocaleString("en-US") : CEN_NOT_INFORMED;
     document.getElementById("node-cmg-gen2").textContent = Number.isFinite(cmgValue) ? cmgValue.toLocaleString("en-US") : CEN_NOT_INFORMED;
-    document.getElementById("chart-value-gen2").textContent = Number.isFinite(Number(mw)) ? Math.round(mw).toLocaleString("en-US") + " MWh 24 h" : CEN_NOT_INFORMED;
+    document.getElementById("chart-value-gen2").textContent = Number.isFinite(Number(mw)) ? Math.round(mw).toLocaleString("en-US") + " MWh fecha" : CEN_NOT_INFORMED;
     buildGen2Chart(feature);
   }
   function buildGen2Chart(feature) {
@@ -2294,8 +2393,10 @@
     if (!window.echarts) return;
     if (!gen2Chart) gen2Chart = window.echarts.init(el);
     gen2Chart.clear();
-    const entry = liveGenEntry(feature);
-    const points = entry && Array.isArray(entry.values) ? entry.values.filter((point) => Number.isFinite(Number(point.value))).slice(-24) : [];
+    const entry = genEntry(feature);
+    const date = analysisDateOrLive();
+    const dayPoints = entry && Array.isArray(entry.values) ? entry.values.filter((point) => String(point.timestamp || "").slice(0, 10) === date && Number.isFinite(Number(point.value))) : [];
+    const points = dayPoints.length ? dayPoints : (entry && (!analysisDate || analysisDate === dataDate()) && Array.isArray(entry.values) ? entry.values.filter((point) => Number.isFinite(Number(point.value))).slice(-24) : []);
     if (!points.length) {
       gen2Chart.setOption({
         backgroundColor: "transparent",
@@ -2306,7 +2407,12 @@
     const hours = points.map((point) => shortTimestampLabel(point.timestamp).date + "\n" + shortTimestampLabel(point.timestamp).hour);
     const gen = points.map((point) => Math.round(Number(point.value)));
     const cmg24 = [];
-    points.forEach((point) => cmg24.push(cmg(feature, timestampHour(point.timestamp))));
+    const cmgPoints = cmgSeries(feature);
+    points.forEach((point) => {
+      const timestamp = String(point.timestamp || "");
+      const matched = cmgPoints.find((row) => row.timestamp === timestamp);
+      cmg24.push(matched && Number.isFinite(Number(matched.value)) ? matched.value : cmg(feature, timestampHour(timestamp)));
+    });
     const secondary = cssVar("--secondary", "#5e5e5e");
     const onSurface = cssVar("--on-surface", "#151c27");
     const outlineVariant = cssVar("--outline-variant", "#c3c5d9");
@@ -2430,7 +2536,7 @@
     const visible = filteredGenUnits().map((feature) => genEnergy24(feature)).filter(Number.isFinite);
     const currentTotal = visible.reduce((sum, value) => sum + Number(value), 0);
     const hourlyTotals = liveData.genHours.map((timestamp) => filteredGenUnits().reduce((sum, feature) => {
-      const entry = liveGenEntry(feature);
+      const entry = genEntry(feature);
       const point = entry?.values?.find((item) => item.timestamp === timestamp);
       return sum + (Number.isFinite(Number(point?.value)) ? Number(point.value) : 0);
     }, 0));
@@ -2442,11 +2548,11 @@
   function renderGen2Ranking() {
     const status = document.getElementById("gen2-ranking-status");
     const rows = filteredGenUnits()
-      .map((feature) => ({ feature, mw: genEnergy24(feature), entry: liveGenEntry(feature) }))
+      .map((feature) => ({ feature, mw: genEnergy24(feature), entry: genEntry(feature) }))
       .filter((row) => Number.isFinite(Number(row.mw)))
       .sort((a, b) => Number(b.mw) - Number(a.mw))
       .slice(0, 10);
-    if (status) status.textContent = rows.length ? "Top centrales despachadas por CEN · últimas 24 h informadas" : CEN_NOT_INFORMED;
+    if (status) status.textContent = rows.length ? "Top centrales despachadas por CEN · fecha de análisis" : CEN_NOT_INFORMED;
     const el = document.getElementById("gen2-ranking");
     el.innerHTML = rows.length ? rows.map((row) =>
       '<button class="text-left border border-outline-variant p-3 hover:bg-surface-container-low" data-gen-rank="' + escapeHtml(genUnitKey(row.feature)) + '">' +
@@ -2815,10 +2921,9 @@
     const cmgValues = [];
     const demandValues = demandSeries().map((row) => Number(row.valueMWh)).filter(Number.isFinite);
     const subs = points.filter((f) => layerOf(f) === "substation");
-    const visibleHours = liveData.cmgHours.slice(-24);
-    const offset = liveData.cmgHours.length - visibleHours.length;
+    const visibleHours = cmgVisibleHours().hours;
     for (let i = 0; i < visibleHours.length; i += 1) {
-      const values = subs.map((f) => cmgHistoryFor(f)?.values?.[offset + i]?.value).map(Number).filter(Number.isFinite);
+      const values = subs.map((f) => cmgSeries(f).find((point) => point.timestamp === visibleHours[i])?.value).map(Number).filter(Number.isFinite);
       if (values.length) cmgValues.push(Math.round(values.reduce((a, b) => a + b, 0) / values.length));
     }
     const currentCmg = avgCmg();
@@ -3105,14 +3210,15 @@
     return range?.startDate && range?.endDate ? range.startDate + " → " + range.endDate : "";
   }
   function cmgWindowText() {
-    const hours = liveData.cmgHours.slice(-24);
+    const hours = cmgVisibleHours().hours;
     if (!hours.length) return "";
     return shortTimestampLabel(hours[0]).full + " → " + shortTimestampLabel(hours[hours.length - 1]).full;
   }
   function cmgApiText() {
-    const hours = liveData.cmgHours.slice(-24);
-    return liveData.loaded && hours.length
-      ? "CMg API del Coordinador (CEN): ultimas " + hours.length + " h secuenciales informadas, desde " + shortTimestampLabel(hours[0]).full + " hasta " + shortTimestampLabel(hours[hours.length - 1]).full + (liveData.cmgStale ? ". Ultimo dato real disponible; API CEN no informó actualización nueva." : ".")
+    const visible = cmgVisibleHours();
+    const hours = visible.hours;
+    return hours.length
+      ? "CMg API del Coordinador (CEN): " + hours.length + " h informadas para fecha de análisis, desde " + shortTimestampLabel(hours[0]).full + " hasta " + shortTimestampLabel(hours[hours.length - 1]).full + (visible.source === "history" ? ". Fuente: histórico compacto." : "") + (liveData.cmgStale ? ". Ultimo dato real disponible; API CEN no informó actualización nueva." : ".")
       : "CMg: " + CEN_NOT_INFORMED + ".";
   }
   function genApiText() {
@@ -3162,17 +3268,18 @@
   }
 
   function updateDates() {
-    const visibleCmgHours = liveData.cmgHours.slice(-24);
-    const hasCmgWindow = liveData.loaded && visibleCmgHours.length;
+    const visible = cmgVisibleHours();
+    const visibleCmgHours = visible.hours;
+    const hasCmgWindow = visibleCmgHours.length > 0;
     const windowText = globalWindowText();
     const origin = hasCmgWindow ? "CMg API del Coordinador (CEN)" : "CMg no informado por CEN";
     const text = hasCmgWindow
-      ? "Ventana CEN: " + (windowText || "—") + " · CMg ultimas " + visibleCmgHours.length + " h secuenciales · desde " + shortTimestampLabel(visibleCmgHours[0]).full + " hasta " + shortTimestampLabel(visibleCmgHours[visibleCmgHours.length - 1]).full + (liveData.cmgStale ? " · ultimo dato real disponible" : "")
+      ? "Fecha análisis: " + analysisDateOrLive() + " · CMg " + visibleCmgHours.length + " h informadas · desde " + shortTimestampLabel(visibleCmgHours[0]).full + " hasta " + shortTimestampLabel(visibleCmgHours[visibleCmgHours.length - 1]).full + (visible.source === "history" ? " · histórico compacto" : "") + (liveData.cmgStale ? " · ultimo dato real disponible" : "")
       : "Datos: " + CEN_NOT_INFORMED;
     document.getElementById("mc-date").textContent = text;
     document.getElementById("mc-date-overview").textContent = text;
     const statusText = hasCmgWindow
-      ? (liveData.cmgStale ? "API CEN sin actualización nueva · " : "API CEN activa · ") + "CMg ultimas " + visibleCmgHours.length + " h secuenciales · " + liveData.cmgRows.length + " barras · " + liveData.matchedFeatures + " nodos emparejados"
+      ? (liveData.cmgStale ? "API CEN sin actualización nueva · " : "API CEN activa · ") + "CMg " + visibleCmgHours.length + " h fecha análisis · " + liveData.cmgRows.length + " barras live · " + liveData.matchedFeatures + " nodos emparejados"
       : CEN_NOT_INFORMED;
     document.getElementById("map-status").textContent = statusText;
     document.getElementById("map-status-mc").textContent = statusText;
@@ -3212,6 +3319,15 @@
     if (selectedLine) renderLineDetail(selectedLine);
     updateDates();
     updateFilterBadges();
+    syncAnalysisDateInputs();
+  }
+
+  async function setAnalysisDate(date) {
+    analysisDate = /^\d{4}-\d{2}-\d{2}$/.test(String(date || "")) ? date : "";
+    syncAnalysisDateInputs();
+    await ensureAnalysisHistory();
+    resetGenFilter(true);
+    refreshAll();
   }
 
   function currentMatches(query) {
@@ -3419,6 +3535,9 @@
       }
       liveData.loaded = liveData.cmgOnline.size > 0;
       liveData.matchedFeatures = points.filter((feature) => Number.isFinite(liveCmgValue(feature))).length;
+      if (!analysisDate) analysisDate = analysisDateOrLive();
+      syncAnalysisDateInputs();
+      ensureAnalysisHistory().then(() => refreshAll());
       updateDates();
       refreshAll();
       if (currentView === "gen2") renderGenerationView();
@@ -3477,6 +3596,10 @@
       hour = Number(event.target.value);
       refreshAll();
     });
+  });
+
+  document.querySelectorAll(".analysis-date").forEach((input) => {
+    input.addEventListener("change", (event) => setAnalysisDate(event.target.value));
   });
 
   document.getElementById("mc-mode-all").addEventListener("click", () => { mcMode = "all"; syncModeButtons(); refreshAll(); });
