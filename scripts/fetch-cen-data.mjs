@@ -220,7 +220,7 @@ async function requestOperationGenerationWindow(dataset) {
   const attempts = [];
   const content = [];
   let lastError;
-  for (let offset = dataset.multiDateDays - 1; offset >= 0; offset -= 1) {
+  for (let offset = 0; offset < dataset.multiDateDays; offset += 1) {
     const date = formatDate(addDays(new Date(), -offset));
     const range = { startDate: date, endDate: date };
     try {
@@ -251,7 +251,7 @@ async function requestMultiDateWindow(dataset) {
   const content = [];
   const paths = [dataset.path, ...(dataset.fallbackPaths || [])];
   let lastError;
-  for (let offset = dataset.multiDateDays - 1; offset >= 0; offset -= 1) {
+  for (let offset = 0; offset < dataset.multiDateDays; offset += 1) {
     const date = formatDate(addDays(new Date(), -offset));
     const range = { startDate: date, endDate: date };
     for (const candidatePath of paths) {
@@ -338,12 +338,7 @@ async function requestPath(dataset, candidatePath, range, page = 0) {
 }
 
 async function fetchWithRetry(url, headers) {
-  for (let attempt = 0; attempt < 3; attempt += 1) {
-    const response = await fetch(url, { headers });
-    if (response.status !== 429 || attempt === 2) return response;
-    const retryAfter = Number(response.headers.get("retry-after") || 0);
-    await delay(Math.max(retryAfter * 1000, 15000 * (attempt + 1)));
-  }
+  return fetch(url, { headers });
 }
 
 function describeError(error) {
