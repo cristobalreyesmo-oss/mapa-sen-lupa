@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-12T17:31:24.519Z",
+  "generatedAt": "2026-08-12T17:36:57.723Z",
   "baseUrl": "https://sipub.api.coordinador.cl:443",
   "startDate": "2026-08-06",
   "endDate": "2026-08-12",
@@ -27,6 +27,8 @@
       "id": "cmg-online",
       "file": "data/cmg-online-latest.json",
       "ok": true,
+      "stale": true,
+      "error": "429  {\"message\":\"Too Many Requests\"}",
       "records": 1603,
       "rawCount": 5000,
       "sampleKeys": [
@@ -53,7 +55,7 @@
           "path": "/costo-marginal-online/v4/findByDate",
           "startDate": "2026-08-06",
           "endDate": "2026-08-12",
-          "rows": 5000
+          "error": "429  {\"message\":\"Too Many Requests\"}"
         }
       ]
     },
@@ -64,7 +66,7 @@
       "records": 0,
       "rawCount": 0,
       "sampleKeys": [],
-      "updatedAt": "2026-08-12T17:32:53.838Z",
+      "updatedAt": "2026-08-12T17:37:02.118Z",
       "source": "/costo-marginal-real/v4/findByDate",
       "range": {
         "startDate": "2026-08-06",
@@ -82,11 +84,11 @@
     {
       "id": "demanda-real",
       "file": "data/demanda-real-estimada.json",
-      "ok": true,
+      "ok": false,
       "records": 0,
       "rawCount": 0,
       "sampleKeys": [],
-      "updatedAt": "2026-08-12T17:32:55.393Z",
+      "updatedAt": "2026-08-12T17:37:03.997Z",
       "source": "/demanda-real-estimada/v4/findByDate",
       "range": {
         "startDate": "2026-08-06",
@@ -118,19 +120,10 @@
     },
     {
       "id": "generacion-real",
-      "file": "data/generacion-real-last-24h.json",
-      "ok": true,
-      "stale": true,
+      "file": "data/generacion-real-central-latest.json",
+      "ok": false,
       "error": "502 Bad Gateway {\"message\": \"Internal server error\"}",
-      "records": 36,
-      "rawCount": 36,
-      "sampleKeys": [],
-      "updatedAt": "2026-08-12T16:44:04.297Z",
-      "source": "/reportes/v3/generation",
-      "range": {
-        "startDate": "2026-08-06",
-        "endDate": "2026-08-12"
-      },
+      "records": 0,
       "attempts": [
         {
           "path": "/generacion-real/v3/findByDate",
