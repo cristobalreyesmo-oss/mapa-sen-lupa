@@ -1,8 +1,563 @@
 {
   "id": "generacion-real",
-  "ok": false,
-  "updatedAt": "2026-08-12T15:34:05.028Z",
-  "error": "Cannot access 'TECH_CANON' before initialization",
-  "attempts": [],
-  "records": []
+  "ok": true,
+  "updatedAt": "2026-08-12T15:51:41.561Z",
+  "source": "/reportes/v3/generation",
+  "range": {
+    "startDate": "2026-08-06",
+    "endDate": "2026-08-12"
+  },
+  "attempts": [
+    {
+      "path": "/reportes/v3/generation",
+      "startDate": "2026-08-12",
+      "endDate": "2026-08-12",
+      "error": "404  {\"message\":\"NotFoundException\",\"detail\":\"No records found\"}"
+    },
+    {
+      "path": "/reportes/v3/generation",
+      "startDate": "2026-08-11",
+      "endDate": "2026-08-11",
+      "rows": 6
+    },
+    {
+      "path": "/reportes/v3/generation",
+      "startDate": "2026-08-10",
+      "endDate": "2026-08-10",
+      "rows": 6
+    },
+    {
+      "path": "/reportes/v3/generation",
+      "startDate": "2026-08-09",
+      "endDate": "2026-08-09",
+      "rows": 6
+    },
+    {
+      "path": "/reportes/v3/generation",
+      "startDate": "2026-08-08",
+      "endDate": "2026-08-08",
+      "rows": 6
+    },
+    {
+      "path": "/reportes/v3/generation",
+      "startDate": "2026-08-07",
+      "endDate": "2026-08-07",
+      "rows": 6
+    },
+    {
+      "path": "/reportes/v3/generation",
+      "startDate": "2026-08-06",
+      "endDate": "2026-08-06",
+      "rows": 6
+    }
+  ],
+  "rawCount": 36,
+  "granularity": "daily",
+  "unit": "GWh",
+  "records": [
+    {
+      "technology": "Hidráulica",
+      "dailyGWh": 193.59,
+      "monthlyGWh": 2130.968,
+      "annualGWh": 23198.632,
+      "date": "2026-08-11",
+      "raw": {
+        "description": "Hidráulica",
+        "dailyCurrent": 193.59,
+        "monthlyCurrentTodate": 2130.968,
+        "annualCurrentTodate": 23198.632,
+        "date": "2026-08-11"
+      }
+    },
+    {
+      "technology": "Térmica",
+      "dailyGWh": 143.174,
+      "monthlyGWh": 1034.79,
+      "annualGWh": 41226.613,
+      "date": "2026-08-11",
+      "raw": {
+        "description": "Térmica",
+        "dailyCurrent": 143.174,
+        "monthlyCurrentTodate": 1034.79,
+        "annualCurrentTodate": 41226.613,
+        "date": "2026-08-11"
+      }
+    },
+    {
+      "technology": "Eólica",
+      "dailyGWh": 101.434,
+      "monthlyGWh": 943.044,
+      "annualGWh": 16062.917,
+      "date": "2026-08-11",
+      "raw": {
+        "description": "Eólica",
+        "dailyCurrent": 101.434,
+        "monthlyCurrentTodate": 943.044,
+        "annualCurrentTodate": 16062.917,
+        "date": "2026-08-11"
+      }
+    },
+    {
+      "technology": "Solar",
+      "dailyGWh": 48.107,
+      "monthlyGWh": 1077.041,
+      "annualGWh": 26894.419,
+      "date": "2026-08-11",
+      "raw": {
+        "description": "Solar",
+        "dailyCurrent": 48.107,
+        "monthlyCurrentTodate": 1077.041,
+        "annualCurrentTodate": 26894.419,
+        "date": "2026-08-11"
+      }
+    },
+    {
+      "technology": "Bess",
+      "dailyGWh": 22.189,
+      "monthlyGWh": 389.609,
+      "annualGWh": 5113.32,
+      "date": "2026-08-11",
+      "raw": {
+        "description": "BESS",
+        "dailyCurrent": 22.189,
+        "monthlyCurrentTodate": 389.609,
+        "annualCurrentTodate": 5113.32,
+        "date": "2026-08-11"
+      }
+    },
+    {
+      "technology": "Geotermica",
+      "dailyGWh": 1.244,
+      "monthlyGWh": 12.499,
+      "annualGWh": 160.873,
+      "date": "2026-08-11",
+      "raw": {
+        "description": "Geotérmica",
+        "dailyCurrent": 1.244,
+        "monthlyCurrentTodate": 12.499,
+        "annualCurrentTodate": 160.873,
+        "date": "2026-08-11"
+      }
+    },
+    {
+      "technology": "Hidráulica",
+      "dailyGWh": 188.011,
+      "monthlyGWh": 1935.773,
+      "annualGWh": 23003.436,
+      "date": "2026-08-10",
+      "raw": {
+        "description": "Hidráulica",
+        "dailyCurrent": 188.011,
+        "monthlyCurrentTodate": 1935.773,
+        "annualCurrentTodate": 23003.436,
+        "date": "2026-08-10"
+      }
+    },
+    {
+      "technology": "Térmica",
+      "dailyGWh": 98.315,
+      "monthlyGWh": 891.152,
+      "annualGWh": 41083.499,
+      "date": "2026-08-10",
+      "raw": {
+        "description": "Térmica",
+        "dailyCurrent": 98.315,
+        "monthlyCurrentTodate": 891.152,
+        "annualCurrentTodate": 41083.499,
+        "date": "2026-08-10"
+      }
+    },
+    {
+      "technology": "Eólica",
+      "dailyGWh": 111.9,
+      "monthlyGWh": 842.379,
+      "annualGWh": 15967.633,
+      "date": "2026-08-10",
+      "raw": {
+        "description": "Eólica",
+        "dailyCurrent": 111.9,
+        "monthlyCurrentTodate": 842.379,
+        "annualCurrentTodate": 15967.633,
+        "date": "2026-08-10"
+      }
+    },
+    {
+      "technology": "Solar",
+      "dailyGWh": 71.566,
+      "monthlyGWh": 1024.34,
+      "annualGWh": 26841.349,
+      "date": "2026-08-10",
+      "raw": {
+        "description": "Solar",
+        "dailyCurrent": 71.566,
+        "monthlyCurrentTodate": 1024.34,
+        "annualCurrentTodate": 26841.349,
+        "date": "2026-08-10"
+      }
+    },
+    {
+      "technology": "Bess",
+      "dailyGWh": 40.215,
+      "monthlyGWh": 367.259,
+      "annualGWh": 5090.971,
+      "date": "2026-08-10",
+      "raw": {
+        "description": "BESS",
+        "dailyCurrent": 40.215,
+        "monthlyCurrentTodate": 367.259,
+        "annualCurrentTodate": 5090.971,
+        "date": "2026-08-10"
+      }
+    },
+    {
+      "technology": "Geotermica",
+      "dailyGWh": 1.196,
+      "monthlyGWh": 11.254,
+      "annualGWh": 159.629,
+      "date": "2026-08-10",
+      "raw": {
+        "description": "Geotérmica",
+        "dailyCurrent": 1.196,
+        "monthlyCurrentTodate": 11.254,
+        "annualCurrentTodate": 159.629,
+        "date": "2026-08-10"
+      }
+    },
+    {
+      "technology": "Hidráulica",
+      "dailyGWh": 187.536,
+      "monthlyGWh": 1745.418,
+      "annualGWh": 22812.818,
+      "date": "2026-08-09",
+      "raw": {
+        "description": "Hidráulica",
+        "dailyCurrent": 187.536,
+        "monthlyCurrentTodate": 1745.418,
+        "annualCurrentTodate": 22812.818,
+        "date": "2026-08-09"
+      }
+    },
+    {
+      "technology": "Térmica",
+      "dailyGWh": 67.665,
+      "monthlyGWh": 793.408,
+      "annualGWh": 40985.756,
+      "date": "2026-08-09",
+      "raw": {
+        "description": "Térmica",
+        "dailyCurrent": 67.665,
+        "monthlyCurrentTodate": 793.408,
+        "annualCurrentTodate": 40985.756,
+        "date": "2026-08-09"
+      }
+    },
+    {
+      "technology": "Eólica",
+      "dailyGWh": 81.192,
+      "monthlyGWh": 730.34,
+      "annualGWh": 15855.594,
+      "date": "2026-08-09",
+      "raw": {
+        "description": "Eólica",
+        "dailyCurrent": 81.192,
+        "monthlyCurrentTodate": 730.34,
+        "annualCurrentTodate": 15855.594,
+        "date": "2026-08-09"
+      }
+    },
+    {
+      "technology": "Solar",
+      "dailyGWh": 110.043,
+      "monthlyGWh": 949.962,
+      "annualGWh": 26765.333,
+      "date": "2026-08-09",
+      "raw": {
+        "description": "Solar",
+        "dailyCurrent": 110.043,
+        "monthlyCurrentTodate": 949.962,
+        "annualCurrentTodate": 26765.333,
+        "date": "2026-08-09"
+      }
+    },
+    {
+      "technology": "Bess",
+      "dailyGWh": 32.479,
+      "monthlyGWh": 324.529,
+      "annualGWh": 5048.241,
+      "date": "2026-08-09",
+      "raw": {
+        "description": "BESS",
+        "dailyCurrent": 32.479,
+        "monthlyCurrentTodate": 324.529,
+        "annualCurrentTodate": 5048.241,
+        "date": "2026-08-09"
+      }
+    },
+    {
+      "technology": "Geotermica",
+      "dailyGWh": 1.09,
+      "monthlyGWh": 10.058,
+      "annualGWh": 158.433,
+      "date": "2026-08-09",
+      "raw": {
+        "description": "Geotérmica",
+        "dailyCurrent": 1.09,
+        "monthlyCurrentTodate": 10.058,
+        "annualCurrentTodate": 158.433,
+        "date": "2026-08-09"
+      }
+    },
+    {
+      "technology": "Hidráulica",
+      "dailyGWh": 186.89,
+      "monthlyGWh": 1557.059,
+      "annualGWh": 22624.46,
+      "date": "2026-08-08",
+      "raw": {
+        "description": "Hidráulica",
+        "dailyCurrent": 186.89,
+        "monthlyCurrentTodate": 1557.059,
+        "annualCurrentTodate": 22624.46,
+        "date": "2026-08-08"
+      }
+    },
+    {
+      "technology": "Térmica",
+      "dailyGWh": 75.275,
+      "monthlyGWh": 725.727,
+      "annualGWh": 40918.074,
+      "date": "2026-08-08",
+      "raw": {
+        "description": "Térmica",
+        "dailyCurrent": 75.275,
+        "monthlyCurrentTodate": 725.727,
+        "annualCurrentTodate": 40918.074,
+        "date": "2026-08-08"
+      }
+    },
+    {
+      "technology": "Eólica",
+      "dailyGWh": 82.909,
+      "monthlyGWh": 649.132,
+      "annualGWh": 15774.387,
+      "date": "2026-08-08",
+      "raw": {
+        "description": "Eólica",
+        "dailyCurrent": 82.909,
+        "monthlyCurrentTodate": 649.132,
+        "annualCurrentTodate": 15774.387,
+        "date": "2026-08-08"
+      }
+    },
+    {
+      "technology": "Solar",
+      "dailyGWh": 109.72,
+      "monthlyGWh": 837.794,
+      "annualGWh": 26651.405,
+      "date": "2026-08-08",
+      "raw": {
+        "description": "Solar",
+        "dailyCurrent": 109.72,
+        "monthlyCurrentTodate": 837.794,
+        "annualCurrentTodate": 26651.405,
+        "date": "2026-08-08"
+      }
+    },
+    {
+      "technology": "Bess",
+      "dailyGWh": 37.652,
+      "monthlyGWh": 290.925,
+      "annualGWh": 5014.637,
+      "date": "2026-08-08",
+      "raw": {
+        "description": "BESS",
+        "dailyCurrent": 37.652,
+        "monthlyCurrentTodate": 290.925,
+        "annualCurrentTodate": 5014.637,
+        "date": "2026-08-08"
+      }
+    },
+    {
+      "technology": "Geotermica",
+      "dailyGWh": 1.127,
+      "monthlyGWh": 8.968,
+      "annualGWh": 157.342,
+      "date": "2026-08-08",
+      "raw": {
+        "description": "Geotérmica",
+        "dailyCurrent": 1.127,
+        "monthlyCurrentTodate": 8.968,
+        "annualCurrentTodate": 157.342,
+        "date": "2026-08-08"
+      }
+    },
+    {
+      "technology": "Hidráulica",
+      "dailyGWh": 196.557,
+      "monthlyGWh": 1369.216,
+      "annualGWh": 22436.616,
+      "date": "2026-08-07",
+      "raw": {
+        "description": "Hidráulica",
+        "dailyCurrent": 196.557,
+        "monthlyCurrentTodate": 1369.216,
+        "annualCurrentTodate": 22436.616,
+        "date": "2026-08-07"
+      }
+    },
+    {
+      "technology": "Térmica",
+      "dailyGWh": 86.067,
+      "monthlyGWh": 650.388,
+      "annualGWh": 40842.735,
+      "date": "2026-08-07",
+      "raw": {
+        "description": "Térmica",
+        "dailyCurrent": 86.067,
+        "monthlyCurrentTodate": 650.388,
+        "annualCurrentTodate": 40842.735,
+        "date": "2026-08-07"
+      }
+    },
+    {
+      "technology": "Eólica",
+      "dailyGWh": 88.703,
+      "monthlyGWh": 566.343,
+      "annualGWh": 15691.598,
+      "date": "2026-08-07",
+      "raw": {
+        "description": "Eólica",
+        "dailyCurrent": 88.703,
+        "monthlyCurrentTodate": 566.343,
+        "annualCurrentTodate": 15691.598,
+        "date": "2026-08-07"
+      }
+    },
+    {
+      "technology": "Solar",
+      "dailyGWh": 108.03,
+      "monthlyGWh": 726.402,
+      "annualGWh": 26539.81,
+      "date": "2026-08-07",
+      "raw": {
+        "description": "Solar",
+        "dailyCurrent": 108.03,
+        "monthlyCurrentTodate": 726.402,
+        "annualCurrentTodate": 26539.81,
+        "date": "2026-08-07"
+      }
+    },
+    {
+      "technology": "Bess",
+      "dailyGWh": 39.382,
+      "monthlyGWh": 253.273,
+      "annualGWh": 4976.985,
+      "date": "2026-08-07",
+      "raw": {
+        "description": "BESS",
+        "dailyCurrent": 39.382,
+        "monthlyCurrentTodate": 253.273,
+        "annualCurrentTodate": 4976.985,
+        "date": "2026-08-07"
+      }
+    },
+    {
+      "technology": "Geotermica",
+      "dailyGWh": 1.113,
+      "monthlyGWh": 7.841,
+      "annualGWh": 156.215,
+      "date": "2026-08-07",
+      "raw": {
+        "description": "Geotérmica",
+        "dailyCurrent": 1.113,
+        "monthlyCurrentTodate": 7.841,
+        "annualCurrentTodate": 156.215,
+        "date": "2026-08-07"
+      }
+    },
+    {
+      "technology": "Hidráulica",
+      "dailyGWh": 202.345,
+      "monthlyGWh": 1171.18,
+      "annualGWh": 22238.58,
+      "date": "2026-08-06",
+      "raw": {
+        "description": "Hidráulica",
+        "dailyCurrent": 202.345,
+        "monthlyCurrentTodate": 1171.18,
+        "annualCurrentTodate": 22238.58,
+        "date": "2026-08-06"
+      }
+    },
+    {
+      "technology": "Térmica",
+      "dailyGWh": 86.551,
+      "monthlyGWh": 564.171,
+      "annualGWh": 40756.518,
+      "date": "2026-08-06",
+      "raw": {
+        "description": "Térmica",
+        "dailyCurrent": 86.551,
+        "monthlyCurrentTodate": 564.171,
+        "annualCurrentTodate": 40756.518,
+        "date": "2026-08-06"
+      }
+    },
+    {
+      "technology": "Eólica",
+      "dailyGWh": 63.253,
+      "monthlyGWh": 477.548,
+      "annualGWh": 15602.802,
+      "date": "2026-08-06",
+      "raw": {
+        "description": "Eólica",
+        "dailyCurrent": 63.253,
+        "monthlyCurrentTodate": 477.548,
+        "annualCurrentTodate": 15602.802,
+        "date": "2026-08-06"
+      }
+    },
+    {
+      "technology": "Solar",
+      "dailyGWh": 113.708,
+      "monthlyGWh": 611.92,
+      "annualGWh": 26425.327,
+      "date": "2026-08-06",
+      "raw": {
+        "description": "Solar",
+        "dailyCurrent": 113.708,
+        "monthlyCurrentTodate": 611.92,
+        "annualCurrentTodate": 26425.327,
+        "date": "2026-08-06"
+      }
+    },
+    {
+      "technology": "Bess",
+      "dailyGWh": 39.94,
+      "monthlyGWh": 213.762,
+      "annualGWh": 4937.474,
+      "date": "2026-08-06",
+      "raw": {
+        "description": "BESS",
+        "dailyCurrent": 39.94,
+        "monthlyCurrentTodate": 213.762,
+        "annualCurrentTodate": 4937.474,
+        "date": "2026-08-06"
+      }
+    },
+    {
+      "technology": "Geotermica",
+      "dailyGWh": 1.109,
+      "monthlyGWh": 6.728,
+      "annualGWh": 155.102,
+      "date": "2026-08-06",
+      "raw": {
+        "description": "Geotérmica",
+        "dailyCurrent": 1.109,
+        "monthlyCurrentTodate": 6.728,
+        "annualCurrentTodate": 155.102,
+        "date": "2026-08-06"
+      }
+    }
+  ]
 }

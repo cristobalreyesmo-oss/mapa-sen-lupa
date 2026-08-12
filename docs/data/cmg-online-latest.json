@@ -440,5 +440,136 @@
         }
       ]
     }
+  ],
+  "stale": true,
+  "staleReason": "404 Not Found Error 404: Recurso no encontrado.",
+  "lastFetchAttemptAt": "2026-08-12T15:51:29.366Z",
+  "lastFetchAttempts": [
+    {
+      "path": "/costo-marginal-online/v4/findByDate",
+      "startDate": "2026-08-12",
+      "endDate": "2026-08-12",
+      "error": "429  {\"message\":\"Too Many Requests\"}"
+    },
+    {
+      "path": "/cmg-online/v4/findByDate",
+      "startDate": "2026-08-12",
+      "endDate": "2026-08-12",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/costos-marginales-online/v4/findByDate",
+      "startDate": "2026-08-12",
+      "endDate": "2026-08-12",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/costo-marginal-online/v4/findByDate",
+      "startDate": "2026-08-11",
+      "endDate": "2026-08-11",
+      "error": "429  {\"message\":\"Too Many Requests\"}"
+    },
+    {
+      "path": "/cmg-online/v4/findByDate",
+      "startDate": "2026-08-11",
+      "endDate": "2026-08-11",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/costos-marginales-online/v4/findByDate",
+      "startDate": "2026-08-11",
+      "endDate": "2026-08-11",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/costo-marginal-online/v4/findByDate",
+      "startDate": "2026-08-10",
+      "endDate": "2026-08-10",
+      "error": "429  {\"message\":\"Too Many Requests\"}"
+    },
+    {
+      "path": "/cmg-online/v4/findByDate",
+      "startDate": "2026-08-10",
+      "endDate": "2026-08-10",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/costos-marginales-online/v4/findByDate",
+      "startDate": "2026-08-10",
+      "endDate": "2026-08-10",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/costo-marginal-online/v4/findByDate",
+      "startDate": "2026-08-09",
+      "endDate": "2026-08-09",
+      "error": "429  {\"message\":\"Too Many Requests\"}"
+    },
+    {
+      "path": "/cmg-online/v4/findByDate",
+      "startDate": "2026-08-09",
+      "endDate": "2026-08-09",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/costos-marginales-online/v4/findByDate",
+      "startDate": "2026-08-09",
+      "endDate": "2026-08-09",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/costo-marginal-online/v4/findByDate",
+      "startDate": "2026-08-08",
+      "endDate": "2026-08-08",
+      "error": "429  {\"message\":\"Too Many Requests\"}"
+    },
+    {
+      "path": "/cmg-online/v4/findByDate",
+      "startDate": "2026-08-08",
+      "endDate": "2026-08-08",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/costos-marginales-online/v4/findByDate",
+      "startDate": "2026-08-08",
+      "endDate": "2026-08-08",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/costo-marginal-online/v4/findByDate",
+      "startDate": "2026-08-07",
+      "endDate": "2026-08-07",
+      "error": "429  {\"message\":\"Too Many Requests\"}"
+    },
+    {
+      "path": "/cmg-online/v4/findByDate",
+      "startDate": "2026-08-07",
+      "endDate": "2026-08-07",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/costos-marginales-online/v4/findByDate",
+      "startDate": "2026-08-07",
+      "endDate": "2026-08-07",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/costo-marginal-online/v4/findByDate",
+      "startDate": "2026-08-06",
+      "endDate": "2026-08-06",
+      "error": "429  {\"message\":\"Too Many Requests\"}"
+    },
+    {
+      "path": "/cmg-online/v4/findByDate",
+      "startDate": "2026-08-06",
+      "endDate": "2026-08-06",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/costos-marginales-online/v4/findByDate",
+      "startDate": "2026-08-06",
+      "endDate": "2026-08-06",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    }
   ]
 }

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-12T15:32:30.072Z",
+  "generatedAt": "2026-08-12T15:50:45.594Z",
   "baseUrl": "https://sipub.api.coordinador.cl:443",
   "startDate": "2026-08-11",
   "endDate": "2026-08-12",
@@ -18,6 +18,8 @@
       "id": "cmg-online",
       "file": "data/cmg-online-latest.json",
       "ok": true,
+      "stale": true,
+      "error": "404 Not Found Error 404: Recurso no encontrado.",
       "records": 10,
       "rawCount": 10,
       "sampleKeys": [
@@ -42,19 +44,135 @@
       "attempts": [
         {
           "path": "/costo-marginal-online/v4/findByDate",
-          "startDate": "2026-08-05",
+          "startDate": "2026-08-12",
           "endDate": "2026-08-12",
-          "rows": 10
+          "error": "429  {\"message\":\"Too Many Requests\"}"
+        },
+        {
+          "path": "/cmg-online/v4/findByDate",
+          "startDate": "2026-08-12",
+          "endDate": "2026-08-12",
+          "error": "404 Not Found Error 404: Recurso no encontrado."
+        },
+        {
+          "path": "/costos-marginales-online/v4/findByDate",
+          "startDate": "2026-08-12",
+          "endDate": "2026-08-12",
+          "error": "404 Not Found Error 404: Recurso no encontrado."
+        },
+        {
+          "path": "/costo-marginal-online/v4/findByDate",
+          "startDate": "2026-08-11",
+          "endDate": "2026-08-11",
+          "error": "429  {\"message\":\"Too Many Requests\"}"
+        },
+        {
+          "path": "/cmg-online/v4/findByDate",
+          "startDate": "2026-08-11",
+          "endDate": "2026-08-11",
+          "error": "404 Not Found Error 404: Recurso no encontrado."
+        },
+        {
+          "path": "/costos-marginales-online/v4/findByDate",
+          "startDate": "2026-08-11",
+          "endDate": "2026-08-11",
+          "error": "404 Not Found Error 404: Recurso no encontrado."
+        },
+        {
+          "path": "/costo-marginal-online/v4/findByDate",
+          "startDate": "2026-08-10",
+          "endDate": "2026-08-10",
+          "error": "429  {\"message\":\"Too Many Requests\"}"
+        },
+        {
+          "path": "/cmg-online/v4/findByDate",
+          "startDate": "2026-08-10",
+          "endDate": "2026-08-10",
+          "error": "404 Not Found Error 404: Recurso no encontrado."
+        },
+        {
+          "path": "/costos-marginales-online/v4/findByDate",
+          "startDate": "2026-08-10",
+          "endDate": "2026-08-10",
+          "error": "404 Not Found Error 404: Recurso no encontrado."
+        },
+        {
+          "path": "/costo-marginal-online/v4/findByDate",
+          "startDate": "2026-08-09",
+          "endDate": "2026-08-09",
+          "error": "429  {\"message\":\"Too Many Requests\"}"
+        },
+        {
+          "path": "/cmg-online/v4/findByDate",
+          "startDate": "2026-08-09",
+          "endDate": "2026-08-09",
+          "error": "404 Not Found Error 404: Recurso no encontrado."
+        },
+        {
+          "path": "/costos-marginales-online/v4/findByDate",
+          "startDate": "2026-08-09",
+          "endDate": "2026-08-09",
+          "error": "404 Not Found Error 404: Recurso no encontrado."
         }
       ]
     },
     {
       "id": "generacion-real",
       "file": "data/generacion-real-last-24h.json",
-      "ok": false,
-      "error": "Cannot access 'TECH_CANON' before initialization",
-      "records": 0,
-      "attempts": []
+      "ok": true,
+      "records": 36,
+      "rawCount": 36,
+      "sampleKeys": [],
+      "updatedAt": "2026-08-12T15:51:41.561Z",
+      "source": "/reportes/v3/generation",
+      "range": {
+        "startDate": "2026-08-06",
+        "endDate": "2026-08-12"
+      },
+      "attempts": [
+        {
+          "path": "/reportes/v3/generation",
+          "startDate": "2026-08-12",
+          "endDate": "2026-08-12",
+          "error": "404  {\"message\":\"NotFoundException\",\"detail\":\"No records found\"}"
+        },
+        {
+          "path": "/reportes/v3/generation",
+          "startDate": "2026-08-11",
+          "endDate": "2026-08-11",
+          "rows": 6
+        },
+        {
+          "path": "/reportes/v3/generation",
+          "startDate": "2026-08-10",
+          "endDate": "2026-08-10",
+          "rows": 6
+        },
+        {
+          "path": "/reportes/v3/generation",
+          "startDate": "2026-08-09",
+          "endDate": "2026-08-09",
+          "rows": 6
+        },
+        {
+          "path": "/reportes/v3/generation",
+          "startDate": "2026-08-08",
+          "endDate": "2026-08-08",
+          "rows": 6
+        },
+        {
+          "path": "/reportes/v3/generation",
+          "startDate": "2026-08-07",
+          "endDate": "2026-08-07",
+          "rows": 6
+        },
+        {
+          "path": "/reportes/v3/generation",
+          "startDate": "2026-08-06",
+          "endDate": "2026-08-06",
+          "rows": 6
+        }
+      ]
     }
   ]
 }
