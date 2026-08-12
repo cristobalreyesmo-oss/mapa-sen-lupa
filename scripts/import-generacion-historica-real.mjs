@@ -148,7 +148,7 @@ function writeMonthlyGeneration(months) {
       generatedAt: new Date().toISOString(),
       month,
       unit: "MWh",
-      bessRule: "Subtipo BESS Retiro e Inyeccion se conserva segun el signo real informado en el CSV.",
+      bessRule: "BESS se publica como central unica neta: Inyeccion suma positiva y Retiro suma negativa segun signo real informado en el CSV.",
       hours,
       plants: plants.map((plant) => ({
         name: plant.name,
@@ -188,7 +188,7 @@ function writeAnnualTechnology(years) {
       granularity: "monthly",
       unit: "GWh",
       signed: true,
-      bessRule: "BESS Retiro e Inyeccion quedan separados por Subtipo y conservan el signo real informado en el CSV.",
+      bessRule: "BESS queda como una sola serie neta; Inyeccion y Retiro se integran conservando el signo real informado en el CSV.",
       hours: months,
       series,
       total,
@@ -259,10 +259,7 @@ function ensureTechnology(state, month, key, label, subtype, sign) {
 function normalizeTechnology(tipo, subtipo) {
   const base = baseTechnology(tipo);
   const sub = normalizeSubtype(subtipo);
-  if (normalizeKey(base).includes("bess") && sub) {
-    if (isWithdrawalSubtype(sub)) return { key: "bess-retiro", label: "BESS Retiro", subtype: "Retiro", sign: 1 };
-    if (isInjectionSubtype(sub)) return { key: "bess-inyeccion", label: "BESS Inyeccion", subtype: "Inyeccion", sign: 1 };
-  }
+  if (normalizeKey(base).includes("bess")) return { key: "bess", label: "BESS", subtype: sub, sign: 1 };
   return { key: normalizeKey(base), label: base || "Sin clasificar", subtype: sub, sign: 1 };
 }
 

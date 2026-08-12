@@ -1545,8 +1545,6 @@
     "Fuel Oil": "#8a6d3b",
     "Cogeneración": "#2a9d8f",
     "BESS": "#9f7aea",
-    "BESS Inyeccion": "#6d5dfc",
-    "BESS Retiro": "#b7791f",
     "Otros": "#8b93a1",
     "Sin clasificar": "#8b93a1",
   };
@@ -1583,6 +1581,7 @@
     document.querySelectorAll(".analysis-date").forEach((input) => { input.value = analysisDateOrLive() || ""; });
   }
   function syncHourToAnalysisWindow() {
+    if (currentView === "flows") return;
     const latest = cmgVisibleHours().hours.at(-1);
     if (!latest) return;
     const parsed = timestampHour(latest);
@@ -1638,11 +1637,17 @@
     return best.score >= 2 && best.index >= 0 ? { hours: data.hours, values: data.values[best.index] || [], meta: data[entityKey][best.index] } : null;
   }
   async function ensureAnalysisHistory() {
+    return ensureHistoryFor("cmg");
+  }
+  async function ensureHistoryFor(...datasets) {
     const date = analysisDateOrLive();
     if (!date) return;
-    if (historyLoading) return historyLoading;
-    historyLoading = Promise.all([loadHistoryDataset("cmg", date), loadHistoryDataset("generacion", date), loadHistoryDataset("flujos", date), loadGenerationTechnologyYear(date.slice(0, 4))]).finally(() => { historyLoading = null; });
-    return historyLoading;
+    const jobs = [];
+    for (const dataset of datasets) {
+      if (dataset === "generacion-tecnologia") jobs.push(loadGenerationTechnologyYear(date.slice(0, 4)));
+      else jobs.push(loadHistoryDataset(dataset, date));
+    }
+    return Promise.all(jobs);
   }
   function cmgVisibleHours() {
     const date = analysisDateOrLive();
@@ -3602,7 +3607,7 @@
   }
 
   function refreshAll() {
-    ["overview", "marginal", "flows"].forEach((viewKey) => {
+    [currentView === "gen2" ? "overview" : currentView].filter((viewKey) => ["overview", "marginal", "flows"].includes(viewKey)).forEach((viewKey) => {
       if (maps[viewKey]) {
         updateMapData(maps[viewKey], viewKey);
         if (viewKey !== "flows") renderDetail(viewKey);
@@ -3633,7 +3638,8 @@
   async function setAnalysisDate(date) {
     analysisDate = /^\d{4}-\d{2}-\d{2}$/.test(String(date || "")) ? date : "";
     syncAnalysisDateInputs();
-    await ensureAnalysisHistory();
+    const datasets = currentView === "gen2" ? ["cmg", "generacion", "generacion-tecnologia"] : currentView === "flows" ? ["flujos"] : ["cmg"];
+    await ensureHistoryFor(...datasets);
     syncHourToAnalysisWindow();
     resetGenFilter(true);
     refreshAll();
@@ -3726,7 +3732,7 @@
     document.querySelector('[data-view="' + name + '"]')?.classList.add("nav-active");
 
     if (name === "gen2") {
-      ensureAnalysisHistory().then(() => loadGenerationData()).then(() => {
+      ensureHistoryFor("cmg", "generacion", "generacion-tecnologia").then(() => loadGenerationData()).then(() => {
         if (!maps.gen2) initGen2Map();
         renderGenerationView();
         setTimeout(() => { resizeVisuals(); refreshAll(); }, 0);
@@ -3736,7 +3742,7 @@
     }
 
     if (name === "flows") {
-      ensureAnalysisHistory().then(() => loadFlowData()).then(() => refreshAll());
+      ensureHistoryFor("flujos").then(() => loadFlowData()).then(() => refreshAll());
     }
 
     if (!maps[name]) initMap(name);
@@ -3846,7 +3852,7 @@
       liveData.matchedFeatures = points.filter((feature) => Number.isFinite(liveCmgValue(feature))).length;
       if (!analysisDate) analysisDate = analysisDateOrLive();
       syncAnalysisDateInputs();
-      ensureAnalysisHistory().then(() => { syncHourToAnalysisWindow(); refreshAll(); });
+      ensureHistoryFor("cmg").then(() => { syncHourToAnalysisWindow(); refreshAll(); });
       updateDates();
       syncHourToAnalysisWindow();
       refreshAll();

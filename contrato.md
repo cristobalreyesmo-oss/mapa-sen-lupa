@@ -93,7 +93,7 @@ docs/data/history/flujos/YYYY-MM.json
 ```
 
 Importadores locales para descargables reales CEN/Qlik:
-- `scripts/import-generacion-historica-real.mjs`: lee CSV ancho diario de generacion real desde `docs/data/generacion historica real/`, publica historico horario mensual por central y agregado mensual anual por tecnologia. La columna `Subtipo` separa BESS `Inyeccion` y `Retiro`; se conserva el signo real informado en el CSV.
+- `scripts/import-generacion-historica-real.mjs`: lee CSV ancho diario de generacion real desde `docs/data/generacion historica real/`, publica historico horario mensual por central y agregado mensual anual por tecnologia. Para BESS, la columna `Subtipo` se usa solo para interpretar/validar inyeccion y retiro, pero la BESS debe quedar como una misma central/tecnologia neta; se conserva el signo real informado en el CSV.
 - `scripts/import-potencia-transitada-historica-real.mjs`: lee CSV historico de potencia transitada desde `docs/data/potencia transitada por lineas historico real/`, publica historico horario mensual de flujos por tramo/linea.
 
 Datos historicos reales publicados actualmente:
@@ -156,7 +156,8 @@ Graficos de analisis:
 - El cruce debe ser por timestamp real, no por posicion de array.
 - Cross-filtering: seleccionar central, tecnologia, nodo o tension debe actualizar los graficos relacionados sin recargar toda la pagina.
 - Si falta generacion o CMg real para el cruce, mostrar `CEN no ha informado esta información` para la serie faltante.
-- BESS debe mostrarse separado por `Subtipo`: `BESS Inyeccion` y `BESS Retiro`. No invertir signos manualmente; conservar el signo real informado por CEN/Qlik.
+- BESS no debe mostrarse como dos tecnologias separadas. Debe ser una sola serie/central neta `BESS`, donde la inyeccion aparece positiva y el retiro aparece negativo segun el signo real informado por CEN/Qlik.
+- Para rendimiento, la UI no debe cargar generacion mensual pesada ni flujos historicos al iniciar. Debe cargar solo el historico necesario para la seccion activa: CMg en Costos Marginales, generacion en Generacion, flujos en Transmision, y `generacion-tecnologia/YYYY.json` como agregado liviano.
 
 ### Costos Marginales
 
@@ -242,7 +243,7 @@ Nota: `npm test` puede fallar localmente si falta `vinext`.
 - `docs/index.html` es unico HTML publicado.
 - La UI ya fue reorganizada inicialmente por secciones: Overview topologico, Generacion, Costos Marginales y Transmision.
 - Historico CMg compacto parcial existe para agosto 2026.
-- Generacion historica real 2026 ya esta importada desde `docs/data/generacion historica real/*.csv` hacia `docs/data/history/generacion/` y `docs/data/history/generacion-tecnologia/`.
+- Generacion historica real 2026 ya esta importada desde `docs/data/generacion historica real/*.csv` hacia `docs/data/history/generacion/` y `docs/data/history/generacion-tecnologia/`. BESS esta modelada como serie neta unica, no separada en Inyeccion/Retiro.
 - Potencia transitada historica real 2026 ya esta importada desde `docs/data/potencia transitada por lineas historico real/*.csv` hacia `docs/data/history/flujos/` para enero-junio 2026.
 - La carpeta de potencia transitada contiene CSV real aunque originalmente se esperaba XLSX; mantener CSV como fuente preferente KISS cuando este disponible.
 - Se identificaron fuentes oficiales alternativas:
@@ -252,8 +253,9 @@ Nota: `npm test` puede fallar localmente si falta `vinext`.
 
 ## Proximo Orden de Trabajo
 
-1. Validar en navegador el cruce central-generacion-CMg para fechas 2026 con historico real mensual.
-2. Mejorar matching de nombres entre lineas del modelo SEN y tramos Qlik si hay lineas sin emparejar.
-3. Incorporar CMg definitivo descargable desde `https://www.coordinador.cl/costos-marginales/` para reemplazar/fortalecer el respaldo API.
-4. Automatizar importadores de descargables reales cuando exista una ruta estable y liviana, manteniendo JSON compactos.
-5. Buscar fuente real de capacidad instalada de centrales/BESS; hasta entonces mostrar `CEN no ha informado esta información`.
+1. Validar fluidez en navegador y reducir cargas iniciales si algun JSON mensual sigue afectando interaccion.
+2. Validar en navegador el cruce central-generacion-CMg para fechas 2026 con historico real mensual.
+3. Mejorar matching de nombres entre lineas del modelo SEN y tramos Qlik si hay lineas sin emparejar.
+4. Incorporar CMg definitivo descargable desde `https://www.coordinador.cl/costos-marginales/` para reemplazar/fortalecer el respaldo API.
+5. Automatizar importadores de descargables reales cuando exista una ruta estable y liviana, manteniendo JSON compactos.
+6. Buscar fuente real de capacidad instalada de centrales/BESS; hasta entonces mostrar `CEN no ha informado esta información`.
