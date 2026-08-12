@@ -24,6 +24,8 @@ jobs:
         env:
           CEN_API_BASE_URL: "https://sipub.api.coordinador.cl:443"
           CEN_API_KEY: ${{ secrets.CEN_API_KEY }}
+          CEN_OPERACION_API_BASE_URL: "https://operacion.api.coordinador.cl:443"
+          CEN_OPERACION_USER_KEY: ${{ secrets.CEN_OPERACION_USER_KEY }}
           CEN_DATASETS: "cmg-online,generacion-real"
           CEN_LOOKBACK_DAYS: "1"
         run: node scripts/fetch-cen-data.mjs

@@ -7,6 +7,8 @@ fs.mkdirSync(outDir, { recursive: true });
 
 const baseUrl = (process.env.CEN_API_BASE_URL || "https://sipub.api.coordinador.cl:443").replace(/\/$/, "");
 const apiKey = process.env.CEN_API_KEY || "";
+const operacionBaseUrl = (process.env.CEN_OPERACION_API_BASE_URL || "https://operacion.api.coordinador.cl:443").replace(/\/$/, "");
+const operacionUserKey = process.env.CEN_OPERACION_USER_KEY || "";
 const defaultEndDate = formatDate(new Date());
 const defaultStartDate = formatDate(addDays(new Date(), -1));
 const startDate = process.env.CEN_START_DATE || defaultStartDate;
@@ -56,11 +58,16 @@ const datasets = [
   {
     id: "generacion-real",
     file: "generacion-real-last-24h.json",
-    path: "/generacion-real/v4/findByDate",
-    fallbackPaths: ["/generacion/v4/findByDate", "/generacion-real/v4/findAll", "/generacion/v4/findAll"],
-    mode: "generacion",
+    baseUrl: operacionBaseUrl,
+    apiKey: operacionUserKey,
+    path: "/reportes/v3/generation",
+    fallbackPaths: [],
+    mode: "operacionGenerationDaily",
     rangeSpanDays: 1,
     tryLookback: true,
+    dateParam: "date",
+    dateValue: "endDate",
+    noRangeParams: true,
   },
 ];
 
@@ -72,6 +79,7 @@ const status = {
   lookbackDays,
   enabledDatasets: [...enabledDatasetIds],
   hasApiKey: Boolean(apiKey),
+  hasOperacionUserKey: Boolean(operacionUserKey),
   ok: false,
   datasets: [],
 };
@@ -153,28 +161,32 @@ async function requestDataset(dataset) {
 }
 
 async function requestPath(dataset, candidatePath, range) {
-  const url = new URL(baseUrl + candidatePath);
-  if (!dataset.noDateParams) {
+  const url = new URL((dataset.baseUrl || baseUrl) + candidatePath);
+  if (dataset.dateParam) {
+    url.searchParams.set(dataset.dateParam, range[dataset.dateValue || "startDate"] || range.endDate || range.startDate);
+    url.searchParams.set("page", "0");
+  } else if (!dataset.noDateParams && !dataset.noRangeParams) {
     url.searchParams.set("startDate", range.startDate);
     url.searchParams.set("endDate", range.endDate);
     url.searchParams.set("page", "0");
   }
   const headers = { accept: "application/json" };
-  if (apiKey) {
-    url.searchParams.set("user_key", apiKey);
-    url.searchParams.set("apiKey", apiKey);
-    url.searchParams.set("apikey", apiKey);
-    url.searchParams.set("subscription-key", apiKey);
-    url.searchParams.set("subscription_key", apiKey);
-    url.searchParams.set("api-key", apiKey);
-    headers.apiKey = apiKey;
-    headers.ApiKey = apiKey;
-    headers.apikey = apiKey;
-    headers.Authorization = `Bearer ${apiKey}`;
-    headers["Ocp-Apim-Subscription-Key"] = apiKey;
-    headers["subscription-key"] = apiKey;
-    headers["Subscription-Key"] = apiKey;
-    headers["x-api-key"] = apiKey;
+  const key = dataset.apiKey || apiKey;
+  if (key) {
+    url.searchParams.set("user_key", key);
+    url.searchParams.set("apiKey", key);
+    url.searchParams.set("apikey", key);
+    url.searchParams.set("subscription-key", key);
+    url.searchParams.set("subscription_key", key);
+    url.searchParams.set("api-key", key);
+    headers.apiKey = key;
+    headers.ApiKey = key;
+    headers.apikey = key;
+    headers.Authorization = `Bearer ${key}`;
+    headers["Ocp-Apim-Subscription-Key"] = key;
+    headers["subscription-key"] = key;
+    headers["Subscription-Key"] = key;
+    headers["x-api-key"] = key;
   }
   const response = await fetchWithRetry(url, headers);
   if (!response.ok) {
@@ -210,6 +222,9 @@ function normalizeDataset(dataset, payload) {
   const rows = unwrapRows(actualPayload);
   if (dataset.mode === "generacion") {
     return normalizeGeneracion(rows, sourcePath, range, payload?.__attempts || []);
+  }
+  if (dataset.mode === "operacionGenerationDaily") {
+    return normalizeOperacionGenerationDaily(rows, sourcePath, range, payload?.__attempts || []);
   }
   if (dataset.mode === "latestByBar") {
     const records = latestByName(rows).map((row) => ({
@@ -476,6 +491,31 @@ function normalizeGeneracion(rows, sourcePath, range, attempts) {
     hours: window,
     series,
     total,
+  };
+}
+
+function normalizeOperacionGenerationDaily(rows, sourcePath, range, attempts) {
+  const records = rows
+    .map((row) => ({
+      technology: canonicalTech(readText(row, ["description", "tecnologia", "technology"])),
+      dailyGWh: readNumber(row, ["dailyCurrent", "daily_current", "daily", "valor", "value"]),
+      monthlyGWh: readNumber(row, ["monthlyCurrentTodate", "monthly_current_todate"]),
+      annualGWh: readNumber(row, ["annualCurrentTodate", "annual_current_todate"]),
+      date: readText(row, ["date", "fecha"]),
+      raw: row,
+    }))
+    .filter((row) => row.technology && Number.isFinite(row.dailyGWh));
+  return {
+    id: "generacion-real",
+    ok: records.length > 0,
+    updatedAt: new Date().toISOString(),
+    source: sourcePath,
+    range,
+    attempts,
+    rawCount: rows.length,
+    granularity: "daily",
+    unit: "GWh",
+    records,
   };
 }
 
