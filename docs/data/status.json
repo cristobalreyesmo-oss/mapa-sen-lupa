@@ -1,11 +1,12 @@
 {
-  "generatedAt": "2026-08-12T13:56:45.983Z",
+  "generatedAt": "2026-08-12T14:25:07.441Z",
   "baseUrl": "https://sipub.api.coordinador.cl:443",
   "startDate": "2026-08-11",
-  "endDate": "2026-08-11",
-  "lookbackDays": 2,
+  "endDate": "2026-08-12",
+  "lookbackDays": 1,
   "enabledDatasets": [
-    "cmg-online"
+    "cmg-online",
+    "generacion-real"
   ],
   "hasApiKey": true,
   "ok": true,
@@ -14,7 +15,7 @@
       "id": "cmg-online",
       "file": "data/cmg-online-latest.json",
       "ok": true,
-      "records": 10,
+      "records": 9,
       "rawCount": 10,
       "sampleKeys": [
         "id_info",
@@ -29,17 +30,46 @@
         "fecha_hora",
         "fecha_minuto"
       ],
-      "updatedAt": "2026-08-12T13:56:49.440Z",
+      "updatedAt": "2026-08-12T14:25:10.009Z",
       "source": "/costo-marginal-online/v4/findByDate",
       "range": {
-        "startDate": "2026-08-12",
+        "startDate": "2026-08-11",
         "endDate": "2026-08-12"
       },
       "attempts": [
         {
           "path": "/costo-marginal-online/v4/findByDate",
-          "startDate": "2026-08-12",
+          "startDate": "2026-08-11",
           "rows": 10
+        }
+      ]
+    },
+    {
+      "id": "generacion-real",
+      "file": "data/generacion-real-last-24h.json",
+      "ok": false,
+      "error": "404 Not Found Error 404: Recurso no encontrado.",
+      "records": 0,
+      "attempts": [
+        {
+          "path": "/generacion-real/v4/findByDate",
+          "startDate": "2026-08-11",
+          "error": "404 Not Found No Mapping Rule matched"
+        },
+        {
+          "path": "/generacion/v4/findByDate",
+          "startDate": "2026-08-11",
+          "error": "404 Not Found Error 404: Recurso no encontrado."
+        },
+        {
+          "path": "/generacion-real/v4/findAll",
+          "startDate": "2026-08-11",
+          "error": "404 Not Found No Mapping Rule matched"
+        },
+        {
+          "path": "/generacion/v4/findAll",
+          "startDate": "2026-08-11",
+          "error": "404 Not Found Error 404: Recurso no encontrado."
         }
       ]
     }

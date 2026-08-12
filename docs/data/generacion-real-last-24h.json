@@ -1,0 +1,33 @@
+{
+  "id": "generacion-real",
+  "ok": false,
+  "updatedAt": "2026-08-12T14:25:14.582Z",
+  "error": "404 Not Found Error 404: Recurso no encontrado.",
+  "attempts": [
+    {
+      "path": "/generacion-real/v4/findByDate",
+      "startDate": "2026-08-11",
+      "endDate": "2026-08-12",
+      "error": "404 Not Found No Mapping Rule matched"
+    },
+    {
+      "path": "/generacion/v4/findByDate",
+      "startDate": "2026-08-11",
+      "endDate": "2026-08-12",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/generacion-real/v4/findAll",
+      "startDate": "2026-08-11",
+      "endDate": "2026-08-12",
+      "error": "404 Not Found No Mapping Rule matched"
+    },
+    {
+      "path": "/generacion/v4/findAll",
+      "startDate": "2026-08-11",
+      "endDate": "2026-08-12",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    }
+  ],
+  "records": []
+}
