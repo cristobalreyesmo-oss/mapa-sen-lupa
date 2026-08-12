@@ -2,6 +2,21 @@ name: Actualizar datos CEN
 
 on:
   workflow_dispatch:
+    inputs:
+      datasets:
+        description: "Datasets CEN a consultar"
+        required: false
+        default: "cmg-real,cmg-online,demanda-real,potencia-transitada,generacion-real,centrales"
+      start_date:
+        description: "Fecha inicio YYYY-MM-DD"
+        required: false
+      end_date:
+        description: "Fecha fin YYYY-MM-DD"
+        required: false
+      commit_data:
+        description: "Commit de docs/data/*.json"
+        required: false
+        default: "true"
   schedule:
     - cron: "*/15 * * * *"
 
@@ -30,11 +45,14 @@ jobs:
           CEN_API_KEY: ${{ secrets.CEN_API_KEY }}
           CEN_OPERACION_API_BASE_URL: "https://operacion.api.coordinador.cl:443"
           CEN_OPERACION_USER_KEY: ${{ secrets.CEN_OPERACION_USER_KEY }}
-          CEN_DATASETS: "cmg-real,cmg-online,demanda-real,potencia-transitada,generacion-real,centrales"
+          CEN_DATASETS: ${{ github.event.inputs.datasets || 'cmg-real,cmg-online,demanda-real,potencia-transitada,generacion-real,centrales' }}
           CEN_WINDOW_DAYS: "7"
+          CEN_START_DATE: ${{ github.event.inputs.start_date || '' }}
+          CEN_END_DATE: ${{ github.event.inputs.end_date || '' }}
         run: node scripts/fetch-cen-data.mjs
 
       - name: Commit datos actualizados
+        if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.commit_data != 'false' }}
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Actualizar datos CEN"
