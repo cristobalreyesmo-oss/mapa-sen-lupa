@@ -269,6 +269,15 @@ function normalizeTechnology(tipo, subtipo) {
 function baseTechnology(value) {
   const text = cleanText(value);
   if (!text || text === "-") return "Sin clasificar";
+  const key = normalizedText(text);
+  if (key.includes("eolica")) return "Eólica";
+  if (key.includes("hidroelectrica") || key.includes("hidraulica")) return "Hidráulica";
+  if (key.includes("termoelectrica") || key.includes("termica")) return "Térmica";
+  if (key.includes("geoterm")) return "Geotermia";
+  if (key.includes("solar")) return "Solar";
+  if (key.includes("bess")) return "BESS";
+  if (key.includes("biomasa")) return "Biomasa";
+  if (key.includes("biogas")) return "Biogás";
   return text;
 }
 
