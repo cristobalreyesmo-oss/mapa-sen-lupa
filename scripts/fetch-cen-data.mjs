@@ -101,7 +101,7 @@ const datasets = [
   },
   {
     id: "generacion-real",
-    file: "generacion-real-last-24h.json",
+    file: "generacion-real-central-latest.json",
     path: "/generacion-real/v3/findByDate",
     fallbackPaths: [],
     mode: "generacionRealCentral",
@@ -124,7 +124,7 @@ const datasets = [
   },
   {
     id: "generacion-real-diaria",
-    file: "generacion-real-diaria.json",
+    file: "generacion-real-last-24h.json",
     baseUrl: operacionBaseUrl,
     apiKey: operacionUserKey,
     path: "/reportes/v3/generation",
@@ -162,10 +162,11 @@ for (const dataset of datasets.filter((item) => enabledDatasetIds.has(item.id)))
     const payload = await requestDataset(dataset);
     const normalized = normalizeDataset(dataset, payload);
     writeJson(target, normalized);
+    const datasetOk = normalized.ok !== false;
     status.datasets.push({
       id: dataset.id,
       file: `data/${dataset.file}`,
-      ok: true,
+      ok: datasetOk,
       records: normalized.records?.length ?? normalized.rawCount ?? 0,
       rawCount: normalized.rawCount ?? null,
       sampleKeys: normalized.sampleKeys || [],

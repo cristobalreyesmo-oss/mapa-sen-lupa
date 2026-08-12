@@ -3096,7 +3096,8 @@
   function genNote() {
     const gen = dailyGenerationDataset(liveData.generacion) || (liveData.generacion && liveData.generacion.hours && liveData.generacion.hours.length ? liveData.generacion : null);
     if (gen) {
-      return genApiText() + " Fuente: generacion-real-last-24h.json · actualizado " + String(gen.updatedAt || "").slice(0, 16).replace("T", " ") + " UTC.";
+      const file = gen.granularity === "daily" ? "generacion-real-last-24h.json" : "generacion-real-central-latest.json";
+      return genApiText() + " Fuente: " + file + " · actualizado " + String(gen.updatedAt || "").slice(0, 16).replace("T", " ") + " UTC.";
     }
     return genApiText();
   }
@@ -3273,9 +3274,9 @@
         fetch("./data/cmg-online-latest.json", { cache: "no-store" }).then((response) => response.ok ? response.json() : null).catch(() => null),
         fetch("./data/demanda-real-estimada.json", { cache: "no-store" }).then((response) => response.ok ? response.json() : null).catch(() => null),
         fetch("./data/potencia-transitada-latest.json", { cache: "no-store" }).then((response) => response.ok ? response.json() : null).catch(() => null),
-        fetch("./data/generacion-real-last-24h.json", { cache: "no-store" }).then((response) => response.ok ? response.json() : null).catch(() => null),
+        fetch("./data/generacion-real-central-latest.json", { cache: "no-store" }).then((response) => response.ok ? response.json() : null).catch(() => null),
         fetch("./data/centrales-latest.json", { cache: "no-store" }).then((response) => response.ok ? response.json() : null).catch(() => null),
-        fetch("./data/generacion-real-diaria.json", { cache: "no-store" }).then((response) => response.ok ? response.json() : null).catch(() => null),
+        fetch("./data/generacion-real-last-24h.json", { cache: "no-store" }).then((response) => response.ok ? response.json() : null).catch(() => null),
       ]);
       liveData.status = status;
       if (demanda && demanda.ok && Array.isArray(demanda.values) && demanda.values.length) {
