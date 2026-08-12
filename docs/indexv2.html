@@ -884,7 +884,10 @@
         <div id="gen2-ranking" class="p-3 grid grid-cols-1 md:grid-cols-2 gap-3"></div>
       </div>
       <div class="col-span-4 md:col-span-12 mt-gutter">
-        <h2 class="text-headline-md font-display text-on-surface mb-1">Generación por Tecnología</h2>
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
+          <h2 class="text-headline-md font-display text-on-surface">Generación por Tecnología</h2>
+          <label class="flex items-center gap-2 text-label-mono text-secondary">VENTANA<select id="gen-days-select" class="glass-ctrl px-2 py-1 text-label-mono text-on-surface focus:border-primary"><option value="1">1 día</option><option value="2">2 días</option><option value="3">3 días</option><option value="4">4 días</option><option value="5">5 días</option><option value="6">6 días</option><option value="7" selected>7 días</option></select></label>
+        </div>
         <p class="text-body-md text-secondary">Mezcla de generación real informada por CEN/Operación, desglosada por tecnología.</p>
         <div id="gen-source" class="text-caption font-label-mono text-primary mt-1">Datos: —</div>
       </div>
@@ -1302,7 +1305,7 @@
   const nodeFilter = { selected: new Set() };
   const layers = { lines: true, substations: true, plants: true, bess: true };
   const voltages = { "500": true, "220": true, "154": true };
-  const liveData = { status: null, cmgOnline: new Map(), cmgRows: [], cmgHistory: new Map(), cmgHours: [], generacion: null, loaded: false, matchedFeatures: 0 };
+  const liveData = { status: null, cmgOnline: new Map(), cmgRows: [], cmgHistory: new Map(), cmgHours: [], cmgStale: false, generacion: null, loaded: false, matchedFeatures: 0 };
   let points = [];
   let substations = [];
   let grouped = null;
@@ -1323,6 +1326,7 @@
   let gen2ChartHoverKey = "";
   const genFilter = { techs: new Set(), plants: new Set(), query: "" };
   const CEN_NOT_INFORMED = "CEN no ha informado esta información";
+  let genDays = 7;
   const viewRefs = {
     overview: { mapId: "map", chartId: "cmg-chart", lensId: "lens-readout", popupId: "lens-popup", nameId: "node-name", detailId: "node-detail", cmgId: "node-cmg", valueId: "chart-value" },
     marginal: { mapId: "map-mc", chartId: "cmg-chart-mc", lensId: "lens-readout-mc", popupId: "lens-popup-mc", nameId: "node-name-mc", detailId: "node-detail-mc", cmgId: "node-cmg-mc", valueId: "chart-value-mc" },
@@ -1470,6 +1474,7 @@
     "Hidráulica": "#2f6fdc",
     "Carbón": "#55585e",
     "Gas Natural": "#e07000",
+    "Térmica": "#e07000",
     "Solar": "#d9a400",
     "Eólica": "#00875f",
     "Biomasa": "#7a5cbf",
@@ -1543,10 +1548,12 @@
   }
   function dailyGenerationDataset(gen) {
     if (!gen || gen.granularity !== "daily" || !Array.isArray(gen.records) || !gen.records.length) return null;
-    const date = gen.records[0].date || gen.range?.endDate || "—";
-    const series = gen.records.map((row) => ({ technology: row.technology, values: [Number(row.dailyGWh) || 0] }));
-    const total = [series.reduce((sum, row) => sum + (Number(row.values[0]) || 0), 0)];
-    return { ...gen, hours: [date], series, total, unit: "GWh", granularity: "daily" };
+    const dates = [...new Set(gen.records.map((row) => row.date).filter(Boolean))].sort().slice(-genDays);
+    const techs = [...new Set(gen.records.map((row) => row.technology).filter(Boolean))].sort();
+    const byDateTech = new Map(gen.records.map((row) => [row.date + "|" + row.technology, Number(row.dailyGWh) || 0]));
+    const series = techs.map((technology) => ({ technology, values: dates.map((date) => byDateTech.get(date + "|" + technology) || 0) }));
+    const total = dates.map((date) => techs.reduce((sum, technology) => sum + (byDateTech.get(date + "|" + technology) || 0), 0));
+    return { ...gen, hours: dates, series, total, unit: "GWh", granularity: "daily" };
   }
   function setGenText(id, value) {
     const el = document.getElementById(id);
@@ -1637,9 +1644,10 @@
       return;
     }
     const origin = gen.granularity === "daily" ? "Generación real diaria · API Operación CEN" : "Generación real · API del Coordinador (CEN) · últimas " + gen.hours.length + " h secuenciales informadas";
-    const windowText = gen.granularity === "daily" ? " · fecha " + gen.hours[0] : " · desde " + genFullLabel(gen.hours[0]) + " hasta " + genFullLabel(gen.hours[gen.hours.length - 1]);
+    const windowText = gen.granularity === "daily" ? " · desde " + gen.hours[0] + " hasta " + gen.hours[gen.hours.length - 1] : " · desde " + genFullLabel(gen.hours[0]) + " hasta " + genFullLabel(gen.hours[gen.hours.length - 1]);
     const updated = gen && gen.updatedAt ? " · actualizado " + String(gen.updatedAt).slice(0, 16).replace("T", " ") + " UTC" : "";
-    setGenText("gen-source", "Datos: " + origin + windowText + updated);
+    const stale = gen.stale ? " · ultimo dato real disponible, API no informó actualización nueva" : "";
+    setGenText("gen-source", "Datos: " + origin + windowText + updated + stale);
   }
   function renderGenKpis(gen) {
     if (!gen) {
@@ -1653,7 +1661,7 @@
     const totalSum = perTech.reduce((a, b) => a + b.sum, 0) || 1;
     const dom = perTech[0];
     setGenText("kpi-gen-energy", energy.toFixed(1));
-    setGenText("kpi-gen-energy-note", gen.granularity === "daily" ? "GWh diarios · " + gen.hours[0] : gen.hours.length + " horas · " + genFullLabel(gen.hours[0]) + " → " + genFullLabel(gen.hours[gen.hours.length - 1]));
+    setGenText("kpi-gen-energy-note", gen.granularity === "daily" ? "GWh diarios · " + gen.hours[0] + " → " + gen.hours[gen.hours.length - 1] : gen.hours.length + " horas · " + genFullLabel(gen.hours[0]) + " → " + genFullLabel(gen.hours[gen.hours.length - 1]));
     setGenText("kpi-gen-peak", peakMw.toLocaleString("es-CL"));
     setGenText("kpi-gen-peak-note", "hora " + genHourLabel(gen.hours[peakIdx]));
     setGenText("kpi-gen-dominant", dom ? dom.technology : "—");
@@ -1693,7 +1701,7 @@
     const peakIdx = gen.total.reduce((best, v, i) => (Number(v) || 0) > (Number(gen.total[best]) || 0) ? i : best, 0);
     const notes = [
       "Fuente: " + (gen.source || "API Operación CEN"),
-      gen.granularity === "daily" ? "Dato informado: generación diaria por tecnología en GWh para " + gen.hours[0] : "Ventana analizada: últimas " + gen.hours.length + " horas disponibles (" + genFullLabel(gen.hours[0]) + " → " + genFullLabel(gen.hours[gen.hours.length - 1]) + ")",
+      gen.granularity === "daily" ? "Dato informado: generación diaria por tecnología en GWh desde " + gen.hours[0] + " hasta " + gen.hours[gen.hours.length - 1] : "Ventana analizada: últimas " + gen.hours.length + " horas disponibles (" + genFullLabel(gen.hours[0]) + " → " + genFullLabel(gen.hours[gen.hours.length - 1]) + ")",
       gen.granularity === "daily" ? "Total diario informado: " + Number(gen.total[0] || 0).toLocaleString("es-CL") + " GWh" : "Máximo de la ventana: " + Math.round(gen.total[peakIdx] || 0).toLocaleString("es-CL") + " MW a las " + genHourLabel(gen.hours[peakIdx]),
       "Lectura del gráfico: cada barra apila la generación de todas las tecnologías de esa hora; la línea blanca punteada es el total del sistema.",
       gen.granularity === "daily" ? "El endpoint reportes/v3/generation no entrega serie horaria ni centrales: solo clasificación diaria por tecnología." : "Los valores son potencias por hora (MW). La energía acumulada de las 24 h se reporta en GWh.",
@@ -3079,14 +3087,14 @@
   function cmgApiText() {
     const range = cmgWindowText();
     return liveData.loaded && range
-      ? "CMg API del Coordinador (CEN): ultimas " + liveData.cmgHours.length + " h secuenciales informadas, desde " + shortTimestampLabel(liveData.cmgHours[0]).full + " hasta " + shortTimestampLabel(liveData.cmgHours[liveData.cmgHours.length - 1]).full + "."
+      ? "CMg API del Coordinador (CEN): ultimas " + liveData.cmgHours.length + " h secuenciales informadas, desde " + shortTimestampLabel(liveData.cmgHours[0]).full + " hasta " + shortTimestampLabel(liveData.cmgHours[liveData.cmgHours.length - 1]).full + (liveData.cmgStale ? ". Ultimo dato real disponible; API CEN no informó actualización nueva." : ".")
       : "CMg: " + CEN_NOT_INFORMED + ".";
   }
   function genApiText() {
     const gen = dailyGenerationDataset(liveData.generacion) || (liveData.generacion && liveData.generacion.hours && liveData.generacion.hours.length ? liveData.generacion : null);
     if (!gen) return "Generacion: " + CEN_NOT_INFORMED + ".";
     return gen.granularity === "daily"
-      ? "Generacion real API Operacion CEN: dato diario por tecnologia para " + gen.hours[0] + "."
+      ? "Generacion real API Operacion CEN: dato diario por tecnologia desde " + gen.hours[0] + " hasta " + gen.hours[gen.hours.length - 1] + "."
       : "Generacion real API del Coordinador (CEN): ultimas " + gen.hours.length + " h secuenciales informadas, desde " + genFullLabel(gen.hours[0]) + " hasta " + genFullLabel(gen.hours[gen.hours.length - 1]) + ".";
   }
 
@@ -3120,12 +3128,12 @@
     const hasCmgWindow = liveData.loaded && liveData.cmgHours.length;
     const origin = hasCmgWindow ? "CMg API del Coordinador (CEN)" : "CMg no informado por CEN";
     const text = hasCmgWindow
-      ? "Datos CEN: ultimas " + liveData.cmgHours.length + " h secuenciales · desde " + shortTimestampLabel(liveData.cmgHours[0]).full + " hasta " + shortTimestampLabel(liveData.cmgHours[liveData.cmgHours.length - 1]).full
+      ? "Datos CEN: ultimas " + liveData.cmgHours.length + " h secuenciales · desde " + shortTimestampLabel(liveData.cmgHours[0]).full + " hasta " + shortTimestampLabel(liveData.cmgHours[liveData.cmgHours.length - 1]).full + (liveData.cmgStale ? " · ultimo dato real disponible" : "")
       : "Datos: " + CEN_NOT_INFORMED;
     document.getElementById("mc-date").textContent = text;
     document.getElementById("mc-date-overview").textContent = text;
     const statusText = hasCmgWindow
-      ? "API CEN activa · CMg ultimas " + liveData.cmgHours.length + " h secuenciales · " + liveData.cmgRows.length + " barras · " + liveData.matchedFeatures + " nodos emparejados"
+      ? (liveData.cmgStale ? "API CEN sin actualización nueva · " : "API CEN activa · ") + "CMg ultimas " + liveData.cmgHours.length + " h secuenciales · " + liveData.cmgRows.length + " barras · " + liveData.matchedFeatures + " nodos emparejados"
       : CEN_NOT_INFORMED;
     document.getElementById("map-status").textContent = statusText;
     document.getElementById("map-status-mc").textContent = statusText;
@@ -3276,6 +3284,7 @@
         liveData.generacion = generacion;
       }
       if (Array.isArray(cmgOnline?.records)) {
+        liveData.cmgStale = Boolean(cmgOnline.stale);
         liveData.cmgRows = cmgOnline.records;
         liveData.cmgHours = Array.isArray(cmgOnline.hours) ? cmgOnline.hours : [];
         liveData.cmgHistory.clear();
@@ -3415,6 +3424,10 @@
     applyGenFilter();
   });
   document.getElementById("gen-filter-reset").addEventListener("click", () => resetGenFilter(false));
+  document.getElementById("gen-days-select").addEventListener("change", (event) => {
+    genDays = Math.max(1, Math.min(7, Number(event.target.value) || 7));
+    renderGenerationView();
+  });
 
   document.querySelectorAll("[data-layer]").forEach((button) => {
     button.addEventListener("click", () => {

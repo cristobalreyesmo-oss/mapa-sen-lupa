@@ -103,6 +103,7 @@ La clase base es `.glass`; los controles pequenos usan `.glass-ctrl` (capsula) y
 - Cada seccion debe mostrar claramente la fuente y ventana: **API del Coordinador (CEN)**, dataset usado y rango **desde fecha/hora UTC hasta fecha/hora UTC**.
 - Si una seccion no tiene serie horaria CEN real (por ejemplo flujos de transmision), debe decirlo explicitamente y no presentar una ventana CEN ficticia.
 - No se deben mostrar datos simulados. Si CEN/API no entrega la informacion, la UI debe mostrar exactamente: `CEN no ha informado esta información`.
+- Excepcion operativa sin simulacion: si una actualizacion API falla (429/404/timeout), `scripts/fetch-cen-data.mjs` debe preservar el ultimo JSON real bueno y marcarlo `stale: true`, mostrando en UI "ultimo dato real disponible". Nunca debe vaciar datos reales por una falla temporal.
 - Las credenciales nunca se escriben en codigo ni en archivos del repo; deben venir desde GitHub Secrets o variables de entorno (`CEN_API_KEY`, `CEN_OPERACION_USER_KEY`).
 - La vista Generacion mantiene desacoplado el bloque global de **Generacion por tecnologia**: es dato global CEN del sistema y no depende del filtro/cross-filter por central.
 - Principio KISS/performance: no redibujar ECharts globales ni recalcular listas completas cuando cambia un filtro local si la informacion global no depende de ese filtro.
@@ -191,6 +192,7 @@ La clase base es `.glass`; los controles pequenos usan `.glass-ctrl` (capsula) y
 - El bloque de tecnologia conserva grafico ECharts (vendored localmente en `docs/vendor/echarts.min.js`), KPIs y paneles de detalle.
 - Los **datos de generacion por tecnologia** vienen de API Operacion CEN `GET /reportes/v3/generation` (`https://operacion.api.coordinador.cl:443`) con parametro `date` y `user_key`, via `scripts/fetch-cen-data.mjs` -> `docs/data/generacion-real-last-24h.json`.
 - Ese endpoint entrega clasificacion **diaria** por tecnologia en GWh (`dailyCurrent`, `monthlyCurrentTodate`, `annualCurrentTodate`); no entrega serie horaria ni centrales. Por lo tanto, el grafico debe rotularse como dato diario real cuando use este endpoint.
+- Para generar contexto historico real sin sobrecargar la UI, el fetch consulta hasta 7 dias diarios (`CEN_GENERACION_DAYS`, min 1, max 7) y la UI permite filtrar 1-7 dias. El cliente solo filtra arrays ya descargados; no llama APIs desde navegador.
 - La generacion real por central queda pendiente hasta contar con endpoint/documentacion que entregue central/unidad y MW/energia real. Mientras falte, la UI debe mostrar `CEN no ha informado esta información`.
 - La consulta de generacion usa la misma regla de ventana movil `hoy - 1 dia → hoy`; agrupa por clave horaria cronologica `YYYY-MM-DD HH` y despues corta `hours.slice(-24)`. No rellena horas faltantes ni fuerza un dia calendario; si la API publica horas de dias anteriores, se mantienen siempre que sean parte de las ultimas 24 horas reales disponibles.
 - El eje del grafico no asume `00-23`; usa los timestamps reales de `hours`, con etiquetas `dd/mm + hora UTC`, por lo que una ventana que cruza medianoche queda explicitamente marcada.

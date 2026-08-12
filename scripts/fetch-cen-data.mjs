@@ -14,6 +14,7 @@ const defaultStartDate = formatDate(addDays(new Date(), -1));
 const startDate = process.env.CEN_START_DATE || defaultStartDate;
 const endDate = process.env.CEN_END_DATE || defaultEndDate;
 const lookbackDays = Number(process.env.CEN_LOOKBACK_DAYS || 2);
+const generationDays = Math.max(1, Math.min(7, Number(process.env.CEN_GENERACION_DAYS || 7)));
 const enabledDatasetIds = new Set(
   (process.env.CEN_DATASETS || "cmg-online,cmg-real,demanda,hidrologia,generacion-real")
     .split(",")
@@ -68,6 +69,7 @@ const datasets = [
     dateParam: "date",
     dateValue: "endDate",
     noRangeParams: true,
+    multiDateDays: generationDays,
   },
 ];
 
@@ -77,6 +79,7 @@ const status = {
   startDate,
   endDate,
   lookbackDays,
+  generationDays,
   enabledDatasets: [...enabledDatasetIds],
   hasApiKey: Boolean(apiKey),
   hasOperacionUserKey: Boolean(operacionUserKey),
@@ -103,6 +106,24 @@ for (const dataset of datasets.filter((item) => enabledDatasetIds.has(item.id)))
       attempts: summarizeAttempts(normalized.attempts || []),
     });
   } catch (error) {
+    const preserved = preserveExistingDataset(target, dataset, error);
+    if (preserved) {
+      status.datasets.push({
+        id: dataset.id,
+        file: `data/${dataset.file}`,
+        ok: true,
+        stale: true,
+        error: describeError(error),
+        records: preserved.records?.length ?? preserved.rawCount ?? 0,
+        rawCount: preserved.rawCount ?? null,
+        sampleKeys: preserved.sampleKeys || [],
+        updatedAt: preserved.updatedAt,
+        source: preserved.source,
+        range: preserved.range,
+        attempts: summarizeAttempts(error?.attempts || []),
+      });
+      continue;
+    }
     const fallback = {
       id: dataset.id,
       ok: false,
@@ -128,6 +149,9 @@ writeJson(path.join(outDir, "status.json"), status);
 console.log(JSON.stringify(status, null, 2));
 
 async function requestDataset(dataset) {
+  if (dataset.mode === "operacionGenerationDaily" && dataset.multiDateDays) {
+    return requestOperationGenerationWindow(dataset);
+  }
   const paths = [dataset.path, ...(dataset.fallbackPaths || [])];
   const ranges = candidateRanges(dataset);
   let lastError;
@@ -158,6 +182,36 @@ async function requestDataset(dataset) {
     throw lastError;
   }
   return { __sourcePath: dataset.path, __range: ranges[0], __attempts: attempts, __payload: [] };
+}
+
+async function requestOperationGenerationWindow(dataset) {
+  const attempts = [];
+  const content = [];
+  let lastError;
+  for (let offset = dataset.multiDateDays - 1; offset >= 0; offset -= 1) {
+    const date = formatDate(addDays(new Date(), -offset));
+    const range = { startDate: date, endDate: date };
+    try {
+      await delay(900);
+      const json = await requestPath(dataset, dataset.path, range);
+      const rows = unwrapRows(json);
+      attempts.push({ path: dataset.path, startDate: date, endDate: date, rows: rows.length });
+      content.push(...rows);
+    } catch (error) {
+      lastError = error;
+      attempts.push({ path: dataset.path, startDate: date, endDate: date, error: describeError(error) });
+      const message = String(error?.message || "");
+      if (!message.startsWith("404 ") && !message.startsWith("429 ") && !message.startsWith("500 ")) {
+        error.attempts = attempts;
+        throw error;
+      }
+    }
+  }
+  if (!content.length && lastError) {
+    lastError.attempts = attempts;
+    throw lastError;
+  }
+  return { __sourcePath: dataset.path, __range: { startDate: formatDate(addDays(new Date(), -(dataset.multiDateDays - 1))), endDate }, __attempts: attempts, __payload: { content } };
 }
 
 async function requestPath(dataset, candidatePath, range) {
@@ -397,6 +451,7 @@ const TECH_CANON = {
   "carbon": "Carbón",
   "carbon pulverizado": "Carbón",
   "gas natural": "Gas Natural",
+  "termica": "Térmica",
   "gnl": "Gas Natural",
   "gn": "Gas Natural",
   "eolica": "Eólica",
@@ -566,10 +621,33 @@ function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function preserveExistingDataset(file, dataset, error) {
+  try {
+    if (!fs.existsSync(file)) return null;
+    const existing = JSON.parse(fs.readFileSync(file, "utf8"));
+    const hasRecords = Array.isArray(existing.records) && existing.records.length > 0;
+    const hasSeries = Array.isArray(existing.series) && existing.series.length > 0;
+    if (!existing.ok || (!hasRecords && !hasSeries)) return null;
+    const preserved = {
+      ...existing,
+      ok: true,
+      stale: true,
+      staleReason: describeError(error),
+      lastFetchAttemptAt: new Date().toISOString(),
+      lastFetchAttempts: error?.attempts || [],
+    };
+    writeJson(file, preserved);
+    return preserved;
+  } catch {
+    return null;
+  }
+}
+
 function summarizeAttempts(attempts) {
   return attempts.slice(0, 12).map((attempt) => ({
     path: attempt.path,
     startDate: attempt.startDate,
+    endDate: attempt.endDate,
     rows: attempt.rows,
     error: attempt.error,
   }));

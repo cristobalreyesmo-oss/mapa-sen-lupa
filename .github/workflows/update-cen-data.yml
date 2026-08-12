@@ -28,6 +28,7 @@ jobs:
           CEN_OPERACION_USER_KEY: ${{ secrets.CEN_OPERACION_USER_KEY }}
           CEN_DATASETS: "cmg-online,generacion-real"
           CEN_LOOKBACK_DAYS: "1"
+          CEN_GENERACION_DAYS: "7"
         run: node scripts/fetch-cen-data.mjs
 
       - name: Commit datos actualizados
