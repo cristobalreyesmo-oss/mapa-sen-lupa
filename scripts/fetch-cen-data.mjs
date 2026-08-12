@@ -434,6 +434,7 @@ function normalizeDataset(dataset, payload) {
       timestamp: readText(row, timestampFields()),
     })).filter((row) => row.key && Number.isFinite(row.value));
     const history = cmgHistoryByBar(rows);
+    const recordKeys = new Set(records.flatMap((row) => [row.key, ...(row.aliases || [])]).filter(Boolean));
     return {
       id: dataset.id,
       ok: records.length > 0,
@@ -446,7 +447,7 @@ function normalizeDataset(dataset, payload) {
       sampleRows: records.length ? [] : rows.slice(0, 3),
       records,
       hours: history.hours,
-      history: history.records,
+      history: history.records.filter((row) => recordKeys.has(row.key) || (row.aliases || []).some((alias) => recordKeys.has(alias))),
     };
   }
   return {
@@ -976,7 +977,7 @@ function preserveExistingDataset(file, dataset, error) {
     const hasSeries = Array.isArray(existing.series) && existing.series.length > 0;
     if (!existing.ok || (!hasRecords && !hasSeries)) return null;
     const preserved = {
-      ...existing,
+      ...compactExistingDataset(existing),
       ok: true,
       stale: true,
       staleReason: describeError(error),
@@ -988,6 +989,21 @@ function preserveExistingDataset(file, dataset, error) {
   } catch {
     return null;
   }
+}
+
+function compactExistingDataset(dataset) {
+  return stripRawFields(dataset);
+}
+
+function stripRawFields(value) {
+  if (Array.isArray(value)) return value.map(stripRawFields);
+  if (!value || typeof value !== "object") return value;
+  const output = {};
+  for (const [key, nested] of Object.entries(value)) {
+    if (key === "raw") continue;
+    output[key] = stripRawFields(nested);
+  }
+  return output;
 }
 
 function summarizeAttempts(attempts) {
