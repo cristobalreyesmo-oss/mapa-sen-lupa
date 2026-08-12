@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-12T14:50:47.491Z",
+  "generatedAt": "2026-08-12T15:10:00.655Z",
   "baseUrl": "https://sipub.api.coordinador.cl:443",
   "startDate": "2026-08-11",
   "endDate": "2026-08-12",
@@ -9,19 +9,39 @@
     "generacion-real"
   ],
   "hasApiKey": true,
-  "ok": false,
+  "hasOperacionUserKey": true,
+  "ok": true,
   "datasets": [
     {
       "id": "cmg-online",
       "file": "data/cmg-online-latest.json",
-      "ok": false,
-      "error": "429  {\"message\":\"Too Many Requests\"}",
-      "records": 0,
+      "ok": true,
+      "records": 9,
+      "rawCount": 10,
+      "sampleKeys": [
+        "id_info",
+        "barra_info",
+        "barra_transf",
+        "fecha",
+        "hra",
+        "min",
+        "cmg_clp_kwh_",
+        "cmg_usd_mwh_",
+        "version",
+        "fecha_hora",
+        "fecha_minuto"
+      ],
+      "updatedAt": "2026-08-12T15:10:02.859Z",
+      "source": "/costo-marginal-online/v4/findByDate",
+      "range": {
+        "startDate": "2026-08-11",
+        "endDate": "2026-08-12"
+      },
       "attempts": [
         {
           "path": "/costo-marginal-online/v4/findByDate",
           "startDate": "2026-08-11",
-          "error": "429  {\"message\":\"Too Many Requests\"}"
+          "rows": 10
         }
       ]
     },
@@ -29,28 +49,13 @@
       "id": "generacion-real",
       "file": "data/generacion-real-last-24h.json",
       "ok": false,
-      "error": "404 Not Found Error 404: Recurso no encontrado.",
+      "error": "404  {\"message\":\"NotFoundException\",\"detail\":\"No records found\"}",
       "records": 0,
       "attempts": [
         {
-          "path": "/generacion-real/v4/findByDate",
+          "path": "/reportes/v3/generation",
           "startDate": "2026-08-11",
-          "error": "404 Not Found No Mapping Rule matched"
-        },
-        {
-          "path": "/generacion/v4/findByDate",
-          "startDate": "2026-08-11",
-          "error": "404 Not Found Error 404: Recurso no encontrado."
-        },
-        {
-          "path": "/generacion-real/v4/findAll",
-          "startDate": "2026-08-11",
-          "error": "404 Not Found No Mapping Rule matched"
-        },
-        {
-          "path": "/generacion/v4/findAll",
-          "startDate": "2026-08-11",
-          "error": "404 Not Found Error 404: Recurso no encontrado."
+          "error": "404  {\"message\":\"NotFoundException\",\"detail\":\"No records found\"}"
         }
       ]
     }
