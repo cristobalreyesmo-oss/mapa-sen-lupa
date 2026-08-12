@@ -17,6 +17,14 @@ on:
         description: "Commit de docs/data/history"
         required: false
         default: "true"
+      limit:
+        description: "Filas por pagina API"
+        required: false
+        default: "500"
+      max_pages:
+        description: "Paginas maximas por dia"
+        required: false
+        default: "6"
 
 concurrency:
   group: backfill-cen-history
@@ -44,6 +52,8 @@ jobs:
           CEN_BACKFILL_DATASETS: ${{ github.event.inputs.datasets }}
           CEN_BACKFILL_START_DATE: ${{ github.event.inputs.start_date }}
           CEN_BACKFILL_END_DATE: ${{ github.event.inputs.end_date }}
+          CEN_BACKFILL_LIMIT: ${{ github.event.inputs.limit }}
+          CEN_BACKFILL_MAX_PAGES: ${{ github.event.inputs.max_pages }}
         run: node scripts/backfill-cen-history.mjs
 
       - name: Commit historico actualizado
