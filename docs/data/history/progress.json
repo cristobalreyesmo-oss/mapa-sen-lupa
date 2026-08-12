@@ -1,0 +1,1 @@
+{"schema":"sen-history-progress-v1","runs":[{"generatedAt":"2026-08-12T20:03:29.813Z","startDate":"2020-06-26","endDate":"2020-06-26","datasets":[{"id":"potencia-transitada","ok":false,"rawRows":0,"months":[],"attempts":[{"date":"2020-06-26","error":"502 Bad Gateway {\"message\": \"Internal server error\"}"}]}],"ok":false}]}
