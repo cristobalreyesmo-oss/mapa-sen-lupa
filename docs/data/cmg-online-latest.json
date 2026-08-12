@@ -1,15 +1,235 @@
 {
   "id": "cmg-online",
-  "ok": false,
-  "updatedAt": "2026-08-12T09:56:03.249Z",
-  "error": "429  {\"message\":\"Too Many Requests\"}",
+  "ok": true,
+  "updatedAt": "2026-08-12T10:48:59.925Z",
+  "source": "/costo-marginal-online/v4/findByDate",
+  "range": {
+    "startDate": "2026-08-12",
+    "endDate": "2026-08-12"
+  },
   "attempts": [
     {
       "path": "/costo-marginal-online/v4/findByDate",
       "startDate": "2026-08-12",
       "endDate": "2026-08-12",
-      "error": "429  {\"message\":\"Too Many Requests\"}"
+      "rows": 10
     }
   ],
-  "records": []
+  "rawCount": 10,
+  "sampleKeys": [
+    "id_info",
+    "barra_info",
+    "barra_transf",
+    "fecha",
+    "hra",
+    "min",
+    "cmg_clp_kwh_",
+    "cmg_usd_mwh_",
+    "version",
+    "fecha_hora",
+    "fecha_minuto"
+  ],
+  "sampleRows": [],
+  "records": [
+    {
+      "name": "BA S/E LOS DOMINICOS 12KV BP1",
+      "key": "ba s e los dominicos 12kv bp1",
+      "value": 17.46892,
+      "timestamp": "2026-08-12 00:00",
+      "raw": {
+        "id_info": 826,
+        "barra_info": "BA S/E LOS DOMINICOS 12KV BP1",
+        "barra_transf": "LOS_DOMINICOS_013",
+        "fecha": "2026-08-12",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 16.00677,
+        "cmg_usd_mwh_": 17.46892,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-08-12 00:00",
+        "fecha_minuto": "2026-08-12 00:00",
+        "timestamp": "2026-08-12 00:00"
+      }
+    },
+    {
+      "name": "BA S/E CASABLANCA 12kV BP1",
+      "key": "ba s e casablanca 12kv bp1",
+      "value": 17.10576,
+      "timestamp": "2026-08-12 00:00",
+      "raw": {
+        "id_info": 994,
+        "barra_info": "BA S/E CASABLANCA 12kV BP1",
+        "barra_transf": "CASABLANCA____013",
+        "fecha": "2026-08-12",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 15.67401,
+        "cmg_usd_mwh_": 17.10576,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-08-12 00:00",
+        "fecha_minuto": "2026-08-12 00:00",
+        "timestamp": "2026-08-12 00:00"
+      }
+    },
+    {
+      "name": "BA S/E LOS DOMINICOS 110KV BP1",
+      "key": "ba s e los dominicos 110kv bp1",
+      "value": 17.45195,
+      "timestamp": "2026-08-12 00:00",
+      "raw": {
+        "id_info": 824,
+        "barra_info": "BA S/E LOS DOMINICOS 110KV BP1",
+        "barra_transf": "LOS_DOMINICOS_110",
+        "fecha": "2026-08-12",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 15.99122,
+        "cmg_usd_mwh_": 17.45195,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-08-12 00:00",
+        "fecha_minuto": "2026-08-12 00:00",
+        "timestamp": "2026-08-12 00:00"
+      }
+    },
+    {
+      "name": "BA S/E CASABLANCA 66kV BP1",
+      "key": "ba s e casablanca 66kv bp1",
+      "value": 17.07182,
+      "timestamp": "2026-08-12 00:00",
+      "raw": {
+        "id_info": 1328,
+        "barra_info": "BA S/E CASABLANCA 66kV BP1",
+        "barra_transf": "CASABLANCA____066",
+        "fecha": "2026-08-12",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 15.64291,
+        "cmg_usd_mwh_": 17.07182,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-08-12 00:00",
+        "fecha_minuto": "2026-08-12 00:00",
+        "timestamp": "2026-08-12 00:00"
+      }
+    },
+    {
+      "name": "BA S/E LOTA 13.2KV B1",
+      "key": "ba s e lota 13 2kv b1",
+      "value": 17.5334,
+      "timestamp": "2026-08-12 00:00",
+      "raw": {
+        "id_info": 1076,
+        "barra_info": "BA S/E LOTA 13.2KV B1",
+        "barra_transf": "LOTA__________013",
+        "fecha": "2026-08-12",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 16.06586,
+        "cmg_usd_mwh_": 17.5334,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-08-12 00:00",
+        "fecha_minuto": "2026-08-12 00:00",
+        "timestamp": "2026-08-12 00:00"
+      }
+    },
+    {
+      "name": "BA S/E CASAS VIEJAS 13.2KV",
+      "key": "ba s e casas viejas 13 2kv",
+      "value": 17.9305,
+      "timestamp": "2026-08-12 00:00",
+      "raw": {
+        "id_info": 159,
+        "barra_info": "BA S/E CASAS VIEJAS 13.2KV",
+        "barra_transf": "CASASVIEJAS___023",
+        "fecha": "2026-08-12",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 16.42972,
+        "cmg_usd_mwh_": 17.9305,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-08-12 00:00",
+        "fecha_minuto": "2026-08-12 00:00",
+        "timestamp": "2026-08-12 00:00"
+      }
+    },
+    {
+      "name": "BA S/E LOTA 66KV BP",
+      "key": "ba s e lota 66kv bp",
+      "value": 17.46043,
+      "timestamp": "2026-08-12 00:00",
+      "raw": {
+        "id_info": 2428,
+        "barra_info": "BA S/E LOTA 66KV BP",
+        "barra_transf": "LOTA__________066",
+        "fecha": "2026-08-12",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 15.99899,
+        "cmg_usd_mwh_": 17.46043,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-08-12 00:00",
+        "fecha_minuto": "2026-08-12 00:00",
+        "timestamp": "2026-08-12 00:00"
+      }
+    },
+    {
+      "name": "BA S/E CASAS VIEJAS 110KV",
+      "key": "ba s e casas viejas 110kv",
+      "value": 17.90844,
+      "timestamp": "2026-08-12 00:00",
+      "raw": {
+        "id_info": 263,
+        "barra_info": "BA S/E CASAS VIEJAS 110KV",
+        "barra_transf": "CASASVIEJAS___110",
+        "fecha": "2026-08-12",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 16.4095,
+        "cmg_usd_mwh_": 17.90844,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-08-12 00:00",
+        "fecha_minuto": "2026-08-12 00:00",
+        "timestamp": "2026-08-12 00:00"
+      }
+    },
+    {
+      "name": "BA S/E MANSO DE VELASCO 15KV",
+      "key": "ba s e manso de velasco 15kv",
+      "value": 16.69169,
+      "timestamp": "2026-08-12 00:00",
+      "raw": {
+        "id_info": 189,
+        "barra_info": "BA S/E MANSO DE VELASCO 15KV",
+        "barra_transf": "M.DEVELASCO___013",
+        "fecha": "2026-08-12",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 15.2946,
+        "cmg_usd_mwh_": 16.69169,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-08-12 00:00",
+        "fecha_minuto": "2026-08-12 00:00",
+        "timestamp": "2026-08-12 00:00"
+      }
+    },
+    {
+      "name": "BA S/E CASTILLA 23KV",
+      "key": "ba s e castilla 23kv",
+      "value": 16.58818,
+      "timestamp": "2026-08-12 00:00",
+      "raw": {
+        "id_info": 468,
+        "barra_info": "BA S/E CASTILLA 23KV",
+        "barra_transf": "CASTILLA______023",
+        "fecha": "2026-08-12",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 15.19974,
+        "cmg_usd_mwh_": 16.58818,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-08-12 00:00",
+        "fecha_minuto": "2026-08-12 00:00",
+        "timestamp": "2026-08-12 00:00"
+      }
+    }
+  ]
 }
