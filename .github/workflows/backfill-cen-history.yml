@@ -1,0 +1,54 @@
+name: Backfill historico CEN
+
+on:
+  workflow_dispatch:
+    inputs:
+      datasets:
+        description: "Datasets: cmg-real,cmg-online,generacion-real,potencia-transitada"
+        required: false
+        default: "cmg-real"
+      start_date:
+        description: "Fecha inicio YYYY-MM-DD"
+        required: true
+      end_date:
+        description: "Fecha fin YYYY-MM-DD"
+        required: true
+      commit_data:
+        description: "Commit de docs/data/history"
+        required: false
+        default: "true"
+
+concurrency:
+  group: backfill-cen-history
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Ejecutar backfill historico
+        env:
+          CEN_API_BASE_URL: "https://sipub.api.coordinador.cl:443"
+          CEN_API_KEY: ${{ secrets.CEN_API_KEY }}
+          CEN_BACKFILL_DATASETS: ${{ github.event.inputs.datasets }}
+          CEN_BACKFILL_START_DATE: ${{ github.event.inputs.start_date }}
+          CEN_BACKFILL_END_DATE: ${{ github.event.inputs.end_date }}
+        run: node scripts/backfill-cen-history.mjs
+
+      - name: Commit historico actualizado
+        if: ${{ github.event.inputs.commit_data != 'false' }}
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Actualizar historico CEN"
+          file_pattern: docs/data/history/**/*.json
