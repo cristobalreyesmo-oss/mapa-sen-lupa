@@ -41628,14 +41628,14 @@
     }
   ],
   "stale": true,
-  "staleReason": "403 Forbidden Authentication parameters missing",
-  "lastFetchAttemptAt": "2026-08-12T18:08:19.770Z",
+  "staleReason": "429  {\"message\":\"Too Many Requests\"}",
+  "lastFetchAttemptAt": "2026-08-12T18:09:45.553Z",
   "lastFetchAttempts": [
     {
       "path": "/costo-marginal-online/v4/findByDate",
       "startDate": "2026-08-06",
       "endDate": "2026-08-12",
-      "error": "403 Forbidden Authentication parameters missing"
+      "error": "429  {\"message\":\"Too Many Requests\"}"
     }
   ]
 }
