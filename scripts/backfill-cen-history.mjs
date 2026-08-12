@@ -26,6 +26,7 @@ const configs = {
 const progress = readJson(path.join(outDir, "progress.json")) || { schema: "sen-history-progress-v1", runs: [] };
 const manifest = readJson(path.join(outDir, "manifest.json")) || { schema: "sen-etl-manifest-v1", generatedAt: "", window: {}, datasets: {} };
 const run = { generatedAt: new Date().toISOString(), startDate, endDate, datasets: [], ok: false };
+let manifestChanged = false;
 
 for (const id of datasets) {
   const config = configs[id];
@@ -49,12 +50,13 @@ for (const id of datasets) {
   const months = writeDatasetHistory(config.historyId, normalized);
   for (const month of months) {
     manifest.datasets[config.historyId] = addMonth(manifest.datasets[config.historyId], month, `history/${config.historyId}/${month}.json`);
+    manifestChanged = true;
   }
   run.datasets.push({ id, ok: months.length > 0, rawRows: rows.length, months, attempts: attempts.slice(0, 40) });
 }
 
 run.ok = run.datasets.some((dataset) => dataset.ok);
-manifest.generatedAt = new Date().toISOString();
+if (manifestChanged) manifest.generatedAt = new Date().toISOString();
 progress.runs = [run, ...(progress.runs || [])].slice(0, 30);
 writeJson(path.join(outDir, "manifest.json"), manifest);
 writeJson(path.join(outDir, "progress.json"), progress);
