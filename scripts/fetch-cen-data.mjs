@@ -58,7 +58,8 @@ const datasets = [
     fallbackPaths: ["/cmg-online/v4/findByDate", "/costos-marginales-online/v4/findByDate"],
     mode: "latestByBar",
     paginate: true,
-    query: { limit: "5000" },
+    query: { limit: "2000" },
+    maxPages: 3,
     tryLookback: false,
   },
   {
@@ -68,7 +69,8 @@ const datasets = [
     fallbackPaths: ["/cmg-real/v4/findByDate", "/costos-marginales-reales/v4/findByDate"],
     mode: "latestByBar",
     paginate: true,
-    query: { type: "DEFINITIVO", limit: "5000" },
+    query: { type: "DEFINITIVO", limit: "2000" },
+    maxPages: 3,
     tryLookback: false,
   },
   {
@@ -430,7 +432,6 @@ function normalizeDataset(dataset, payload) {
       aliases: aliasKeysForRow(row),
       value: readNumber(row, cmgValueFields()),
       timestamp: readText(row, timestampFields()),
-      raw: row,
     })).filter((row) => row.key && Number.isFinite(row.value));
     const history = cmgHistoryByBar(rows);
     return {
@@ -676,7 +677,6 @@ function normalizeOperacionGenerationDaily(rows, sourcePath, range, attempts) {
       monthlyGWh: readNumber(row, ["monthlyCurrentTodate", "monthly_current_todate"]),
       annualGWh: readNumber(row, ["annualCurrentTodate", "annual_current_todate"]),
       date: readText(row, ["date", "fecha"]),
-      raw: row,
     }))
     .filter((row) => row.technology && Number.isFinite(row.dailyGWh));
   return {
@@ -707,7 +707,6 @@ function normalizeGeneracionRealCentral(rows, id, sourcePath, range, attempts) {
         owner: readText(row, ["propietario", "owner"]),
         unit: readText(row, ["unidad", "unit"]),
         value: readNumber(row, ["valor", "value", "generacion", "mwh", "mw"]),
-        raw: row,
       };
     })
     .filter((row) => row.name && row.timestamp && Number.isFinite(row.value));
@@ -728,7 +727,6 @@ function normalizeGeneracionRealCentral(rows, id, sourcePath, range, attempts) {
         technology: row.technology,
         owner: row.owner,
         values: new Map(),
-        raw: row.raw,
       });
     }
     const plant = byPlant.get(key);
@@ -747,7 +745,6 @@ function normalizeGeneracionRealCentral(rows, id, sourcePath, range, attempts) {
       value: latest ? latest.value : null,
       timestamp: latest ? latest.timestamp : "",
       values,
-      raw: plant.raw,
     };
   }).filter((row) => Number.isFinite(Number(row.value)));
   const techs = [...new Set(records.map((row) => row.technology).filter(Boolean))].sort();
@@ -785,7 +782,6 @@ function normalizeCentralesCatalog(rows, id, sourcePath, range, attempts) {
       technology: canonicalTech(readText(row, ["tipo_tecnologia", "tipoTecnologia", "tecnologia"])),
       connectionPoint: readText(row, ["punto_conexion", "puntoConexion"]),
       region: readText(row, ["region"]),
-      raw: row,
     }))
     .filter((row) => row.name || row.idCentral);
   return {
@@ -826,7 +822,6 @@ function normalizeDemandaReal(rows, id, sourcePath, range, attempts) {
       supplier: readText(row, ["suministrador", "supplier"]),
       withdrawal: readText(row, ["retiro", "withdrawal"]),
       type: readText(row, ["tipo", "type"]),
-      raw: row,
     }))
     .filter((row) => row.timestamp && Number.isFinite(row.valueMWh));
   const byHour = new Map();
@@ -863,7 +858,6 @@ function normalizePotenciaTransitada(rows, id, sourcePath, range, attempts) {
       zone: readText(row, ["zona", "zone"]),
       direction: readText(row, ["sentido_linea", "sentidoLinea", "direction"]),
       powerMw: readNumber(row, ["potencia_mwh", "potenciaMwh", "potencia_mw", "potenciaMw", "potencia_kwh", "potenciaKwh"]),
-      raw: row,
     }))
     .filter((row) => row.lineName && row.timestamp && Number.isFinite(row.powerMw));
   const latestByLine = new Map();
@@ -883,7 +877,6 @@ function normalizePotenciaTransitada(rows, id, sourcePath, range, attempts) {
     valueMw: row.powerMw,
     timestamp: row.timestamp,
     direction: row.direction,
-    raw: row.raw,
   }));
   const hours = [...new Set(records.map((row) => parseHourKey(row.timestamp)).filter(Boolean))].sort();
   return {
