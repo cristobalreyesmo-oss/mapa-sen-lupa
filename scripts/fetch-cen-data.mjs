@@ -88,8 +88,9 @@ const datasets = [
     fallbackPaths: [],
     mode: "potenciaTransitada",
     paginate: true,
-    query: { limit: "5000" },
+    query: { limit: "1000" },
     maxPages: 50,
+    multiDateDays: cenWindowDays,
     tryLookback: false,
   },
   {
@@ -106,8 +107,9 @@ const datasets = [
     fallbackPaths: [],
     mode: "generacionRealCentral",
     paginate: true,
-    query: { pageSize: "5000" },
+    query: { pageSize: "1000" },
     maxPages: 50,
+    multiDateDays: cenWindowDays,
     tryLookback: false,
   },
   {
@@ -118,7 +120,7 @@ const datasets = [
     mode: "centralesCatalog",
     paginate: true,
     noDateParams: true,
-    query: { limit: "5000" },
+    query: { limit: "1000" },
     maxPages: 20,
     tryLookback: false,
   },
@@ -222,6 +224,9 @@ async function requestDataset(dataset) {
   if (dataset.mode === "operacionGenerationDaily" && dataset.multiDateDays) {
     return requestOperationGenerationWindow(dataset);
   }
+  if (dataset.multiDateDays && dataset.paginate && !dataset.dateParam) {
+    return requestMultiDateWindow(dataset);
+  }
   const paths = [dataset.path, ...(dataset.fallbackPaths || [])];
   const ranges = candidateRanges(dataset);
   let lastError;
@@ -288,9 +293,9 @@ async function requestMultiDateWindow(dataset) {
   const attempts = [];
   const content = [];
   const paths = [dataset.path, ...(dataset.fallbackPaths || [])];
+  const dates = windowDates().slice(-dataset.multiDateDays).reverse();
   let lastError;
-  for (let offset = 0; offset < dataset.multiDateDays; offset += 1) {
-    const date = formatDate(addDays(new Date(), -offset));
+  for (const date of dates) {
     const range = { startDate: date, endDate: date };
     for (const candidatePath of paths) {
       try {
@@ -304,7 +309,7 @@ async function requestMultiDateWindow(dataset) {
         lastError = error;
         attempts.push({ path: candidatePath, startDate: date, endDate: date, error: describeError(error) });
         const message = String(error?.message || "");
-        if (!message.startsWith("404 ") && !message.startsWith("429 ") && !message.startsWith("500 ")) {
+        if (!message.startsWith("404 ") && !message.startsWith("429 ") && !message.startsWith("500 ") && !message.startsWith("502 ")) {
           error.attempts = attempts;
           throw error;
         }
@@ -315,7 +320,7 @@ async function requestMultiDateWindow(dataset) {
     lastError.attempts = attempts;
     throw lastError;
   }
-  return { __sourcePath: dataset.path, __range: { startDate: formatDate(addDays(new Date(), -(dataset.multiDateDays - 1))), endDate }, __attempts: attempts, __payload: { content } };
+  return { __sourcePath: dataset.path, __range: { startDate, endDate }, __attempts: attempts, __payload: { content } };
 }
 
 async function requestPagedPath(dataset, candidatePath, range) {
