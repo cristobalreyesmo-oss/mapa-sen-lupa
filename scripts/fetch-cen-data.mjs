@@ -23,6 +23,31 @@ const enabledDatasetIds = new Set(
     .filter(Boolean),
 );
 
+const TECH_CANON = {
+  "hidraulica": "Hidráulica",
+  "hidro": "Hidráulica",
+  "hidroelectrico": "Hidráulica",
+  "carbon": "Carbón",
+  "carbon pulverizado": "Carbón",
+  "gas natural": "Gas Natural",
+  "termica": "Térmica",
+  "gnl": "Gas Natural",
+  "gn": "Gas Natural",
+  "eolica": "Eólica",
+  "solar": "Solar",
+  "solar fv": "Solar",
+  "fotovoltaica": "Solar",
+  "solar fotovoltaica": "Solar",
+  "biomasa": "Biomasa",
+  "biogas": "Biogás",
+  "geotermia": "Geotermia",
+  "petroleo diesel": "Petróleo Diésel",
+  "diesel": "Petróleo Diésel",
+  "cogeneracion": "Cogeneración",
+  "fuel oil": "Fuel Oil",
+  "otros": "Otros",
+};
+
 const datasets = [
   {
     id: "cmg-online",
@@ -30,9 +55,8 @@ const datasets = [
     path: "/costo-marginal-online/v4/findByDate",
     fallbackPaths: ["/cmg-online/v4/findByDate", "/costos-marginales-online/v4/findByDate"],
     mode: "latestByBar",
-    rangeSpanDays: cmgDays,
-    singleWideRange: true,
     paginate: true,
+    multiDateDays: cmgDays,
     tryLookback: true,
   },
   {
@@ -41,9 +65,8 @@ const datasets = [
     path: "/costo-marginal-real/v4/findByDate",
     fallbackPaths: ["/cmg-real/v4/findByDate", "/costos-marginales-reales/v4/findByDate"],
     mode: "latestByBar",
-    rangeSpanDays: cmgDays,
-    singleWideRange: true,
     paginate: true,
+    multiDateDays: cmgDays,
     tryLookback: true,
   },
   {
@@ -158,6 +181,9 @@ async function requestDataset(dataset) {
   if (dataset.mode === "operacionGenerationDaily" && dataset.multiDateDays) {
     return requestOperationGenerationWindow(dataset);
   }
+  if (dataset.mode === "latestByBar" && dataset.multiDateDays) {
+    return requestMultiDateWindow(dataset);
+  }
   const paths = [dataset.path, ...(dataset.fallbackPaths || [])];
   const ranges = candidateRanges(dataset);
   let lastError;
@@ -210,6 +236,40 @@ async function requestOperationGenerationWindow(dataset) {
       if (!message.startsWith("404 ") && !message.startsWith("429 ") && !message.startsWith("500 ")) {
         error.attempts = attempts;
         throw error;
+      }
+    }
+  }
+  if (!content.length && lastError) {
+    lastError.attempts = attempts;
+    throw lastError;
+  }
+  return { __sourcePath: dataset.path, __range: { startDate: formatDate(addDays(new Date(), -(dataset.multiDateDays - 1))), endDate }, __attempts: attempts, __payload: { content } };
+}
+
+async function requestMultiDateWindow(dataset) {
+  const attempts = [];
+  const content = [];
+  const paths = [dataset.path, ...(dataset.fallbackPaths || [])];
+  let lastError;
+  for (let offset = dataset.multiDateDays - 1; offset >= 0; offset -= 1) {
+    const date = formatDate(addDays(new Date(), -offset));
+    const range = { startDate: date, endDate: date };
+    for (const candidatePath of paths) {
+      try {
+        await delay(900);
+        const json = dataset.paginate ? await requestPagedPath(dataset, candidatePath, range) : await requestPath(dataset, candidatePath, range);
+        const rows = unwrapRows(json);
+        attempts.push({ path: candidatePath, startDate: date, endDate: date, rows: rows.length });
+        content.push(...rows);
+        break;
+      } catch (error) {
+        lastError = error;
+        attempts.push({ path: candidatePath, startDate: date, endDate: date, error: describeError(error) });
+        const message = String(error?.message || "");
+        if (!message.startsWith("404 ") && !message.startsWith("429 ") && !message.startsWith("500 ")) {
+          error.attempts = attempts;
+          throw error;
+        }
       }
     }
   }
@@ -469,31 +529,6 @@ function readNumber(row, names) {
   }
   return NaN;
 }
-
-const TECH_CANON = {
-  "hidraulica": "Hidráulica",
-  "hidro": "Hidráulica",
-  "hidroelectrico": "Hidráulica",
-  "carbon": "Carbón",
-  "carbon pulverizado": "Carbón",
-  "gas natural": "Gas Natural",
-  "termica": "Térmica",
-  "gnl": "Gas Natural",
-  "gn": "Gas Natural",
-  "eolica": "Eólica",
-  "solar": "Solar",
-  "solar fv": "Solar",
-  "fotovoltaica": "Solar",
-  "solar fotovoltaica": "Solar",
-  "biomasa": "Biomasa",
-  "biogas": "Biogás",
-  "geotermia": "Geotermia",
-  "petroleo diesel": "Petróleo Diésel",
-  "diesel": "Petróleo Diésel",
-  "cogeneracion": "Cogeneración",
-  "fuel oil": "Fuel Oil",
-  "otros": "Otros",
-};
 
 function tecnologiaFields() {
   return ["tecnologia", "tipo_tecnologia", "tipo", "fuente", "combustible", "energia_primaria", "grupo_tecnologia", "tecnologia_grupo"];
