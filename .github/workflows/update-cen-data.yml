@@ -51,9 +51,12 @@ jobs:
           CEN_END_DATE: ${{ github.event.inputs.end_date || '' }}
         run: node scripts/fetch-cen-data.mjs
 
+      - name: Construir ETL CEN compacto
+        run: node scripts/build-cen-etl.mjs
+
       - name: Commit datos actualizados
         if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.commit_data != 'false' }}
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Actualizar datos CEN"
-          file_pattern: docs/data/*.json
+          file_pattern: docs/data/*.json docs/data/live/*.json docs/data/history/**/*.json

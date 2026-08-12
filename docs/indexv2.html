@@ -1790,7 +1790,9 @@
     return best.score >= 2 ? best.row : null;
   }
   function demandSeries() {
-    return Array.isArray(liveData.demanda?.values) ? liveData.demanda.values.slice(-24) : [];
+    if (Array.isArray(liveData.demanda?.values)) return liveData.demanda.values.slice(-24);
+    if (liveData.demanda?.latest) return [liveData.demanda.latest];
+    return [];
   }
   function currentDemand() {
     const values = demandSeries().map((row) => Number(row.valueMWh)).filter(Number.isFinite);
@@ -1859,6 +1861,7 @@
   }
   function sparkline(values) {
     if (!values.length) return "";
+    if (values.length < 2) return '<line x1="0" y1="20" x2="100" y2="20" stroke="' + cssVar("--primary", "#003ec7") + '" stroke-width="1.5"></line>';
     const max = Math.max.apply(null, values);
     const min = Math.min.apply(null, values);
     const range = (max - min) || 1;
@@ -3098,7 +3101,7 @@
     return dataset?.range?.startDate || "";
   }
   function globalWindowText() {
-    const range = liveData.status?.globalWindow || liveData.status;
+    const range = liveData.status?.globalWindow || liveData.status?.window || liveData.status;
     return range?.startDate && range?.endDate ? range.startDate + " → " + range.endDate : "";
   }
   function cmgWindowText() {
@@ -3333,7 +3336,7 @@
     liveData.flowsLoaded = true;
   }
   function ingestGenerationData(generacion, centrales, generacionDiaria) {
-    if (generacion && generacion.ok && Array.isArray(generacion.records) && generacion.records.length) {
+    if (generacion && generacion.ok && generacion.granularity === "hourly-central" && Array.isArray(generacion.records) && generacion.records.length) {
       liveData.generacion = generacion;
       liveData.genStale = Boolean(generacion.stale);
       liveData.genRows = generacion.records;
@@ -3355,6 +3358,8 @@
         });
       });
       resetGenFilter(true);
+    } else if (generacion && generacion.ok && generacion.granularity === "daily" && Array.isArray(generacion.records) && generacion.records.length) {
+      liveData.generacion = generacion;
     } else if (generacionDiaria && generacionDiaria.ok && generacionDiaria.granularity === "daily" && Array.isArray(generacionDiaria.records) && generacionDiaria.records.length) {
       liveData.generacion = generacionDiaria;
     }
@@ -3362,14 +3367,14 @@
   }
   async function loadFlowData() {
     if (liveData.flowsLoaded) return;
-    ingestFlowData(await fetchJson("./data/potencia-transitada-latest.json"));
+    ingestFlowData(await fetchJson("./data/live/flujos-current.json") || await fetchJson("./data/potencia-transitada-latest.json"));
     refreshAll();
   }
   async function loadGenerationData() {
     if (liveData.generationLoaded) return;
     await ensureEcharts().catch(() => null);
     const [generacion, centrales, generacionDiaria] = await Promise.all([
-      fetchJson("./data/generacion-real-central-latest.json"),
+      fetchJson("./data/live/generacion-current.json") || fetchJson("./data/generacion-real-central-latest.json"),
       fetchJson("./data/centrales-latest.json"),
       fetchJson("./data/generacion-real-last-24h.json"),
     ]);
@@ -3382,9 +3387,9 @@
   async function loadLiveData() {
     try {
       const [status, cmgReal, demanda] = await Promise.all([
-        fetchJson("./data/status.json"),
-        fetchJson("./data/cmg-real-latest.json"),
-        fetchJson("./data/demanda-real-estimada.json"),
+        fetchJson("./data/live/status.json") || fetchJson("./data/status.json"),
+        fetchJson("./data/live/cmg-current.json") || fetchJson("./data/cmg-real-latest.json"),
+        fetchJson("./data/live/demanda-current.json") || fetchJson("./data/demanda-real-estimada.json"),
       ]);
       liveData.status = status;
       if (demanda && demanda.ok && Array.isArray(demanda.values) && demanda.values.length) {
