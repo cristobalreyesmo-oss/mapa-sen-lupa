@@ -443,7 +443,7 @@
   ],
   "stale": true,
   "staleReason": "404 Not Found Error 404: Recurso no encontrado.",
-  "lastFetchAttemptAt": "2026-08-12T15:51:29.366Z",
+  "lastFetchAttemptAt": "2026-08-12T16:43:52.146Z",
   "lastFetchAttempts": [
     {
       "path": "/costo-marginal-online/v4/findByDate",
