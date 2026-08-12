@@ -1,13 +1,31 @@
 {
   "id": "cmg-online",
   "ok": true,
-  "updatedAt": "2026-08-11T23:36:31.463Z",
+  "updatedAt": "2026-08-12T00:40:58.043Z",
   "source": "/costo-marginal-online/v4/findByDate",
   "range": {
     "startDate": "2026-08-11",
     "endDate": "2026-08-11"
   },
   "attempts": [
+    {
+      "path": "/costo-marginal-online/v4/findByDate",
+      "startDate": "2026-08-12",
+      "endDate": "2026-08-12",
+      "rows": 0
+    },
+    {
+      "path": "/cmg-online/v4/findByDate",
+      "startDate": "2026-08-12",
+      "endDate": "2026-08-12",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
+    {
+      "path": "/costos-marginales-online/v4/findByDate",
+      "startDate": "2026-08-12",
+      "endDate": "2026-08-12",
+      "error": "404 Not Found Error 404: Recurso no encontrado."
+    },
     {
       "path": "/costo-marginal-online/v4/findByDate",
       "startDate": "2026-08-11",
@@ -32,6 +50,26 @@
   "sampleRows": [],
   "records": [
     {
+      "name": "BA S/E QUINQUIMO 110KV BP1-1",
+      "key": "ba s e quinquimo 110kv bp1 1",
+      "value": 52.50554,
+      "timestamp": "2026-08-11 00:00",
+      "raw": {
+        "id_info": 381,
+        "barra_info": "BA S/E QUINQUIMO 110KV BP1-1",
+        "barra_transf": "QUINQUIMO_____110",
+        "fecha": "2026-08-11",
+        "hra": 0,
+        "min": 0,
+        "cmg_clp_kwh_": 47.87297,
+        "cmg_usd_mwh_": 52.50554,
+        "version": "EN LINEA",
+        "fecha_hora": "2026-08-11 00:00",
+        "fecha_minuto": "2026-08-11 00:00",
+        "timestamp": "2026-08-11 00:00"
+      }
+    },
+    {
       "name": "BA S/E LIRQUEN INDURA 66kV BP1 [No_Mostrar]",
       "key": "ba s e lirquen indura 66kv bp1 no mostrar",
       "value": 51.49749,
@@ -52,19 +90,19 @@
       }
     },
     {
-      "name": "BA S/E ARENAS BLANCAS 66KV B1",
-      "key": "ba s e arenas blancas 66kv b1",
-      "value": 52.19852,
+      "name": "BA S/E QUINQUIMO 110 kV BP1-S2 [NO_MOSTRAR]",
+      "key": "ba s e quinquimo 110 bp1 s2 no mostrar",
+      "value": 54.58816,
       "timestamp": "2026-08-11 00:00",
       "raw": {
-        "id_info": 248,
-        "barra_info": "BA S/E ARENAS BLANCAS 66KV B1",
-        "barra_transf": "A.BLANCAS_____066",
+        "id_info": 4138,
+        "barra_info": "BA S/E QUINQUIMO 110 kV BP1-S2 [NO_MOSTRAR]",
+        "barra_transf": "QUINQUIMO2____110",
         "fecha": "2026-08-11",
         "hra": 0,
         "min": 0,
-        "cmg_clp_kwh_": 47.59304,
-        "cmg_usd_mwh_": 52.19852,
+        "cmg_clp_kwh_": 49.77184,
+        "cmg_usd_mwh_": 54.58816,
         "version": "EN LINEA",
         "fecha_hora": "2026-08-11 00:00",
         "fecha_minuto": "2026-08-11 00:00",
@@ -92,19 +130,19 @@
       }
     },
     {
-      "name": "BA S/E ALONSO DE RIBERA 66KV BP1",
-      "key": "ba s e alonso de ribera 66kv bp1",
-      "value": 50.70435,
+      "name": "BA S/E QUINTA 13.2kV BP1",
+      "key": "ba s e quinta 13 2kv bp1",
+      "value": 53.18098,
       "timestamp": "2026-08-11 00:00",
       "raw": {
-        "id_info": 244,
-        "barra_info": "BA S/E ALONSO DE RIBERA 66KV BP1",
-        "barra_transf": "A.DERIBERA____066",
+        "id_info": 1093,
+        "barra_info": "BA S/E QUINTA 13.2kV BP1",
+        "barra_transf": "QUINTA________013",
         "fecha": "2026-08-11",
         "hra": 0,
         "min": 0,
-        "cmg_clp_kwh_": 46.23071,
-        "cmg_usd_mwh_": 50.70435,
+        "cmg_clp_kwh_": 48.48882,
+        "cmg_usd_mwh_": 53.18098,
         "version": "EN LINEA",
         "fecha_hora": "2026-08-11 00:00",
         "fecha_minuto": "2026-08-11 00:00",
@@ -132,19 +170,19 @@
       }
     },
     {
-      "name": "BA S/E ALONSO DE RIBERA 154KV BP1",
-      "key": "ba s e alonso de ribera 154kv bp1",
-      "value": 50.27453,
+      "name": "BA S/E QUINTA 66kV BP1",
+      "key": "ba s e quinta 66kv bp1",
+      "value": 53.18098,
       "timestamp": "2026-08-11 00:00",
       "raw": {
-        "id_info": 137,
-        "barra_info": "BA S/E ALONSO DE RIBERA 154KV BP1",
-        "barra_transf": "A.DERIBERA____154",
+        "id_info": 1243,
+        "barra_info": "BA S/E QUINTA 66kV BP1",
+        "barra_transf": "QUINTA________066",
         "fecha": "2026-08-11",
         "hra": 0,
         "min": 0,
-        "cmg_clp_kwh_": 45.8388,
-        "cmg_usd_mwh_": 50.27453,
+        "cmg_clp_kwh_": 48.48882,
+        "cmg_usd_mwh_": 53.18098,
         "version": "EN LINEA",
         "fecha_hora": "2026-08-11 00:00",
         "fecha_minuto": "2026-08-11 00:00",
@@ -172,19 +210,19 @@
       }
     },
     {
-      "name": "BA S/E ALTO JAHUEL 66KV",
-      "key": "ba s e alto jahuel 66kv",
-      "value": 51.63565,
+      "name": "BA S/E QUINTAY 12kV BP1",
+      "key": "ba s e quintay 12kv bp1",
+      "value": 51.17,
       "timestamp": "2026-08-11 00:00",
       "raw": {
-        "id_info": 459,
-        "barra_info": "BA S/E ALTO JAHUEL 66KV",
-        "barra_transf": "A.JAHUEL______066",
+        "id_info": 1028,
+        "barra_info": "BA S/E QUINTAY 12kV BP1",
+        "barra_transf": "QUINTAY_______013",
         "fecha": "2026-08-11",
         "hra": 0,
         "min": 0,
-        "cmg_clp_kwh_": 47.07983,
-        "cmg_usd_mwh_": 51.63565,
+        "cmg_clp_kwh_": 46.65527,
+        "cmg_usd_mwh_": 51.17,
         "version": "EN LINEA",
         "fecha_hora": "2026-08-11 00:00",
         "fecha_minuto": "2026-08-11 00:00",
@@ -205,26 +243,6 @@
         "min": 0,
         "cmg_clp_kwh_": 46.24937,
         "cmg_usd_mwh_": 50.72482,
-        "version": "EN LINEA",
-        "fecha_hora": "2026-08-11 00:00",
-        "fecha_minuto": "2026-08-11 00:00",
-        "timestamp": "2026-08-11 00:00"
-      }
-    },
-    {
-      "name": "BA S/E ALTO JAHUEL 110KV BP1",
-      "key": "ba s e alto jahuel 110kv bp1",
-      "value": 51.70217,
-      "timestamp": "2026-08-11 00:00",
-      "raw": {
-        "id_info": 454,
-        "barra_info": "BA S/E ALTO JAHUEL 110KV BP1",
-        "barra_transf": "A.JAHUEL______110",
-        "fecha": "2026-08-11",
-        "hra": 0,
-        "min": 0,
-        "cmg_clp_kwh_": 47.14048,
-        "cmg_usd_mwh_": 51.70217,
         "version": "EN LINEA",
         "fecha_hora": "2026-08-11 00:00",
         "fecha_minuto": "2026-08-11 00:00",
