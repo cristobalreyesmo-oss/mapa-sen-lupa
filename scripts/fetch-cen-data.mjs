@@ -435,7 +435,7 @@ function normalizeDataset(dataset, payload) {
     const history = cmgHistoryByBar(rows);
     return {
       id: dataset.id,
-      ok: true,
+      ok: records.length > 0,
       updatedAt: new Date().toISOString(),
       source: sourcePath,
       range,
