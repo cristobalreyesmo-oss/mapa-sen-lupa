@@ -1305,7 +1305,7 @@
   const nodeFilter = { selected: new Set() };
   const layers = { lines: true, substations: true, plants: true, bess: true };
   const voltages = { "500": true, "220": true, "154": true };
-  const liveData = { status: null, cmgOnline: new Map(), cmgRows: [], cmgHistory: new Map(), cmgHours: [], cmgStale: false, generacion: null, loaded: false, matchedFeatures: 0 };
+  const liveData = { status: null, cmgOnline: new Map(), cmgRows: [], cmgHistory: new Map(), cmgHours: [], cmgStale: false, demanda: null, flows: new Map(), flowRows: [], flowStale: false, generacion: null, genByPlant: new Map(), genRows: [], genHours: [], genStale: false, loaded: false, matchedFeatures: 0 };
   let points = [];
   let substations = [];
   let grouped = null;
@@ -1427,14 +1427,6 @@
     if (layer === "plant") return "Central";
     return "Entidad";
   }
-  function hashString(value) {
-    let hash = 0;
-    const text = String(value || "");
-    for (let i = 0; i < text.length; i += 1) {
-      hash = (hash * 31 + text.charCodeAt(i)) >>> 0;
-    }
-    return hash;
-  }
   const lineLimits = new Map();
   for (const row of (typeof LINE_LIMITS === "object" && LINE_LIMITS && Array.isArray(LINE_LIMITS.lines) ? LINE_LIMITS.lines : [])) {
     if (row && row.name && Number.isFinite(Number(row.limit))) {
@@ -1443,13 +1435,11 @@
   }
   function lineCapacity(feature) {
     if (lineLimits.has(feature.name)) return lineLimits.get(feature.name);
-    const v = voltage(feature);
-    const base = v === "500" ? 1150 : v === "220" ? 460 : v === "154" ? 230 : 120;
-    const factor = 0.75 + (hashString(feature.name) % 50) / 100;
-    return Math.round((base * factor) / 5) * 5;
+    return NaN;
   }
   function lineFlow(feature, h) {
-    return NaN;
+    const row = liveFlowValue(feature);
+    return row && Number.isFinite(Number(row.valueMw)) ? Math.abs(Number(row.valueMw)) : NaN;
   }
   function lineLoading(feature, h) {
     const limit = lineCapacity(feature);
@@ -1486,42 +1476,6 @@
     "Otros": "#8b93a1",
     "Sin clasificar": "#8b93a1",
   };
-  const GEN_SIM = [
-    { tech: "Hidráulica", base: 3550, night: 260 },
-    { tech: "Carbón", base: 2400, dip: 220 },
-    { tech: "Gas Natural", base: 1500, evening: 720 },
-    { tech: "Solar", base: 0, solar: 1, solarPeak: 3350 },
-    { tech: "Eólica", base: 1400, wave: 1 },
-    { tech: "Biomasa", base: 470 },
-    { tech: "Cogeneración", base: 210 },
-    { tech: "Geotermia", base: 90 },
-    { tech: "Petróleo Diésel", base: 140, evening: 90 },
-    { tech: "Otros", base: 70 },
-  ];
-  function simulatedGeneracion() {
-    const now = new Date();
-    now.setMinutes(0, 0, 0);
-    const hours = [];
-    for (let k = 23; k >= 0; k -= 1) {
-      const d = new Date(now.getTime() - k * 3600 * 1000);
-      hours.push(d.toISOString().slice(0, 13) + ":00:00Z");
-    }
-    const series = GEN_SIM.map((spec) => ({
-      technology: spec.tech,
-      values: hours.map((_, i) => {
-        const h = Number(hours[i].slice(11, 13));
-        let mw = spec.base;
-        if (spec.solar) mw = Math.max(0, Math.round(spec.solarPeak * Math.exp(-Math.pow(h - 13, 2) / 8)));
-        if (spec.dip) mw -= Math.round(260 * Math.exp(-Math.pow(h - 13, 2) / 14));
-        if (spec.evening) mw += Math.round(spec.evening * Math.exp(-Math.pow(h - 20, 2) / 6));
-        if (spec.wave) mw += Math.round(640 * Math.sin(((h - 4) * Math.PI) / 11));
-        if (spec.night) mw += Math.round(spec.night * Math.max(0, 6 - h));
-        return Math.max(0, Math.round(mw));
-      }),
-    }));
-    const total = hours.map((_, i) => series.reduce((s, x) => s + x.values[i], 0));
-    return { simulated: true, hours, series, total, updatedAt: now.toISOString() };
-  }
   function genHourLabel(key) {
     return String(key).slice(11, 13) + "h";
   }
@@ -1643,7 +1597,7 @@
       setGenText("gen-source", "Datos: " + CEN_NOT_INFORMED);
       return;
     }
-    const origin = gen.granularity === "daily" ? "Generación real diaria · API Operación CEN" : "Generación real · API del Coordinador (CEN) · últimas " + gen.hours.length + " h secuenciales informadas";
+    const origin = gen.granularity === "daily" ? "Generación real diaria · API Operación CEN" : "Generación real horaria por central/unidad · API del Coordinador (CEN) · últimas " + gen.hours.length + " h secuenciales informadas";
     const windowText = gen.granularity === "daily" ? " · desde " + gen.hours[0] + " hasta " + gen.hours[gen.hours.length - 1] : " · desde " + genFullLabel(gen.hours[0]) + " hasta " + genFullLabel(gen.hours[gen.hours.length - 1]);
     const updated = gen && gen.updatedAt ? " · actualizado " + String(gen.updatedAt).slice(0, 16).replace("T", " ") + " UTC" : "";
     const stale = gen.stale ? " · ultimo dato real disponible, API no informó actualización nueva" : "";
@@ -1725,7 +1679,7 @@
     const limit = lineCapacity(feature);
     const flow = lineFlow(feature, hour);
     const loading = limit && Number.isFinite(flow) ? flow / limit : NaN;
-    return { limit, flow: Number.isFinite(flow) ? flow : 0, loading: Number.isFinite(loading) ? Math.round(loading * 100) / 100 : null, lc: loadingColor(loading), ll: loadingLabel(loading) };
+    return { limit: Number.isFinite(limit) ? limit : null, flow: Number.isFinite(flow) ? Math.round(flow) : 0, loading: Number.isFinite(loading) ? Math.round(loading * 100) / 100 : null, lc: loadingColor(loading), ll: loadingLabel(loading) };
   }
   function flowsLinePaint() {
     return {
@@ -1737,15 +1691,6 @@
         12, ["interpolate", ["linear"], ["get", "flow"], 0, 1.8, 600, 3.6, 1200, 6]
       ],
     };
-  }
-  function simulatedCmg(feature, h) {
-    const latFactor = (Math.abs(feature.lat) - 18) / 38;
-    const north = feature.lat > -28 ? 1 : 0;
-    const solarDip = Math.exp(-Math.pow(h - 13, 2) / 15) * (north ? -54 : -22);
-    const ramp = Math.exp(-Math.pow(h - 19.5, 2) / 7) * (north ? 72 : 48);
-    const night = Math.exp(-Math.pow(h - 22, 2) / 9) * 26;
-    const base = 58 + latFactor * 36 + Math.sin((feature.lon + feature.lat) * 3.1) * 11;
-    return Math.max(0, Math.round(base + solarDip + ramp + night));
   }
   function cmg(feature, h) {
     const liveValue = liveCmgValue(feature);
@@ -1803,6 +1748,41 @@
     }
     return best.score >= 2 ? best.entry : null;
   }
+  function liveFlowValue(feature) {
+    if (!feature || !liveData.flows.size) return null;
+    const key = normalizeKey(feature.name);
+    if (!key) return null;
+    if (liveData.flows.has(key)) return liveData.flows.get(key);
+    const compact = key.replace(/\b\d{2,3}\b/g, "").trim();
+    let best = { score: 0, row: null };
+    for (const [lineKey, row] of liveData.flows) {
+      if (compact && (lineKey.includes(compact) || compact.includes(lineKey))) return row;
+      const score = matchScore(compact || key, lineKey);
+      if (score > best.score) best = { score, row };
+    }
+    return best.score >= 2 ? best.row : null;
+  }
+  function liveGenEntry(feature) {
+    if (!feature || !liveData.genByPlant.size) return null;
+    const key = normalizeKey(feature.name);
+    if (!key) return null;
+    if (liveData.genByPlant.has(key)) return liveData.genByPlant.get(key);
+    const compact = key.replace(/\b\d{2,3}\b/g, "").trim();
+    let best = { score: 0, row: null };
+    for (const [plantKey, row] of liveData.genByPlant) {
+      if (compact && (plantKey.includes(compact) || compact.includes(plantKey))) return row;
+      const score = matchScore(compact || key, plantKey);
+      if (score > best.score) best = { score, row };
+    }
+    return best.score >= 2 ? best.row : null;
+  }
+  function demandSeries() {
+    return Array.isArray(liveData.demanda?.values) ? liveData.demanda.values.slice(-24) : [];
+  }
+  function currentDemand() {
+    const values = demandSeries().map((row) => Number(row.valueMWh)).filter(Number.isFinite);
+    return values.length ? values[values.length - 1] : NaN;
+  }
   function cmgColor(value) {
     if (!Number.isFinite(Number(value))) return cssVar("--outline-variant", "#c3c5d9");
     if (value > 105) return cssVar("--status-critical", "#ba1a1a");
@@ -1819,14 +1799,6 @@
   function shortTimestampLabel(timestamp) {
     const m = String(timestamp || "").match(/(\d{4})-(\d{2})-(\d{2})[T\s](\d{2})/);
     return m ? { date: m[3] + "/" + m[2], hour: m[4] + "h", full: m[3] + "/" + m[2] + " " + m[4] + ":00 UTC" } : { date: "", hour: String(timestamp || ""), full: String(timestamp || "") };
-  }
-  function demandAt(h) {
-    const evening = Math.exp(-Math.pow(h - 20.5, 2) / 7) * 1650;
-    const morning = Math.exp(-Math.pow(h - 4.5, 2) / 9) * 500;
-    return Math.round(9400 + evening + morning);
-  }
-  function freqAt(h) {
-    return (50 + Math.sin((h / 24) * Math.PI * 2) * 0.01 + 0.004).toFixed(2);
   }
   function avgCmg() {
     const values = points.filter((f) => layerOf(f) === "substation").map((f) => cmg(f, hour)).filter(Number.isFinite);
@@ -1942,38 +1914,13 @@
     if (input) input.value = "";
     if (!skipRender) applyGenFilter();
   }
-  const GEN2_CAP = {
-    solar: [60, 220], csp: [50, 130], wind: [20, 140], hydroRun: [10, 90],
-    hydroRes: [40, 320], geo: [30, 120], gas: [50, 380], coal: [100, 420],
-    biomass: [10, 60], biogas: [4, 30], oil: [10, 80], bess: [0, 60], other: [0, 0],
-  };
-  function gen2Capacity(feature) {
-    const type = gen2TypeOf(feature);
-    const cap = GEN2_CAP[type] || [0, 0];
-    if (!cap[1]) return 0;
-    const h = hashString(feature.name || "");
-    const t = (h % 1000) / 1000;
-    return Math.round(cap[0] + t * (cap[1] - cap[0]));
-  }
-  function gen2Profile(type, h) {
-    switch (type) {
-      case "solar": return Math.exp(-((h - 13) * (h - 13)) / 9);
-      case "csp": return 0.1 + 0.85 * Math.exp(-((h - 13) * (h - 13)) / 12);
-      case "wind": return 0.35 + 0.65 * (0.5 + 0.5 * Math.sin((h - 4) * Math.PI / 11));
-      case "hydroRun": return 0.7 + 0.3 * (0.5 + 0.5 * Math.sin((h - 10) * Math.PI / 12));
-      case "hydroRes": return 0.75 + 0.25 * Math.exp(-((h - 19) * (h - 19)) / 8);
-      case "geo": return 0.95;
-      case "gas": return 0.5 + 0.5 * Math.exp(-((h - 20) * (h - 20)) / 7);
-      case "coal": return 0.85 + 0.15 * Math.sin((h / 24) * 2 * Math.PI);
-      case "biomass": return 0.9 + 0.05 * Math.sin((h / 24) * 2 * Math.PI);
-      case "biogas": return 0.85;
-      case "oil": return 0.35 + 0.65 * Math.exp(-((h - 20) * (h - 20)) / 8);
-      case "bess": return 0.4 * Math.exp(-((h - 21) * (h - 21)) / 6) + 0.15 * Math.exp(-((h - 8) * (h - 8)) / 5);
-      default: return 0;
-    }
-  }
   function genAt(feature, h) {
-    return NaN;
+    const entry = liveGenEntry(feature);
+    if (!entry || !Array.isArray(entry.values) || !entry.values.length) return NaN;
+    const exact = entry.values.find((point) => timestampHour(point.timestamp) === h && Number.isFinite(Number(point.value)));
+    if (exact) return Number(exact.value);
+    const latest = [...entry.values].reverse().find((point) => Number.isFinite(Number(point.value)));
+    return latest ? Number(latest.value) : NaN;
   }
   function gen2Color(mw) {
     if (!Number.isFinite(Number(mw)) || mw <= 0) return cssVar("--outline-variant", "#c3c5d9");
@@ -2129,8 +2076,11 @@
       lensNode = null;
       return;
     }
-    const total = nearby.reduce((s, r) => s + r.mw, 0);
-    readout.innerHTML = "<strong>" + nearby.length + " activos · " + total.toLocaleString("en-US") + " MW</strong><span>Mayor señal: " + nearby[0].feature.name + " (" + nearby[0].mw.toLocaleString("en-US") + " MW)</span>";
+    const realRows = nearby.filter((row) => Number.isFinite(Number(row.mw)));
+    const total = realRows.reduce((s, r) => s + Number(r.mw), 0);
+    readout.innerHTML = realRows.length
+      ? "<strong>" + realRows.length + " activos · " + Math.round(total).toLocaleString("en-US") + " MW</strong><span>Mayor señal: " + realRows[0].feature.name + " (" + Math.round(realRows[0].mw).toLocaleString("en-US") + " MW)</span>"
+      : "<strong>Lupa operacional</strong><span>Generación real por central: " + CEN_NOT_INFORMED + ".</span>";
     const nearest = nearby.slice().sort((a, b) => a.distance - b.distance)[0];
     const key = nearest.feature.name + "|" + nearest.feature.lat + "|" + nearest.feature.lon;
     if (key !== lensNodeKey) {
@@ -2204,7 +2154,7 @@
     if (!map || !leftEl || !rightEl) return;
     const left = map.project(turf.destination(turf.point([feature.lon, feature.lat]), R * 1.25, 270, { units: "kilometers" }).geometry.coordinates);
     const right = map.project(turf.destination(turf.point([feature.lon, feature.lat]), R * 1.25, 90, { units: "kilometers" }).geometry.coordinates);
-    leftEl.textContent = mw.toLocaleString("en-US") + " MW";
+    leftEl.textContent = Number.isFinite(Number(mw)) ? Math.round(mw).toLocaleString("en-US") + " MW" : CEN_NOT_INFORMED;
     leftEl.style.left = left.x + "px";
     leftEl.style.top = left.y + "px";
     leftEl.hidden = false;
@@ -2232,7 +2182,7 @@
     el.innerHTML =
       '<div class="popup-kicker">' + featureText(feature) + ' · ' + formatHour(hour) + '</div>' +
       '<div class="popup-title">' + escapeHtml(feature.name) + '</div>' +
-      '<div class="popup-row"><span class="popup-dot" style="background:#2b90e2"></span>' + mw.toLocaleString("en-US") + ' <span class="unit">MW</span></div>' +
+      '<div class="popup-row"><span class="popup-dot" style="background:#2b90e2"></span>' + (Number.isFinite(Number(mw)) ? Math.round(mw).toLocaleString("en-US") : CEN_NOT_INFORMED) + ' <span class="unit">MW</span></div>' +
       '<div class="popup-flow-row"><span class="popup-dot" style="background:#f97316"></span>' + c.toLocaleString("en-US") + ' <span class="unit">USD/MWh</span></div>';
     el.hidden = false;
     positionLensPopup(feature);
@@ -2269,7 +2219,7 @@
     const c = cmg(feature, hour);
     return '<div class="popup-kicker">' + kicker + '</div>' +
       '<div class="popup-title">' + feature.name + '</div>' +
-      '<div class="popup-row"><span class="popup-dot" style="background:' + gen2Color(mw) + '"></span>' + CEN_NOT_INFORMED + ' <span class="unit">MW</span></div>' +
+      '<div class="popup-row"><span class="popup-dot" style="background:' + gen2Color(mw) + '"></span>' + (Number.isFinite(Number(mw)) ? Math.round(mw).toLocaleString("en-US") : CEN_NOT_INFORMED) + ' <span class="unit">MW</span></div>' +
       '<div class="popup-flow-row">' + (Number.isFinite(c) ? c : CEN_NOT_INFORMED) + ' <span class="unit">USD/MWh</span></div>' +
       '<div class="popup-foot">lat ' + feature.lat.toFixed(4) + ' · lon ' + feature.lon.toFixed(4) + '</div>';
   }
@@ -2291,9 +2241,9 @@
     document.getElementById("node-name-gen2").textContent = feature.name;
     document.getElementById("node-meta-gen2").textContent = featureText(feature) + " · " + (gen2TypeOf(feature) || "nodo") + " · lat " + feature.lat.toFixed(4) + ", lon " + feature.lon.toFixed(4);
     const cmgValue = cmg(feature, hour);
-    document.getElementById("node-gen-gen2").textContent = CEN_NOT_INFORMED;
+    document.getElementById("node-gen-gen2").textContent = Number.isFinite(Number(mw)) ? Math.round(mw).toLocaleString("en-US") : CEN_NOT_INFORMED;
     document.getElementById("node-cmg-gen2").textContent = Number.isFinite(cmgValue) ? cmgValue.toLocaleString("en-US") : CEN_NOT_INFORMED;
-    document.getElementById("chart-value-gen2").textContent = CEN_NOT_INFORMED;
+    document.getElementById("chart-value-gen2").textContent = Number.isFinite(Number(mw)) ? Math.round(mw).toLocaleString("en-US") + " MW" : CEN_NOT_INFORMED;
     buildGen2Chart(feature);
   }
   function buildGen2Chart(feature) {
@@ -2301,19 +2251,19 @@
     if (!el) return;
     if (!gen2Chart) gen2Chart = echarts.init(el);
     gen2Chart.clear();
-    gen2Chart.setOption({
-      backgroundColor: "transparent",
-      title: { text: CEN_NOT_INFORMED, left: "center", top: "middle", textStyle: { color: cssVar("--secondary", "#5e5e5e"), fontSize: 12, fontFamily: "'JetBrains Mono', monospace" } },
-    }, true);
-    return;
-    const hours = [];
-    const gen = [];
-    const cmg24 = [];
-    for (let h = 0; h < 24; h += 1) {
-      hours.push(formatHour(h));
-      gen.push(genAt(feature, h));
-      cmg24.push(cmg(feature, h));
+    const entry = liveGenEntry(feature);
+    const points = entry && Array.isArray(entry.values) ? entry.values.filter((point) => Number.isFinite(Number(point.value))).slice(-24) : [];
+    if (!points.length) {
+      gen2Chart.setOption({
+        backgroundColor: "transparent",
+        title: { text: CEN_NOT_INFORMED, left: "center", top: "middle", textStyle: { color: cssVar("--secondary", "#5e5e5e"), fontSize: 12, fontFamily: "'JetBrains Mono', monospace" } },
+      }, true);
+      return;
     }
+    const hours = points.map((point) => shortTimestampLabel(point.timestamp).date + "\n" + shortTimestampLabel(point.timestamp).hour);
+    const gen = points.map((point) => Math.round(Number(point.value)));
+    const cmg24 = [];
+    points.forEach((point) => cmg24.push(cmg(feature, timestampHour(point.timestamp))));
     const secondary = cssVar("--secondary", "#5e5e5e");
     const onSurface = cssVar("--on-surface", "#151c27");
     const outlineVariant = cssVar("--outline-variant", "#c3c5d9");
@@ -2432,15 +2382,33 @@
   }
   function renderGen2Kpis() {
     const cmgAvg = avgCmg();
-    document.getElementById("k2-gen-now").textContent = CEN_NOT_INFORMED;
-    document.getElementById("k2-gen-peak").textContent = CEN_NOT_INFORMED;
+    const visible = filteredGenUnits().map((feature) => genAt(feature, hour)).filter(Number.isFinite);
+    const currentTotal = visible.reduce((sum, value) => sum + Number(value), 0);
+    const hourlyTotals = liveData.genHours.map((timestamp) => filteredGenUnits().reduce((sum, feature) => {
+      const entry = liveGenEntry(feature);
+      const point = entry?.values?.find((item) => item.timestamp === timestamp);
+      return sum + (Number.isFinite(Number(point?.value)) ? Number(point.value) : 0);
+    }, 0));
+    const peak = hourlyTotals.length ? Math.max(...hourlyTotals) : NaN;
+    document.getElementById("k2-gen-now").textContent = visible.length ? Math.round(currentTotal).toLocaleString("en-US") : CEN_NOT_INFORMED;
+    document.getElementById("k2-gen-peak").textContent = Number.isFinite(peak) && peak > 0 ? Math.round(peak).toLocaleString("en-US") : CEN_NOT_INFORMED;
     document.getElementById("k2-cmg-avg").textContent = Number.isFinite(cmgAvg) ? Math.round(cmgAvg).toLocaleString("en-US") : CEN_NOT_INFORMED;
   }
   function renderGen2Ranking() {
     const status = document.getElementById("gen2-ranking-status");
-    if (status) status.textContent = CEN_NOT_INFORMED;
+    const rows = filteredGenUnits()
+      .map((feature) => ({ feature, mw: genAt(feature, hour), entry: liveGenEntry(feature) }))
+      .filter((row) => Number.isFinite(Number(row.mw)))
+      .sort((a, b) => Number(b.mw) - Number(a.mw))
+      .slice(0, 10);
+    if (status) status.textContent = rows.length ? "Top centrales con generación real CEN · hora " + formatHour(hour) : CEN_NOT_INFORMED;
     const el = document.getElementById("gen2-ranking");
-    el.innerHTML = '<div class="text-caption font-label-mono text-secondary border border-outline-variant p-4">' + CEN_NOT_INFORMED + '</div>';
+    el.innerHTML = rows.length ? rows.map((row) =>
+      '<button class="text-left border border-outline-variant p-3 hover:bg-surface-container-low" data-gen-rank="' + escapeHtml(genUnitKey(row.feature)) + '">' +
+        '<div class="flex items-center justify-between gap-2"><span class="font-label-mono text-on-surface truncate">' + escapeHtml(row.feature.name) + '</span><span class="text-label-mono text-primary">' + Math.round(row.mw).toLocaleString("en-US") + ' MW</span></div>' +
+        '<div class="text-caption text-secondary mt-1">' + escapeHtml(row.entry?.technology || gen2TechLabel(row.feature)) + '</div>' +
+      '</button>'
+    ).join("") : '<div class="text-caption font-label-mono text-secondary border border-outline-variant p-4">' + CEN_NOT_INFORMED + '</div>';
   }
 
   function visibleSubstationsFor(viewKey) {
@@ -2617,7 +2585,7 @@
     const props = feature.properties || {};
     const coords = feature.geometry && feature.geometry.type === "LineString" ? feature.geometry.coordinates : [];
     const v = props.voltage && props.voltage !== "other" ? props.voltage + " kV" : "voltaje mixto";
-    const flowInfo = Number.isFinite(Number(props.flow))
+    const flowInfo = props.loading !== null && props.loading !== undefined && Number.isFinite(Number(props.loading))
       ? { flow: Number(props.flow), limit: Number(props.limit), loading: Number(props.loading), lc: String(props.lc), ll: String(props.ll) }
       : null;
     el.innerHTML = linePopupHtml(String(props.name || "Línea"), v, lineLengthKm(coords), flowInfo);
@@ -2800,6 +2768,7 @@
 
   function renderKPIs() {
     const cmgValues = [];
+    const demandValues = demandSeries().map((row) => Number(row.valueMWh)).filter(Number.isFinite);
     const subs = points.filter((f) => layerOf(f) === "substation");
     const visibleHours = liveData.cmgHours.slice(-24);
     const offset = liveData.cmgHours.length - visibleHours.length;
@@ -2808,10 +2777,11 @@
       if (values.length) cmgValues.push(Math.round(values.reduce((a, b) => a + b, 0) / values.length));
     }
     const currentCmg = avgCmg();
-    document.getElementById("kpi-demand").textContent = CEN_NOT_INFORMED;
+    const demand = currentDemand();
+    document.getElementById("kpi-demand").textContent = Number.isFinite(demand) ? Math.round(demand).toLocaleString("en-US") : CEN_NOT_INFORMED;
     document.getElementById("kpi-cmg").textContent = Number.isFinite(currentCmg) ? currentCmg.toLocaleString("en-US") : CEN_NOT_INFORMED;
     document.getElementById("kpi-freq").textContent = CEN_NOT_INFORMED;
-    document.getElementById("spark-demand").innerHTML = "";
+    document.getElementById("spark-demand").innerHTML = sparkline(demandValues);
     document.getElementById("spark-cmg").innerHTML = sparkline(cmgValues);
   }
 
@@ -2849,7 +2819,10 @@
 
   function flowsStatusText() {
     const total = grouped.lines.length;
-    return total + " lineas · limites CEN disponibles · flujos: " + CEN_NOT_INFORMED;
+    const matched = grouped.lines.filter((line) => liveFlowValue(line)).length;
+    return liveData.flowRows.length
+      ? total + " lineas · potencia transitada real CEN · " + matched + " lineas emparejadas" + (liveData.flowStale ? " · ultimo dato real disponible" : "")
+      : total + " lineas · potencia transitada: " + CEN_NOT_INFORMED;
   }
 
   function renderFlowTable() {
@@ -2862,7 +2835,7 @@
     el.innerHTML = rows.map((r) =>
       '<div class="flow-row cursor-pointer px-2 py-1.5 border-b border-outline-variant/60 hover:bg-surface-container-low flex items-center justify-between gap-2" data-line-idx="' + grouped.lines.indexOf(r.f) + '">' +
         '<span class="text-on-surface text-[11px] truncate">' + r.f.name + '</span>' +
-        '<span class="flex items-center gap-2 shrink-0"><span class="w-2 h-2 block" style="background:' + loadingColor(r.loading) + '"></span><span class="text-secondary">' + CEN_NOT_INFORMED + '</span></span>' +
+        '<span class="flex items-center gap-2 shrink-0"><span class="w-2 h-2 block" style="background:' + loadingColor(r.loading) + '"></span><span class="text-secondary">' + (Number.isFinite(r.loading) ? Math.round(r.loading * 100) + "%" : CEN_NOT_INFORMED) + '</span></span>' +
       '</div>'
     ).join("");
   }
@@ -2880,7 +2853,7 @@
       const active = selectedLine === f ? " bg-surface-container-low" : "";
       return '<div class="line-item cursor-pointer px-2 py-1 border-b border-outline-variant/60 hover:bg-surface-container-low flex items-center justify-between gap-2' + active + '" data-line-idx="' + grouped.lines.indexOf(f) + '">' +
         '<span class="text-label-mono text-on-surface text-sm truncate">' + f.name + '</span>' +
-        '<span class="flex items-center gap-2 shrink-0"><span class="w-2 h-2 block" style="background:' + loadingColor(loading) + '"></span><span class="text-caption text-secondary">' + CEN_NOT_INFORMED + '</span></span>' +
+        '<span class="flex items-center gap-2 shrink-0"><span class="w-2 h-2 block" style="background:' + loadingColor(loading) + '"></span><span class="text-caption text-secondary">' + (Number.isFinite(loading) ? Math.round(loading * 100) + "%" : CEN_NOT_INFORMED) + '</span></span>' +
       '</div>';
     }).join("");
   }
@@ -2888,12 +2861,12 @@
   function renderLineDetail(line) {
     const flow = lineFlow(line, hour);
     const limit = lineCapacity(line);
-    const loading = limit ? flow / limit : 0;
+    const loading = Number.isFinite(limit) && Number.isFinite(flow) ? flow / limit : NaN;
     document.getElementById("line-name").textContent = line.name;
     document.getElementById("line-meta").textContent = voltage(line) + " kV · " + lineLengthKm(line.coords) + " km · " + formatHour(hour);
-    document.getElementById("line-flow").textContent = CEN_NOT_INFORMED;
-    document.getElementById("line-limit").textContent = limit.toLocaleString("en-US");
-    document.getElementById("line-loading").textContent = CEN_NOT_INFORMED;
+    document.getElementById("line-flow").textContent = Number.isFinite(flow) ? Math.round(flow).toLocaleString("en-US") : CEN_NOT_INFORMED;
+    document.getElementById("line-limit").textContent = Number.isFinite(limit) ? limit.toLocaleString("en-US") : CEN_NOT_INFORMED;
+    document.getElementById("line-loading").textContent = Number.isFinite(loading) ? Math.round(loading * 100) + "%" : CEN_NOT_INFORMED;
     const bar = document.getElementById("line-loading-bar");
     bar.style.width = Number.isFinite(loading) ? Math.min(100, Math.round(loading * 100)) + "%" : "0%";
     bar.style.background = loadingColor(loading);
@@ -3079,8 +3052,12 @@
 
   function dataDate() {
     if (liveData.cmgRows.length && liveData.cmgRows[0].timestamp) return liveData.cmgRows[0].timestamp.slice(0, 10);
-    const dataset = liveData.status?.datasets?.find((d) => d.id === "cmg-online");
+    const dataset = liveData.status?.datasets?.find((d) => d.id === "cmg-real") || liveData.status?.datasets?.find((d) => d.id === "cmg-online");
     return dataset?.range?.startDate || "";
+  }
+  function globalWindowText() {
+    const range = liveData.status?.globalWindow || liveData.status;
+    return range?.startDate && range?.endDate ? range.startDate + " → " + range.endDate : "";
   }
   function cmgWindowText() {
     const hours = liveData.cmgHours.slice(-24);
@@ -3098,7 +3075,18 @@
     if (!gen) return "Generacion: " + CEN_NOT_INFORMED + ".";
     return gen.granularity === "daily"
       ? "Generacion real API Operacion CEN: dato diario por tecnologia desde " + gen.hours[0] + " hasta " + gen.hours[gen.hours.length - 1] + "."
-      : "Generacion real API del Coordinador (CEN): ultimas " + gen.hours.length + " h secuenciales informadas, desde " + genFullLabel(gen.hours[0]) + " hasta " + genFullLabel(gen.hours[gen.hours.length - 1]) + ".";
+      : "Generacion real horaria por central/unidad API del Coordinador (CEN): ultimas " + gen.hours.length + " h secuenciales informadas, desde " + genFullLabel(gen.hours[0]) + " hasta " + genFullLabel(gen.hours[gen.hours.length - 1]) + ".";
+  }
+  function demandApiText() {
+    if (!Array.isArray(liveData.demanda?.values) || !liveData.demanda.values.length) return "Demanda real: " + CEN_NOT_INFORMED + ".";
+    const values = liveData.demanda.values.slice(-24);
+    const stale = liveData.demanda.stale ? " Ultimo dato real disponible; API CEN no informó actualización nueva." : "";
+    return "Demanda real estimada API del Coordinador (CEN): " + values.length + " h informadas, desde " + shortTimestampLabel(values[0].timestamp).full + " hasta " + shortTimestampLabel(values[values.length - 1].timestamp).full + "." + stale;
+  }
+  function flowsApiText() {
+    if (!liveData.flowRows.length) return "Potencia transitada: " + CEN_NOT_INFORMED + ".";
+    const window = globalWindowText();
+    return "Potencia transitada real API del Coordinador (CEN): " + liveData.flowRows.length + " lineas informadas" + (window ? " en ventana " + window : "") + (liveData.flowStale ? ". Ultimo dato real disponible." : ".");
   }
 
   function setNote(id, text) {
@@ -3108,31 +3096,32 @@
   function genNote() {
     const gen = dailyGenerationDataset(liveData.generacion) || (liveData.generacion && liveData.generacion.hours && liveData.generacion.hours.length ? liveData.generacion : null);
     if (gen) {
-      return genApiText() + " Fuente: generacion-real-last-24h.json · actualizado " + String(gen.updatedAt || "").slice(0, 16).replace("T", " ") + " UTC. Esta es generacion global del sistema, no filtrada por central.";
+      return genApiText() + " Fuente: generacion-real-last-24h.json · actualizado " + String(gen.updatedAt || "").slice(0, 16).replace("T", " ") + " UTC.";
     }
     return genApiText();
   }
   function renderSectionNotes() {
-    const live = liveData.loaded;
+    const live = liveData.loaded || Boolean(liveData.demanda) || Boolean(liveData.flowRows.length) || Boolean(liveData.generacion);
     const mapa = "Basemap: CARTO © OpenStreetMap.";
     const api = "API del Coordinador (CEN)";
     setNote("note-overview", live
-      ? cmgApiText() + " Fuente: cmg-online-latest.json. KPIs y mapa usan red del modelo KMZ (sen-data.json). Demanda y frecuencia: " + CEN_NOT_INFORMED + ". " + mapa
+      ? cmgApiText() + " " + demandApiText() + " Fuente: cmg-real-latest.json/demanda-real-estimada.json. KPIs y mapa usan red del modelo KMZ (sen-data.json). Frecuencia: " + CEN_NOT_INFORMED + ". " + mapa
       : "KPIs y mapa: red del modelo KMZ (sen-data.json); CMg, demanda y frecuencia: " + CEN_NOT_INFORMED + ". " + mapa);
     setNote("note-marginal", live
       ? cmgApiText() + " Fuente: cmg-online-latest.json, mapeado sobre el modelo KMZ (sen-data.json). " + mapa
       : "CMg por nodo: " + CEN_NOT_INFORMED + "; red del modelo KMZ (sen-data.json). " + mapa);
-    setNote("note-flows", "Limites fisicos: reales del reporte CEN (reporte_secciones-tramos.xlsx -> linea-limites.json). Flujos: " + CEN_NOT_INFORMED + ". " + mapa);
+    setNote("note-flows", "Limites fisicos: reales del reporte CEN (reporte_secciones-tramos.xlsx -> linea-limites.json). " + flowsApiText() + " " + mapa);
     setNote("note-generation", genNote());
-    setNote("note-gen2", "Generacion real por central: " + CEN_NOT_INFORMED + ". " + cmgApiText() + " " + mapa);
+    setNote("note-gen2", genApiText() + " " + cmgApiText() + " " + mapa);
   }
 
   function updateDates() {
     const visibleCmgHours = liveData.cmgHours.slice(-24);
     const hasCmgWindow = liveData.loaded && visibleCmgHours.length;
+    const windowText = globalWindowText();
     const origin = hasCmgWindow ? "CMg API del Coordinador (CEN)" : "CMg no informado por CEN";
     const text = hasCmgWindow
-      ? "Datos CEN: ultimas " + visibleCmgHours.length + " h secuenciales · desde " + shortTimestampLabel(visibleCmgHours[0]).full + " hasta " + shortTimestampLabel(visibleCmgHours[visibleCmgHours.length - 1]).full + (liveData.cmgStale ? " · ultimo dato real disponible" : "")
+      ? "Ventana CEN: " + (windowText || "—") + " · CMg ultimas " + visibleCmgHours.length + " h secuenciales · desde " + shortTimestampLabel(visibleCmgHours[0]).full + " hasta " + shortTimestampLabel(visibleCmgHours[visibleCmgHours.length - 1]).full + (liveData.cmgStale ? " · ultimo dato real disponible" : "")
       : "Datos: " + CEN_NOT_INFORMED;
     document.getElementById("mc-date").textContent = text;
     document.getElementById("mc-date-overview").textContent = text;
@@ -3147,7 +3136,7 @@
     const gen2Status = document.getElementById("map-status-gen2");
     if (gen2Status) gen2Status.textContent = statusText;
     const flowsDate = document.getElementById("flow-date");
-    if (flowsDate) flowsDate.textContent = "Datos: limites reales CEN por tramo · flujos: " + CEN_NOT_INFORMED;
+    if (flowsDate) flowsDate.textContent = liveData.flowRows.length ? "Ventana CEN: " + (windowText || "—") + " · potencia transitada real" + (liveData.flowStale ? " · ultimo dato real disponible" : "") : "Datos: potencia transitada: " + CEN_NOT_INFORMED;
     const flowsStatus = document.getElementById("map-status-flows");
     if (flowsStatus) flowsStatus.textContent = flowsStatusText();
     renderSectionNotes();
@@ -3278,31 +3267,72 @@
 
   async function loadLiveData() {
     try {
-      const [status, cmgOnline, generacion] = await Promise.all([
+      const [status, cmgReal, cmgOnline, demanda, potenciaTransitada, generacion, centrales, generacionDiaria] = await Promise.all([
         fetch("./data/status.json", { cache: "no-store" }).then((response) => response.ok ? response.json() : null).catch(() => null),
+        fetch("./data/cmg-real-latest.json", { cache: "no-store" }).then((response) => response.ok ? response.json() : null).catch(() => null),
         fetch("./data/cmg-online-latest.json", { cache: "no-store" }).then((response) => response.ok ? response.json() : null).catch(() => null),
+        fetch("./data/demanda-real-estimada.json", { cache: "no-store" }).then((response) => response.ok ? response.json() : null).catch(() => null),
+        fetch("./data/potencia-transitada-latest.json", { cache: "no-store" }).then((response) => response.ok ? response.json() : null).catch(() => null),
         fetch("./data/generacion-real-last-24h.json", { cache: "no-store" }).then((response) => response.ok ? response.json() : null).catch(() => null),
+        fetch("./data/centrales-latest.json", { cache: "no-store" }).then((response) => response.ok ? response.json() : null).catch(() => null),
+        fetch("./data/generacion-real-diaria.json", { cache: "no-store" }).then((response) => response.ok ? response.json() : null).catch(() => null),
       ]);
       liveData.status = status;
-      if (generacion && generacion.ok && ((Array.isArray(generacion.hours) && Array.isArray(generacion.series) && generacion.hours.length) || (generacion.granularity === "daily" && Array.isArray(generacion.records) && generacion.records.length))) {
-        liveData.generacion = generacion;
+      if (demanda && demanda.ok && Array.isArray(demanda.values) && demanda.values.length) {
+        liveData.demanda = demanda;
       }
-      if (Array.isArray(cmgOnline?.records)) {
-        liveData.cmgStale = Boolean(cmgOnline.stale);
-        liveData.cmgRows = cmgOnline.records;
-        liveData.cmgHours = Array.isArray(cmgOnline.hours) ? cmgOnline.hours : [];
+      if (potenciaTransitada && potenciaTransitada.ok && Array.isArray(potenciaTransitada.records) && potenciaTransitada.records.length) {
+        liveData.flowStale = Boolean(potenciaTransitada.stale);
+        liveData.flowRows = potenciaTransitada.records;
+        liveData.flows.clear();
+        potenciaTransitada.records.forEach((row) => {
+          if (!Number.isFinite(Number(row.valueMw))) return;
+          const entry = { valueMw: Number(row.valueMw), timestamp: row.timestamp, name: row.name, range: potenciaTransitada.range, source: potenciaTransitada.source };
+          const aliases = [row.key, row.name, ...(row.aliases || [])].map(normalizeKey).filter(Boolean);
+          aliases.forEach((alias) => liveData.flows.set(alias, entry));
+        });
+      }
+      if (generacion && generacion.ok && Array.isArray(generacion.records) && generacion.records.length) {
+        liveData.generacion = generacion;
+        liveData.genStale = Boolean(generacion.stale);
+        liveData.genRows = generacion.records;
+        liveData.genHours = Array.isArray(generacion.hours) ? generacion.hours : [];
+        liveData.genByPlant.clear();
+        const centralAliases = new Map();
+        if (centrales && centrales.ok && Array.isArray(centrales.records)) {
+          centrales.records.forEach((row) => {
+            const aliases = [row.key, row.name, row.idCentral, row.installation, row.connectionPoint].map(normalizeKey).filter(Boolean);
+            aliases.forEach((alias) => centralAliases.set(alias, aliases));
+          });
+        }
+        generacion.records.forEach((row) => {
+          const entry = { ...row, value: Number(row.value), values: Array.isArray(row.values) ? row.values : [] };
+          const aliases = [row.key, row.name, row.idCentral, ...(row.aliases || [])].map(normalizeKey).filter(Boolean);
+          aliases.forEach((alias) => {
+            liveData.genByPlant.set(alias, entry);
+            (centralAliases.get(alias) || []).forEach((extra) => liveData.genByPlant.set(extra, entry));
+          });
+        });
+      } else if (generacionDiaria && generacionDiaria.ok && generacionDiaria.granularity === "daily" && Array.isArray(generacionDiaria.records) && generacionDiaria.records.length) {
+        liveData.generacion = generacionDiaria;
+      }
+      const cmgData = cmgReal?.ok && Array.isArray(cmgReal.records) && cmgReal.records.length ? cmgReal : cmgOnline;
+      if (Array.isArray(cmgData?.records)) {
+        liveData.cmgStale = Boolean(cmgData.stale);
+        liveData.cmgRows = cmgData.records;
+        liveData.cmgHours = Array.isArray(cmgData.hours) ? cmgData.hours : [];
         liveData.cmgHistory.clear();
-        if (Array.isArray(cmgOnline.history)) {
-          cmgOnline.history.forEach((row) => {
+        if (Array.isArray(cmgData.history)) {
+          cmgData.history.forEach((row) => {
             if (!Array.isArray(row.values) || !row.values.length) return;
-            const entry = { name: row.name, values: row.values, source: cmgOnline.source, range: cmgOnline.range };
+            const entry = { name: row.name, values: row.values, source: cmgData.source, range: cmgData.range };
             const aliases = [row.key, row.name, ...(row.aliases || [])].map(normalizeKey).filter(Boolean);
             aliases.forEach((alias) => liveData.cmgHistory.set(alias, entry));
           });
         }
-        cmgOnline.records.forEach((row) => {
+        cmgData.records.forEach((row) => {
           if (Number.isFinite(Number(row.value))) {
-            const entry = { value: Number(row.value), timestamp: row.timestamp, name: row.name, source: cmgOnline.source, range: cmgOnline.range };
+            const entry = { value: Number(row.value), timestamp: row.timestamp, name: row.name, source: cmgData.source, range: cmgData.range };
             const aliases = [row.key, row.name, ...(row.aliases || [])].map(normalizeKey).filter(Boolean);
             aliases.forEach((alias) => liveData.cmgOnline.set(alias, entry));
           }
@@ -3414,6 +3444,16 @@
     if (event.target.checked) genFilter.plants.add(key);
     else genFilter.plants.delete(key);
     applyGenFilter();
+  });
+  document.getElementById("gen2-ranking").addEventListener("click", (event) => {
+    const item = event.target.closest("[data-gen-rank]");
+    if (!item) return;
+    const feature = genUnits().find((row) => genUnitKey(row) === item.dataset.genRank);
+    if (!feature) return;
+    gen2Selected = feature;
+    renderGen2Detail(feature);
+    showGen2PointPopup(feature);
+    maps.gen2?.flyTo({ center: [feature.lon, feature.lat], zoom: 8, duration: 900 });
   });
   document.getElementById("gen-filter-query").addEventListener("input", (event) => {
     genFilter.query = event.target.value;

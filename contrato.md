@@ -99,12 +99,17 @@ La clase base es `.glass`; los controles pequenos usan `.glass-ctrl` (capsula) y
 
 ### Regla global de ventanas CEN
 
-- Toda seccion que use datos horarios de la API del Coordinador (CEN) debe respetar las **ultimas 24 horas secuenciales informadas por la API**, no un dia calendario fijo ni horas inventadas/rellenadas.
-- Para CMg, el fetch puede descargar hasta 7 dias reales (`CEN_CMG_DAYS`, min 1, max 7), con paginacion si el endpoint la informa. La UI muestra por defecto las ultimas 24 h reales disponibles y conserva el historial descargado para ampliar interaccion sin llamar APIs desde navegador.
-- Cada seccion debe mostrar claramente la fuente y ventana: **API del Coordinador (CEN)**, dataset usado y rango **desde fecha/hora UTC hasta fecha/hora UTC**.
-- Si una seccion no tiene serie horaria CEN real (por ejemplo flujos de transmision), debe decirlo explicitamente y no presentar una ventana CEN ficticia.
+- Todos los datasets operacionales reales deben descargarse con una **misma ventana CEN global** (`CEN_WINDOW_DAYS`, o `CEN_START_DATE`/`CEN_END_DATE` si se fijan manualmente). La misma fecha `startDate` y `endDate` aplica siempre a CMg real, demanda real, generacion real y potencia transitada/congestion.
+- La UI debe mostrar esa ventana global como `Ventana CEN: YYYY-MM-DD -> YYYY-MM-DD` y no mezclar datos de fechas distintas como si pertenecieran a la misma foto operacional.
+- Dentro de la ventana global, cada seccion puede mostrar las ultimas 24 horas secuenciales informadas por la API cuando exista serie horaria real. No se inventan horas ni se rellenan faltantes.
+- Para CMg, el fetch usa `/costo-marginal-real/v4/findByDate` como fuente preferente y conserva el historial descargado para ampliar interaccion sin llamar APIs desde navegador. `cmg-online` queda como respaldo real, no simulado.
+- La demanda real estimada se obtiene desde `/demanda-real-estimada/v4/findByDate` y la potencia transitada real desde `/potencia-transitada/v4/findByDate`, ambos con la misma ventana global.
+- La generacion real horaria por central/unidad se obtiene desde `/generacion-real/v3/findByDate` con la misma ventana global. El catalogo `/centrales/v4/findByDate` se usa para mejorar matching de nombres/idCentral contra el KMZ cuando los nombres no coinciden exactamente.
+- La generacion real diaria por tecnologia desde API Operacion `/reportes/v3/generation` queda solo como respaldo real opcional (`generacion-real-diaria`) si se habilita explicitamente.
+- Cada seccion debe mostrar claramente la fuente y ventana: **API del Coordinador (CEN)**, dataset usado y rango **desde fecha/hora UTC hasta fecha/hora UTC** cuando aplique.
+- Si una seccion no tiene datos CEN reales para esa ventana, debe decirlo explicitamente y no presentar una ventana CEN ficticia.
 - No se deben mostrar datos simulados. Si CEN/API no entrega la informacion, la UI debe mostrar exactamente: `CEN no ha informado esta información`.
-- Excepcion operativa sin simulacion: si una actualizacion API falla (429/404/timeout), `scripts/fetch-cen-data.mjs` debe preservar el ultimo JSON real bueno y marcarlo `stale: true`, mostrando en UI "ultimo dato real disponible". Nunca debe vaciar datos reales por una falla temporal.
+- Excepcion operativa sin simulacion: si una actualizacion API falla (429/404/timeout), `scripts/fetch-cen-data.mjs` debe preservar el ultimo JSON real bueno y marcarlo `stale: true`, mostrando en UI "ultimo dato real disponible". Nunca debe vaciar datos reales por una falla temporal, pero tampoco debe mezclarlo como si fuera parte de la ventana actual.
 - Las credenciales nunca se escriben en codigo ni en archivos del repo; deben venir desde GitHub Secrets o variables de entorno (`CEN_API_KEY`, `CEN_OPERACION_USER_KEY`).
 - La vista Generacion mantiene desacoplado el bloque global de **Generacion por tecnologia**: es dato global CEN del sistema y no depende del filtro/cross-filter por central.
 - Principio KISS/performance: no redibujar ECharts globales ni recalcular listas completas cuando cambia un filtro local si la informacion global no depende de ese filtro.
@@ -113,7 +118,7 @@ La clase base es `.glass`; los controles pequenos usan `.glass-ctrl` (capsula) y
 
 - Nueva vista **"Transmision"** (top nav y side nav) con su propio mapa MapLibre (`map-flows`).
 - Cada linea tiene un **limite fisico (MW)** real tomado del reporte CEN `reporte_secciones-tramos.xlsx` (columnas `Potencia Nominal A->B  con sol 35C MW` y `Potencia Nominal A->B MW  con sol 25C`), emparejado por nombre contra el KMZ mediante `scripts/export-line-limits.py` -> `public/linea-limites.json`. Preferencia 35C, respaldo 25C; valores fisicamente imposibles se descartan como outliers (tope por tension). Lineas sin dato real usan la estimacion por tension como respaldo.
-- El **flujo (MW)** se simula por hora con un perfil de demanda (pico nocturno ~18:30, matutino ~08:30, valle al mediodia) y una componente determinista por linea; algunos tramos operan con sesgo de congestion.
+- El **flujo (MW)** viene solo de potencia transitada real CEN. Si no hay matching o dato real en la ventana global, se muestra `CEN no ha informado esta información`.
 - La **cargabilidad** es `flujo / limite`. Umbrales de congestion:
   - `> 90%` **CRITICO** (rojo `#ba1a1a`)
   - `> 70%` **ALTO** (naranja `#e07000`)
@@ -126,7 +131,7 @@ La clase base es `.glass`; los controles pequenos usan `.glass-ctrl` (capsula) y
 - **Ranking "Mayor Cargabilidad"**: top 10 lineas por `%` de cargabilidad; al hacer click se foca la linea.
 - El selector de HORA solo aplica a series reales disponibles. Si CEN no informa flujos, la vista muestra `CEN no ha informado esta información`.
 - Popup de linea muestra limite real si existe; flujo/cargabilidad solo si hay dato real informado.
-- Nota: los **limites** son reales del reporte CEN. Los **flujos** no se simulan; mientras no exista endpoint real integrado, se informa `CEN no ha informado esta información`.
+- Nota: los **limites** son reales del reporte CEN. Los **flujos** vienen de `/potencia-transitada/v4/findByDate`; si CEN no informa datos para la ventana global, se informa `CEN no ha informado esta información`.
 
 ### Popup al hacer clic en nodos / subestaciones
 
@@ -194,7 +199,7 @@ La clase base es `.glass`; los controles pequenos usan `.glass-ctrl` (capsula) y
 - Los **datos de generacion por tecnologia** vienen de API Operacion CEN `GET /reportes/v3/generation` (`https://operacion.api.coordinador.cl:443`) con parametro `date` y `user_key`, via `scripts/fetch-cen-data.mjs` -> `docs/data/generacion-real-last-24h.json`.
 - Ese endpoint entrega clasificacion **diaria** por tecnologia en GWh (`dailyCurrent`, `monthlyCurrentTodate`, `annualCurrentTodate`); no entrega serie horaria ni centrales. Por lo tanto, el grafico debe rotularse como dato diario real cuando use este endpoint.
 - Para generar contexto historico real sin sobrecargar la UI, el fetch consulta hasta 7 dias diarios (`CEN_GENERACION_DAYS`, min 1, max 7) y la UI permite filtrar 1-7 dias. El cliente solo filtra arrays ya descargados; no llama APIs desde navegador.
-- La generacion real por central queda pendiente hasta contar con endpoint/documentacion que entregue central/unidad y MW/energia real. Mientras falte, la UI debe mostrar `CEN no ha informado esta información`.
+- La generacion real por central/unidad viene de `GET /generacion-real/v3/findByDate`, con campos `fecha`, `hora`, `idCentral`, `nombreCentralUnidad`, `tipoTecnologia`, `unidad` y `valor`. El matching contra centrales del KMZ es heuristico por nombre normalizado y se apoya en `/centrales/v4/findByDate`.
 - Si en el futuro se integra un endpoint horario de generacion, debe seguir la regla global: descargar ventana real amplia controlada, ordenar por timestamp informado y mostrar por defecto las ultimas 24 h reales sin rellenar horas faltantes.
 - El eje del grafico no asume `00-23`; usa los timestamps reales de `hours`, con etiquetas `dd/mm + hora UTC`, por lo que una ventana que cruza medianoche queda explicitamente marcada.
 - Las tecnologias se **normalizan/canonicalizan** por nombre (ej. Carbon -> Carbón) y los valores menores o iguales a 0 se omiten.
@@ -202,7 +207,7 @@ La clase base es `.glass`; los controles pequenos usan `.glass-ctrl` (capsula) y
 - **Grafico**: barras apiladas por tecnologia + linea del total (MW por hora); el nombre de cada tecnologia en el eje X se rota si no cabe.
 - **KPIs** (24h): Energia total (GWh), Pico (MW), Tecnologia dominante con % de participacion y total de Fuentes.
 - **Panel "Share"**: aporte (%) de cada tecnologia con barra proporcional al total.
-- **Panel "Notas"**: explica origen de los datos (CEN real o modelo de respaldo) y muestra la fuente.
+- **Panel "Notas"**: explica origen de los datos reales CEN y muestra la fuente.
 - **Filtro de centrales**: dentro de Generacion hay filtros reactivos por tecnologia y por central, con buscador, seleccion total/limpieza por el conjunto visible y reset global. El filtro actualiza mapa de centrales/BESS, KPIs de generacion por nodo y ranking de centrales. La generacion por tecnologia es global del sistema CEN y no depende de este cross-filter.
 
 ### Tema claro / oscuro (toggle)
@@ -221,14 +226,14 @@ La clase base es `.glass`; los controles pequenos usan `.glass-ctrl` (capsula) y
   - **Overview**: red KMZ + CMg de la **API del Coordinador (CEN)**; si hay `hours/history`, los perfiles muestran las ultimas 24 h publicadas con rango fecha/hora UTC. Demanda/frecuencia muestran `CEN no ha informado esta información` hasta integrar endpoint real.
   - **Costos Marginales**: CMg de la **API del Coordinador (CEN)** (`cmg-online-latest.json`) sobre el modelo KMZ; los perfiles usan la ventana horaria real publicada cuando esta disponible.
   - **Transmision**: limites reales del reporte CEN (`reporte_secciones-tramos.xlsx` → `linea-limites.json`); flujos muestran `CEN no ha informado esta información` hasta integrar endpoint real.
-  - **Generacion por tecnologia**: **API del Coordinador (CEN)** `generacion-real-last-24h.json` o modelo de respaldo.
+- **Generacion por tecnologia**: **API del Coordinador (CEN)** `generacion-real-last-24h.json`; sin modelo de respaldo.
 - Cuando la **API del Coordinador no entrega datos** (sin API key o sin red), el panel muestra `CEN no ha informado esta información`.
 - Siempre menciona el basemap (CARTO © OpenStreetMap). Las notas se rellenan en `renderSectionNotes()`, llamado desde `updateDates()`.
 
 ## Datos y API
 
 - CEN via API SIP (`https://sipub.api.coordinador.cl:443`), autenticacion con `user_key` (pip `CEN_API_KEY`).
-- Datasets: `cmg-online`, `cmg-real`, `demanda`, `hidrologia`, `generacion-real` (ver `scripts/fetch-cen-data.mjs`). Por defecto `npm run cen:update` baja los 5 (variable `CEN_DATASETS` en `.github/workflows/update-cen-data.yml`).
+- Datasets: `cmg-real`, `cmg-online`, `demanda-real`, `potencia-transitada`, `generacion-real`, `centrales` (ver `scripts/fetch-cen-data.mjs`). Por defecto `npm run cen:update` baja esos datasets con una ventana global (`CEN_WINDOW_DAYS`) definida en `.github/workflows/update-cen-data.yml`.
 - El matching CEN-KMZ es heuristico por nombre normalizado; se planea una tabla de equivalencias `docs/data/barra-kmz-mapping.json`.
 - Proximos pasos: cross-filtering entre graficos (estado centralizado KISS + componente `brush` de ECharts), mejorar la lupa/panel de detalle.
 
@@ -257,6 +262,8 @@ quier/
 │   │   ├── cmg-online-latest.json
 │   │   ├── cmg-real-latest.json
 │   │   ├── demanda-real-estimada.json
+│   │   ├── potencia-transitada-latest.json
+│   │   ├── centrales-latest.json
 │   │   ├── embalse-real-last.json
 │   │   └── generacion-real-last-24h.json
 │   └── vendor/
@@ -289,7 +296,7 @@ quier/
 
 - **Mapa de generacion por nodo**: centrales coloreadas por MW estimado (colormap `#2b90e2` → `#7dd3fc`; gris neutro = sin generacion) y tamano proporcional a la potencia; selector HORA (0-23); lupa operacional que suma los MW dentro del radio.
 - **Lupa interactiva tipo VisQuill**: al pasar el cursor sobre un nodo dentro del radio aparecen automaticamente (sin click) un globo con generacion (MW) y CMg (USD/MWh), y arcos semicirculares de colores alrededor del nodo (fondo neutro, arco azul = generacion, arco naranja = CMg) con etiquetas de valores a los lados; se actualizan al mover el cursor y siguen al nodo durante pan/zoom.
-- **Generacion real por central**: pendiente de endpoint real por central/unidad. Mientras no este integrado, muestra `CEN no ha informado esta información`.
+- **Generacion real por central**: usa `/generacion-real/v3/findByDate` y matching por nombre/idCentral apoyado en `/centrales/v4/findByDate`. Si no hay dato o matching real, muestra `CEN no ha informado esta información`.
 - **Detalle de nodo** (click en el mapa): generacion actual (MW) y CMg (USD/MWh) + grafico ECharts 24 h de doble eje estilo VisQuill: Generacion (azul `#2b90e2`, eje izquierdo MW) y CMg (naranja `#f97316`, eje derecho USD/MWh), grid fino y labels mono.
 - **KPIs**: generacion actual, pico 24 h, CMg promedio y centrales activas; mas ranking top 10 de centrales.
 - **Generacion por tecnologia integrada**: KPIs de energia/pico/tecnologia dominante/fuentes, grafico ECharts de barras apiladas + linea total, participacion por tecnologia y notas de fuente. Usa `hours` reales de las ultimas 24 h publicadas (fecha/hora UTC en eje y tooltips). Ya no existe una vista navegable separada `Generation`.

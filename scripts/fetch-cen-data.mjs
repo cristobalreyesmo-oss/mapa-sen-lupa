@@ -9,19 +9,21 @@ const baseUrl = (process.env.CEN_API_BASE_URL || "https://sipub.api.coordinador.
 const apiKey = process.env.CEN_API_KEY || "";
 const operacionBaseUrl = (process.env.CEN_OPERACION_API_BASE_URL || "https://operacion.api.coordinador.cl:443").replace(/\/$/, "");
 const operacionUserKey = process.env.CEN_OPERACION_USER_KEY || "";
+const cenWindowDays = Math.max(1, Math.min(31, Number(process.env.CEN_WINDOW_DAYS || 7)));
 const defaultEndDate = formatDate(new Date());
-const defaultStartDate = formatDate(addDays(new Date(), -1));
+const defaultStartDate = formatDate(addDays(new Date(), -(cenWindowDays - 1)));
 const startDate = process.env.CEN_START_DATE || defaultStartDate;
 const endDate = process.env.CEN_END_DATE || defaultEndDate;
 const lookbackDays = Number(process.env.CEN_LOOKBACK_DAYS || 2);
 const cmgDays = Math.max(1, Math.min(7, Number(process.env.CEN_CMG_DAYS || 7)));
 const generationDays = Math.max(1, Math.min(7, Number(process.env.CEN_GENERACION_DAYS || 7)));
 const enabledDatasetIds = new Set(
-  (process.env.CEN_DATASETS || "cmg-online,cmg-real,demanda,hidrologia,generacion-real")
+  (process.env.CEN_DATASETS || "cmg-real,cmg-online,demanda-real,potencia-transitada,generacion-real,centrales")
     .split(",")
     .map((value) => value.trim())
     .filter(Boolean),
 );
+if (enabledDatasetIds.has("demanda")) enabledDatasetIds.add("demanda-real");
 
 const TECH_CANON = {
   "hidraulica": "Hidráulica",
@@ -56,8 +58,8 @@ const datasets = [
     fallbackPaths: ["/cmg-online/v4/findByDate", "/costos-marginales-online/v4/findByDate"],
     mode: "latestByBar",
     paginate: true,
-    multiDateDays: cmgDays,
-    tryLookback: true,
+    query: { limit: "5000" },
+    tryLookback: false,
   },
   {
     id: "cmg-real",
@@ -66,16 +68,29 @@ const datasets = [
     fallbackPaths: ["/cmg-real/v4/findByDate", "/costos-marginales-reales/v4/findByDate"],
     mode: "latestByBar",
     paginate: true,
-    multiDateDays: cmgDays,
-    tryLookback: true,
+    query: { type: "DEFINITIVO", limit: "5000" },
+    tryLookback: false,
   },
   {
-    id: "demanda",
+    id: "demanda-real",
     file: "demanda-real-estimada.json",
-    path: "/demanda/v4/findByDate",
-    fallbackPaths: ["/demanda-real/v4/findByDate", "/demanda-real-estimada/v4/findByDate"],
-    mode: "raw",
-    tryLookback: true,
+    path: "/demanda-real-estimada/v4/findByDate",
+    fallbackPaths: ["/demanda-real/v4/findByDate", "/demanda/v4/findByDate"],
+    mode: "demandaReal",
+    paginate: true,
+    query: { limit: "5000" },
+    tryLookback: false,
+  },
+  {
+    id: "potencia-transitada",
+    file: "potencia-transitada-latest.json",
+    path: "/potencia-transitada/v4/findByDate",
+    fallbackPaths: [],
+    mode: "potenciaTransitada",
+    paginate: true,
+    query: { limit: "5000" },
+    maxPages: 50,
+    tryLookback: false,
   },
   {
     id: "hidrologia",
@@ -87,6 +102,29 @@ const datasets = [
   {
     id: "generacion-real",
     file: "generacion-real-last-24h.json",
+    path: "/generacion-real/v3/findByDate",
+    fallbackPaths: [],
+    mode: "generacionRealCentral",
+    paginate: true,
+    query: { pageSize: "5000" },
+    maxPages: 50,
+    tryLookback: false,
+  },
+  {
+    id: "centrales",
+    file: "centrales-latest.json",
+    path: "/centrales/v4/findByDate",
+    fallbackPaths: [],
+    mode: "centralesCatalog",
+    paginate: true,
+    noDateParams: true,
+    query: { limit: "5000" },
+    maxPages: 20,
+    tryLookback: false,
+  },
+  {
+    id: "generacion-real-diaria",
+    file: "generacion-real-diaria.json",
     baseUrl: operacionBaseUrl,
     apiKey: operacionUserKey,
     path: "/reportes/v3/generation",
@@ -106,6 +144,8 @@ const status = {
   baseUrl,
   startDate,
   endDate,
+  cenWindowDays,
+  globalWindow: { startDate, endDate },
   lookbackDays,
   cmgDays,
   generationDays,
@@ -181,9 +221,6 @@ async function requestDataset(dataset) {
   if (dataset.mode === "operacionGenerationDaily" && dataset.multiDateDays) {
     return requestOperationGenerationWindow(dataset);
   }
-  if (dataset.mode === "latestByBar" && dataset.multiDateDays) {
-    return requestMultiDateWindow(dataset);
-  }
   const paths = [dataset.path, ...(dataset.fallbackPaths || [])];
   const ranges = candidateRanges(dataset);
   let lastError;
@@ -220,8 +257,8 @@ async function requestOperationGenerationWindow(dataset) {
   const attempts = [];
   const content = [];
   let lastError;
-  for (let offset = 0; offset < dataset.multiDateDays; offset += 1) {
-    const date = formatDate(addDays(new Date(), -offset));
+  const dates = windowDates().slice(-(dataset.multiDateDays || generationDays));
+  for (const date of dates) {
     const range = { startDate: date, endDate: date };
     try {
       await delay(900);
@@ -243,7 +280,7 @@ async function requestOperationGenerationWindow(dataset) {
     lastError.attempts = attempts;
     throw lastError;
   }
-  return { __sourcePath: dataset.path, __range: { startDate: formatDate(addDays(new Date(), -(dataset.multiDateDays - 1))), endDate }, __attempts: attempts, __payload: { content } };
+  return { __sourcePath: dataset.path, __range: { startDate, endDate }, __attempts: attempts, __payload: { content } };
 }
 
 async function requestMultiDateWindow(dataset) {
@@ -292,9 +329,10 @@ async function requestPagedPath(dataset, candidatePath, range) {
     content.push(...rows);
     const totalPages = Number(json?.totalPages ?? json?.page?.totalPages);
     const hasPagingMetadata = json?.totalPages !== undefined || json?.page?.totalPages !== undefined;
-    if (!hasPagingMetadata) break;
+    const pageSize = Number(dataset.query?.pageSize || dataset.query?.limit || json?.pageSize || json?.size || 0);
+    if (!hasPagingMetadata && (!pageSize || rows.length < pageSize)) break;
     if (Number.isFinite(totalPages) && page >= totalPages - 1) break;
-    if (rows.length && !Number.isFinite(totalPages) && rows.length < Number(json?.pageSize || json?.size || 1)) break;
+    if (rows.length && !Number.isFinite(totalPages) && pageSize && rows.length < pageSize) break;
     await delay(600);
   }
   return { ...(firstPayload || {}), content };
@@ -309,6 +347,12 @@ async function requestPath(dataset, candidatePath, range, page = 0) {
     url.searchParams.set("startDate", range.startDate);
     url.searchParams.set("endDate", range.endDate);
     url.searchParams.set("page", String(page));
+  }
+  if (dataset.paginate && !url.searchParams.has("page")) {
+    url.searchParams.set("page", String(page));
+  }
+  for (const [key, value] of Object.entries(dataset.query || {})) {
+    url.searchParams.set(key, String(value));
   }
   const headers = { accept: "application/json" };
   const key = dataset.apiKey || apiKey;
@@ -360,6 +404,18 @@ function normalizeDataset(dataset, payload) {
   }
   if (dataset.mode === "operacionGenerationDaily") {
     return normalizeOperacionGenerationDaily(rows, sourcePath, range, payload?.__attempts || []);
+  }
+  if (dataset.mode === "generacionRealCentral") {
+    return normalizeGeneracionRealCentral(rows, dataset.id, sourcePath, range, payload?.__attempts || []);
+  }
+  if (dataset.mode === "centralesCatalog") {
+    return normalizeCentralesCatalog(rows, dataset.id, sourcePath, range, payload?.__attempts || []);
+  }
+  if (dataset.mode === "demandaReal") {
+    return normalizeDemandaReal(rows, dataset.id, sourcePath, range, payload?.__attempts || []);
+  }
+  if (dataset.mode === "potenciaTransitada") {
+    return normalizePotenciaTransitada(rows, dataset.id, sourcePath, range, payload?.__attempts || []);
   }
   if (dataset.mode === "latestByBar") {
     const records = latestByName(rows).map((row) => ({
@@ -480,6 +536,7 @@ function cmgValueFields() {
     "costoMarginal",
     "costo_marginal_usd",
     "costoMarginalUsd",
+    "cmg_mills_kwh_",
     "cmg_usd_mwh_",
     "cmg_clp_kwh_",
     "valor",
@@ -630,6 +687,229 @@ function normalizeOperacionGenerationDaily(rows, sourcePath, range, attempts) {
   };
 }
 
+function normalizeGeneracionRealCentral(rows, id, sourcePath, range, attempts) {
+  const rawRecords = rows
+    .map((row) => {
+      const timestamp = generationTimestamp(row);
+      return {
+        timestamp,
+        hour: timestampHourNumber(timestamp),
+        date: readText(row, ["fecha", "date"]),
+        idCentral: readText(row, ["idCentral", "id_central", "central_id"]),
+        name: readText(row, ["nombreCentralUnidad", "nombre_central_unidad", "central", "nombre", "name"]),
+        technology: canonicalTech(readText(row, ["tipoTecnologia", "tipo_tecnologia", "tecnologia", "technology"])),
+        owner: readText(row, ["propietario", "owner"]),
+        unit: readText(row, ["unidad", "unit"]),
+        value: readNumber(row, ["valor", "value", "generacion", "mwh", "mw"]),
+        raw: row,
+      };
+    })
+    .filter((row) => row.name && row.timestamp && Number.isFinite(row.value));
+
+  const hourKeys = [...new Set(rawRecords.map((row) => row.timestamp))].sort().slice(-24);
+  const hourSet = new Set(hourKeys);
+  const byPlant = new Map();
+  for (const row of rawRecords) {
+    if (!hourSet.has(row.timestamp)) continue;
+    const key = normalizeKey(row.name);
+    if (!key) continue;
+    if (!byPlant.has(key)) {
+      byPlant.set(key, {
+        name: row.name,
+        key,
+        aliases: [normalizeKey(row.name), normalizeKey(row.idCentral)].filter(Boolean),
+        idCentral: row.idCentral,
+        technology: row.technology,
+        owner: row.owner,
+        values: new Map(),
+        raw: row.raw,
+      });
+    }
+    const plant = byPlant.get(key);
+    plant.values.set(row.timestamp, (plant.values.get(row.timestamp) || 0) + row.value);
+  }
+  const records = [...byPlant.values()].map((plant) => {
+    const values = hourKeys.map((timestamp) => ({ timestamp, value: plant.values.has(timestamp) ? plant.values.get(timestamp) : null }));
+    const latest = [...values].reverse().find((point) => Number.isFinite(Number(point.value)));
+    return {
+      name: plant.name,
+      key: plant.key,
+      aliases: plant.aliases,
+      idCentral: plant.idCentral,
+      technology: plant.technology,
+      owner: plant.owner,
+      value: latest ? latest.value : null,
+      timestamp: latest ? latest.timestamp : "",
+      values,
+      raw: plant.raw,
+    };
+  }).filter((row) => Number.isFinite(Number(row.value)));
+  const techs = [...new Set(records.map((row) => row.technology).filter(Boolean))].sort();
+  const series = techs.map((technology) => ({
+    technology,
+    values: hourKeys.map((timestamp) => records.reduce((sum, row) => sum + (row.technology === technology ? Number(row.values.find((point) => point.timestamp === timestamp)?.value) || 0 : 0), 0)),
+  }));
+  const total = hourKeys.map((timestamp) => records.reduce((sum, row) => sum + (Number(row.values.find((point) => point.timestamp === timestamp)?.value) || 0), 0));
+  return {
+    id,
+    ok: records.length > 0,
+    updatedAt: new Date().toISOString(),
+    source: sourcePath,
+    range,
+    attempts,
+    rawCount: rows.length,
+    sampleKeys: sampleKeys(rows),
+    granularity: "hourly-central",
+    unit: "MWh",
+    hours: hourKeys,
+    records,
+    series,
+    total,
+  };
+}
+
+function normalizeCentralesCatalog(rows, id, sourcePath, range, attempts) {
+  const records = rows
+    .map((row) => ({
+      name: readText(row, ["central", "nombre", "name"]),
+      key: normalizeKey(readText(row, ["central", "nombre", "name"])),
+      idCentral: readText(row, ["id_central", "idCentral", "central_id"]),
+      installation: readText(row, ["instalacion", "installation"]),
+      owner: readText(row, ["propietario", "owner"]),
+      technology: canonicalTech(readText(row, ["tipo_tecnologia", "tipoTecnologia", "tecnologia"])),
+      connectionPoint: readText(row, ["punto_conexion", "puntoConexion"]),
+      region: readText(row, ["region"]),
+      raw: row,
+    }))
+    .filter((row) => row.name || row.idCentral);
+  return {
+    id,
+    ok: records.length > 0,
+    updatedAt: new Date().toISOString(),
+    source: sourcePath,
+    range: null,
+    attempts,
+    rawCount: rows.length,
+    sampleKeys: sampleKeys(rows),
+    records: records.slice(0, 10000),
+  };
+}
+
+function generationTimestamp(row) {
+  const direct = readText(row, ["fecha_hora", "fechaHora", "timestamp"]);
+  if (direct) return parseHourKey(direct) || direct;
+  const fecha = readText(row, ["fecha", "date"]);
+  const hourValue = readText(row, ["hora", "hour"]);
+  if (!fecha) return "";
+  const rawHour = Number(String(hourValue || "0").match(/\d+/)?.[0] || 0);
+  const normalized = rawHour === 24 ? 23 : Math.max(0, Math.min(23, rawHour));
+  return `${fecha} ${String(normalized).padStart(2, "0")}`;
+}
+
+function timestampHourNumber(timestamp) {
+  const match = String(timestamp || "").match(/(?:T|\s)(\d{2})/);
+  return match ? Number(match[1]) : NaN;
+}
+
+function normalizeDemandaReal(rows, id, sourcePath, range, attempts) {
+  const records = rows
+    .map((row) => ({
+      timestamp: readText(row, ["fecha_hora", "fechaHora", "fecha", "date", "datetime", "timestamp"]),
+      valueMWh: readNumber(row, ["medida_kwh", "medidaKwh", "energia_kwh", "value"]),
+      bar: readText(row, ["barra", "nombre_barra", "bar"]),
+      supplier: readText(row, ["suministrador", "supplier"]),
+      withdrawal: readText(row, ["retiro", "withdrawal"]),
+      type: readText(row, ["tipo", "type"]),
+      raw: row,
+    }))
+    .filter((row) => row.timestamp && Number.isFinite(row.valueMWh));
+  const byHour = new Map();
+  for (const row of records) {
+    const hourKey = parseHourKey(row.timestamp);
+    if (!hourKey) continue;
+    byHour.set(hourKey, (byHour.get(hourKey) || 0) + row.valueMWh / 1000);
+  }
+  const hours = [...byHour.keys()].sort();
+  const values = hours.map((timestamp) => ({ timestamp, valueMWh: Math.round(byHour.get(timestamp)) }));
+  return {
+    id,
+    ok: values.length > 0,
+    updatedAt: new Date().toISOString(),
+    source: sourcePath,
+    range,
+    attempts,
+    rawCount: rows.length,
+    sampleKeys: sampleKeys(rows),
+    records: records.slice(0, 5000),
+    hours,
+    values,
+    unit: "MWh",
+  };
+}
+
+function normalizePotenciaTransitada(rows, id, sourcePath, range, attempts) {
+  const records = rows
+    .map((row) => ({
+      lineName: readText(row, ["nombre_linea", "nombreLinea", "linea", "line_name"]),
+      lineId: readText(row, ["id_linea", "idLinea", "line_id"]),
+      timestamp: transitTimestamp(row),
+      bar: readText(row, ["barra", "punto_medida", "puntoMedida"]),
+      zone: readText(row, ["zona", "zone"]),
+      direction: readText(row, ["sentido_linea", "sentidoLinea", "direction"]),
+      powerMw: readNumber(row, ["potencia_mwh", "potenciaMwh", "potencia_mw", "potenciaMw", "potencia_kwh", "potenciaKwh"]),
+      raw: row,
+    }))
+    .filter((row) => row.lineName && row.timestamp && Number.isFinite(row.powerMw));
+  const latestByLine = new Map();
+  const historyByLine = new Map();
+  for (const row of records) {
+    const key = normalizeKey(row.lineName);
+    if (!key) continue;
+    if (!historyByLine.has(key)) historyByLine.set(key, { lineName: row.lineName, key, values: [] });
+    historyByLine.get(key).values.push({ timestamp: row.timestamp, valueMw: row.powerMw, direction: row.direction });
+    const current = latestByLine.get(key);
+    if (!current || String(row.timestamp) > String(current.timestamp || "")) latestByLine.set(key, row);
+  }
+  const latest = [...latestByLine.values()].map((row) => ({
+    name: row.lineName,
+    key: normalizeKey(row.lineName),
+    aliases: [normalizeKey(row.lineName), normalizeKey(row.lineId)].filter(Boolean),
+    valueMw: row.powerMw,
+    timestamp: row.timestamp,
+    direction: row.direction,
+    raw: row.raw,
+  }));
+  const hours = [...new Set(records.map((row) => parseHourKey(row.timestamp)).filter(Boolean))].sort();
+  return {
+    id,
+    ok: latest.length > 0,
+    updatedAt: new Date().toISOString(),
+    source: sourcePath,
+    range,
+    attempts,
+    rawCount: rows.length,
+    sampleKeys: sampleKeys(rows),
+    records: latest,
+    hours,
+    history: [...historyByLine.values()].map((row) => ({
+      ...row,
+      values: row.values.sort((a, b) => String(a.timestamp).localeCompare(String(b.timestamp))).slice(-24),
+    })),
+    unit: "MW",
+  };
+}
+
+function transitTimestamp(row) {
+  const direct = readText(row, ["fecha_hora", "fechaHora", "utc", "timestamp"]);
+  if (direct) return direct;
+  const fecha = readText(row, ["fecha", "date"]);
+  const hora = readText(row, ["hora", "hour"]);
+  if (!fecha) return "";
+  const hourMatch = String(hora || "0").match(/\d+/);
+  const hour = hourMatch ? String(Math.max(0, Math.min(23, Number(hourMatch[0]) || 0))).padStart(2, "0") : "00";
+  return `${fecha} ${hour}:00:00`;
+}
+
 function normalizeKey(value) {
   return String(value || "")
     .normalize("NFD")
@@ -654,12 +934,23 @@ function dateRanges() {
   if (process.env.CEN_START_DATE || process.env.CEN_END_DATE) {
     return [{ startDate, endDate }];
   }
-  const ranges = [];
-  for (let offset = 0; offset <= lookbackDays; offset += 1) {
-    const day = formatDate(addDays(new Date(), -offset));
-    ranges.push({ startDate: day, endDate: day });
+  return [{ startDate, endDate }];
+}
+
+function windowDates() {
+  const dates = [];
+  const start = parseDate(startDate);
+  const end = parseDate(endDate);
+  for (let current = start; current <= end; current = addDays(current, 1)) {
+    dates.push(formatDate(current));
   }
-  return ranges;
+  return dates;
+}
+
+function parseDate(value) {
+  const match = String(value || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return new Date();
+  return new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3])));
 }
 
 function candidateRanges(dataset) {

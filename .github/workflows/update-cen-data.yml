@@ -26,10 +26,8 @@ jobs:
           CEN_API_KEY: ${{ secrets.CEN_API_KEY }}
           CEN_OPERACION_API_BASE_URL: "https://operacion.api.coordinador.cl:443"
           CEN_OPERACION_USER_KEY: ${{ secrets.CEN_OPERACION_USER_KEY }}
-          CEN_DATASETS: "cmg-online,generacion-real"
-          CEN_LOOKBACK_DAYS: "1"
-          CEN_CMG_DAYS: "7"
-          CEN_GENERACION_DAYS: "7"
+          CEN_DATASETS: "cmg-real,cmg-online,demanda-real,potencia-transitada,generacion-real,centrales"
+          CEN_WINDOW_DAYS: "7"
         run: node scripts/fetch-cen-data.mjs
 
       - name: Commit datos actualizados
