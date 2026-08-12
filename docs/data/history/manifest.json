@@ -1,1 +1,1 @@
-{"schema":"sen-etl-manifest-v1","generatedAt":"2026-08-12T20:07:23.326Z","window":{"startDate":"2026-08-06","endDate":"2026-08-12"},"datasets":{"cmg":{"months":[{"month":"2026-08","file":"history/cmg/2026-08.json"}]}}}
+{"schema":"sen-etl-manifest-v1","generatedAt":"2026-08-12T20:09:37.779Z","window":{"startDate":"2026-08-06","endDate":"2026-08-12"},"datasets":{"cmg":{"months":[{"month":"2026-08","file":"history/cmg/2026-08.json"}]}}}
