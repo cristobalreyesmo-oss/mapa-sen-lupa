@@ -1835,7 +1835,7 @@
   function cmgSeries(feature) {
     const history = cmgHistoryFor(feature);
     if (history && Array.isArray(history.values) && history.values.length) {
-      return history.values.map((point, index) => {
+      return history.values.slice(-24).map((point, index) => {
         const h = timestampHour(point.timestamp);
         const value = Number(point.value);
         return {
@@ -2801,8 +2801,10 @@
   function renderKPIs() {
     const cmgValues = [];
     const subs = points.filter((f) => layerOf(f) === "substation");
-    for (let i = 0; i < liveData.cmgHours.length; i += 1) {
-      const values = subs.map((f) => cmgHistoryFor(f)?.values?.[i]?.value).map(Number).filter(Number.isFinite);
+    const visibleHours = liveData.cmgHours.slice(-24);
+    const offset = liveData.cmgHours.length - visibleHours.length;
+    for (let i = 0; i < visibleHours.length; i += 1) {
+      const values = subs.map((f) => cmgHistoryFor(f)?.values?.[offset + i]?.value).map(Number).filter(Number.isFinite);
       if (values.length) cmgValues.push(Math.round(values.reduce((a, b) => a + b, 0) / values.length));
     }
     const currentCmg = avgCmg();
@@ -3081,13 +3083,14 @@
     return dataset?.range?.startDate || "";
   }
   function cmgWindowText() {
-    if (!liveData.cmgHours.length) return "";
-    return shortTimestampLabel(liveData.cmgHours[0]).full + " → " + shortTimestampLabel(liveData.cmgHours[liveData.cmgHours.length - 1]).full;
+    const hours = liveData.cmgHours.slice(-24);
+    if (!hours.length) return "";
+    return shortTimestampLabel(hours[0]).full + " → " + shortTimestampLabel(hours[hours.length - 1]).full;
   }
   function cmgApiText() {
-    const range = cmgWindowText();
-    return liveData.loaded && range
-      ? "CMg API del Coordinador (CEN): ultimas " + liveData.cmgHours.length + " h secuenciales informadas, desde " + shortTimestampLabel(liveData.cmgHours[0]).full + " hasta " + shortTimestampLabel(liveData.cmgHours[liveData.cmgHours.length - 1]).full + (liveData.cmgStale ? ". Ultimo dato real disponible; API CEN no informó actualización nueva." : ".")
+    const hours = liveData.cmgHours.slice(-24);
+    return liveData.loaded && hours.length
+      ? "CMg API del Coordinador (CEN): ultimas " + hours.length + " h secuenciales informadas, desde " + shortTimestampLabel(hours[0]).full + " hasta " + shortTimestampLabel(hours[hours.length - 1]).full + (liveData.cmgStale ? ". Ultimo dato real disponible; API CEN no informó actualización nueva." : ".")
       : "CMg: " + CEN_NOT_INFORMED + ".";
   }
   function genApiText() {
@@ -3125,19 +3128,20 @@
   }
 
   function updateDates() {
-    const hasCmgWindow = liveData.loaded && liveData.cmgHours.length;
+    const visibleCmgHours = liveData.cmgHours.slice(-24);
+    const hasCmgWindow = liveData.loaded && visibleCmgHours.length;
     const origin = hasCmgWindow ? "CMg API del Coordinador (CEN)" : "CMg no informado por CEN";
     const text = hasCmgWindow
-      ? "Datos CEN: ultimas " + liveData.cmgHours.length + " h secuenciales · desde " + shortTimestampLabel(liveData.cmgHours[0]).full + " hasta " + shortTimestampLabel(liveData.cmgHours[liveData.cmgHours.length - 1]).full + (liveData.cmgStale ? " · ultimo dato real disponible" : "")
+      ? "Datos CEN: ultimas " + visibleCmgHours.length + " h secuenciales · desde " + shortTimestampLabel(visibleCmgHours[0]).full + " hasta " + shortTimestampLabel(visibleCmgHours[visibleCmgHours.length - 1]).full + (liveData.cmgStale ? " · ultimo dato real disponible" : "")
       : "Datos: " + CEN_NOT_INFORMED;
     document.getElementById("mc-date").textContent = text;
     document.getElementById("mc-date-overview").textContent = text;
     const statusText = hasCmgWindow
-      ? (liveData.cmgStale ? "API CEN sin actualización nueva · " : "API CEN activa · ") + "CMg ultimas " + liveData.cmgHours.length + " h secuenciales · " + liveData.cmgRows.length + " barras · " + liveData.matchedFeatures + " nodos emparejados"
+      ? (liveData.cmgStale ? "API CEN sin actualización nueva · " : "API CEN activa · ") + "CMg ultimas " + visibleCmgHours.length + " h secuenciales · " + liveData.cmgRows.length + " barras · " + liveData.matchedFeatures + " nodos emparejados"
       : CEN_NOT_INFORMED;
     document.getElementById("map-status").textContent = statusText;
     document.getElementById("map-status-mc").textContent = statusText;
-    document.getElementById("table-status").textContent = "Top 12 nodos · " + origin + (hasCmgWindow ? " · " + shortTimestampLabel(liveData.cmgHours[0]).full + " hasta " + shortTimestampLabel(liveData.cmgHours[liveData.cmgHours.length - 1]).full : "");
+    document.getElementById("table-status").textContent = "Top 12 nodos · " + origin + (hasCmgWindow ? " · " + shortTimestampLabel(visibleCmgHours[0]).full + " hasta " + shortTimestampLabel(visibleCmgHours[visibleCmgHours.length - 1]).full : "");
     const gen2Date = document.getElementById("gen2-date");
     if (gen2Date) gen2Date.textContent = text;
     const gen2Status = document.getElementById("map-status-gen2");

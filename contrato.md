@@ -100,6 +100,7 @@ La clase base es `.glass`; los controles pequenos usan `.glass-ctrl` (capsula) y
 ### Regla global de ventanas CEN
 
 - Toda seccion que use datos horarios de la API del Coordinador (CEN) debe respetar las **ultimas 24 horas secuenciales informadas por la API**, no un dia calendario fijo ni horas inventadas/rellenadas.
+- Para CMg, el fetch puede descargar hasta 7 dias reales (`CEN_CMG_DAYS`, min 1, max 7), con paginacion si el endpoint la informa. La UI muestra por defecto las ultimas 24 h reales disponibles y conserva el historial descargado para ampliar interaccion sin llamar APIs desde navegador.
 - Cada seccion debe mostrar claramente la fuente y ventana: **API del Coordinador (CEN)**, dataset usado y rango **desde fecha/hora UTC hasta fecha/hora UTC**.
 - Si una seccion no tiene serie horaria CEN real (por ejemplo flujos de transmision), debe decirlo explicitamente y no presentar una ventana CEN ficticia.
 - No se deben mostrar datos simulados. Si CEN/API no entrega la informacion, la UI debe mostrar exactamente: `CEN no ha informado esta información`.
@@ -194,7 +195,7 @@ La clase base es `.glass`; los controles pequenos usan `.glass-ctrl` (capsula) y
 - Ese endpoint entrega clasificacion **diaria** por tecnologia en GWh (`dailyCurrent`, `monthlyCurrentTodate`, `annualCurrentTodate`); no entrega serie horaria ni centrales. Por lo tanto, el grafico debe rotularse como dato diario real cuando use este endpoint.
 - Para generar contexto historico real sin sobrecargar la UI, el fetch consulta hasta 7 dias diarios (`CEN_GENERACION_DAYS`, min 1, max 7) y la UI permite filtrar 1-7 dias. El cliente solo filtra arrays ya descargados; no llama APIs desde navegador.
 - La generacion real por central queda pendiente hasta contar con endpoint/documentacion que entregue central/unidad y MW/energia real. Mientras falte, la UI debe mostrar `CEN no ha informado esta información`.
-- La consulta de generacion usa la misma regla de ventana movil `hoy - 1 dia → hoy`; agrupa por clave horaria cronologica `YYYY-MM-DD HH` y despues corta `hours.slice(-24)`. No rellena horas faltantes ni fuerza un dia calendario; si la API publica horas de dias anteriores, se mantienen siempre que sean parte de las ultimas 24 horas reales disponibles.
+- Si en el futuro se integra un endpoint horario de generacion, debe seguir la regla global: descargar ventana real amplia controlada, ordenar por timestamp informado y mostrar por defecto las ultimas 24 h reales sin rellenar horas faltantes.
 - El eje del grafico no asume `00-23`; usa los timestamps reales de `hours`, con etiquetas `dd/mm + hora UTC`, por lo que una ventana que cruza medianoche queda explicitamente marcada.
 - Las tecnologias se **normalizan/canonicalizan** por nombre (ej. Carbon -> Carbón) y los valores menores o iguales a 0 se omiten.
 - Cuando no hay datos CEN (sin API key / sin red), la vista muestra `CEN no ha informado esta información`; no usa modelos de respaldo.

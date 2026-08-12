@@ -14,6 +14,7 @@ const defaultStartDate = formatDate(addDays(new Date(), -1));
 const startDate = process.env.CEN_START_DATE || defaultStartDate;
 const endDate = process.env.CEN_END_DATE || defaultEndDate;
 const lookbackDays = Number(process.env.CEN_LOOKBACK_DAYS || 2);
+const cmgDays = Math.max(1, Math.min(7, Number(process.env.CEN_CMG_DAYS || 7)));
 const generationDays = Math.max(1, Math.min(7, Number(process.env.CEN_GENERACION_DAYS || 7)));
 const enabledDatasetIds = new Set(
   (process.env.CEN_DATASETS || "cmg-online,cmg-real,demanda,hidrologia,generacion-real")
@@ -29,7 +30,9 @@ const datasets = [
     path: "/costo-marginal-online/v4/findByDate",
     fallbackPaths: ["/cmg-online/v4/findByDate", "/costos-marginales-online/v4/findByDate"],
     mode: "latestByBar",
-    rangeSpanDays: 1,
+    rangeSpanDays: cmgDays,
+    singleWideRange: true,
+    paginate: true,
     tryLookback: true,
   },
   {
@@ -38,7 +41,9 @@ const datasets = [
     path: "/costo-marginal-real/v4/findByDate",
     fallbackPaths: ["/cmg-real/v4/findByDate", "/costos-marginales-reales/v4/findByDate"],
     mode: "latestByBar",
-    rangeSpanDays: 1,
+    rangeSpanDays: cmgDays,
+    singleWideRange: true,
+    paginate: true,
     tryLookback: true,
   },
   {
@@ -79,6 +84,7 @@ const status = {
   startDate,
   endDate,
   lookbackDays,
+  cmgDays,
   generationDays,
   enabledDatasets: [...enabledDatasetIds],
   hasApiKey: Boolean(apiKey),
@@ -160,7 +166,7 @@ async function requestDataset(dataset) {
     for (const candidatePath of paths) {
       try {
         await delay(900);
-        const json = await requestPath(dataset, candidatePath, range);
+        const json = dataset.paginate ? await requestPagedPath(dataset, candidatePath, range) : await requestPath(dataset, candidatePath, range);
         const rows = unwrapRows(json);
         attempts.push({ path: candidatePath, startDate: range.startDate, endDate: range.endDate, rows: rows.length });
         if (rows.length || !dataset.tryLookback) {
@@ -214,15 +220,35 @@ async function requestOperationGenerationWindow(dataset) {
   return { __sourcePath: dataset.path, __range: { startDate: formatDate(addDays(new Date(), -(dataset.multiDateDays - 1))), endDate }, __attempts: attempts, __payload: { content } };
 }
 
-async function requestPath(dataset, candidatePath, range) {
+async function requestPagedPath(dataset, candidatePath, range) {
+  const content = [];
+  let firstPayload = null;
+  const maxPages = Math.max(1, Math.min(50, Number(dataset.maxPages || 20)));
+  for (let page = 0; page < maxPages; page += 1) {
+    const json = await requestPath(dataset, candidatePath, range, page);
+    if (!firstPayload) firstPayload = json;
+    const rows = unwrapRows(json);
+    if (!rows.length) break;
+    content.push(...rows);
+    const totalPages = Number(json?.totalPages ?? json?.page?.totalPages);
+    const hasPagingMetadata = json?.totalPages !== undefined || json?.page?.totalPages !== undefined;
+    if (!hasPagingMetadata) break;
+    if (Number.isFinite(totalPages) && page >= totalPages - 1) break;
+    if (rows.length && !Number.isFinite(totalPages) && rows.length < Number(json?.pageSize || json?.size || 1)) break;
+    await delay(600);
+  }
+  return { ...(firstPayload || {}), content };
+}
+
+async function requestPath(dataset, candidatePath, range, page = 0) {
   const url = new URL((dataset.baseUrl || baseUrl) + candidatePath);
   if (dataset.dateParam) {
     url.searchParams.set(dataset.dateParam, range[dataset.dateValue || "startDate"] || range.endDate || range.startDate);
-    url.searchParams.set("page", "0");
+    url.searchParams.set("page", String(page));
   } else if (!dataset.noDateParams && !dataset.noRangeParams) {
     url.searchParams.set("startDate", range.startDate);
     url.searchParams.set("endDate", range.endDate);
-    url.searchParams.set("page", "0");
+    url.searchParams.set("page", String(page));
   }
   const headers = { accept: "application/json" };
   const key = dataset.apiKey || apiKey;
@@ -361,7 +387,7 @@ function cmgHistoryByBar(rows) {
     if (!byBar.has(key)) byBar.set(key, { name, key, aliases: aliasKeysForRow(row), values: new Map() });
     byBar.get(key).values.set(hourKey, value);
   }
-  const hours = [...hourKeys].sort().slice(-24);
+  const hours = [...hourKeys].sort();
   return {
     hours,
     records: [...byBar.values()].map((bar) => ({
@@ -608,6 +634,7 @@ function dateRanges() {
 
 function candidateRanges(dataset) {
   if (dataset.rangeSpanDays) {
+    if (dataset.singleWideRange) return [{ startDate: formatDate(addDays(new Date(), -dataset.rangeSpanDays)), endDate }];
     const ranges = [];
     for (let span = dataset.rangeSpanDays; span >= 1; span -= 1) {
       ranges.push({ startDate: formatDate(addDays(new Date(), -span)), endDate });
