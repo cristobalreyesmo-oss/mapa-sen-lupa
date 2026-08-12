@@ -1,0 +1,15 @@
+{
+  "id": "potencia-transitada",
+  "ok": false,
+  "updatedAt": "2026-08-12T17:32:57.141Z",
+  "error": "502 Bad Gateway {\"message\": \"Internal server error\"}",
+  "attempts": [
+    {
+      "path": "/potencia-transitada/v4/findByDate",
+      "startDate": "2026-08-06",
+      "endDate": "2026-08-12",
+      "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
+    }
+  ],
+  "records": []
+}

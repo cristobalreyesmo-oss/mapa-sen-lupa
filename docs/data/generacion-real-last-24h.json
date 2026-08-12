@@ -559,5 +559,16 @@
         "date": "2026-08-06"
       }
     }
+  ],
+  "stale": true,
+  "staleReason": "502 Bad Gateway {\"message\": \"Internal server error\"}",
+  "lastFetchAttemptAt": "2026-08-12T17:32:58.929Z",
+  "lastFetchAttempts": [
+    {
+      "path": "/generacion-real/v3/findByDate",
+      "startDate": "2026-08-06",
+      "endDate": "2026-08-12",
+      "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
+    }
   ]
 }
