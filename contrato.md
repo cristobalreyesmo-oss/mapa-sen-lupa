@@ -26,9 +26,21 @@ Regla principal: no se muestran datos simulados. Si CEN/API/descargables oficial
 
 - El navegador consume JSON estaticos bajo `docs/data/`; no llama APIs CEN ni Qlik directamente.
 - Las credenciales nunca se escriben en codigo ni repo. Deben venir desde GitHub Secrets o variables de entorno.
-- No interpolar, no rellenar horas faltantes, no inventar centrales, nodos, flujos ni CMg.
+- No interpolar, no rellenar horas faltantes, no inventar centrales, nodos, flujos, CMg, capacidades instaladas ni capacidades de transporte.
 - Si una actualizacion falla (`429`, `404`, timeout, `502`) y existe ultimo dato real bueno, se conserva como `stale: true` y se rotula `ultimo dato real disponible`.
 - Cada dataset debe conservar trazabilidad: fuente, fecha/rango, formato original y timestamp de actualizacion.
+- La capacidad instalada de centrales/BESS solo se muestra si existe fuente real CEN/catalogo oficial. Si falta, usar `CEN no ha informado esta información`.
+- La capacidad de transporte de lineas a `35°C` se toma desde `public/linea-limites.json`, campo `c35` o `limit` cuando `primaryRating` sea `c35`.
+- El nivel de tension de lineas y subestaciones/nodos debe venir del modelo, nombre/carpeta o dataset real. Si no se puede determinar de forma trazable, usar `CEN no ha informado esta información`.
+
+## Reglas Visuales Transversales
+
+- Debe existir una paleta unica por tecnologia para centrales/BESS en toda la pagina.
+- Debe existir una paleta unica por nivel de tension para lineas y nodos/subestaciones en toda la pagina.
+- La leyenda de tecnologias debe ser transversal y reutilizable en Overview, Generacion, Costos Marginales y Transmision cuando la seccion muestre o referencie tecnologias.
+- La leyenda de tension debe ser transversal y reutilizable en todas las secciones que muestren lineas o nodos/subestaciones.
+- No cambiar colores por seccion para la misma tecnologia o tension.
+- Si una seccion colorea por una metrica operacional adicional, como cargabilidad, debe conservar una referencia clara al nivel de tension y no romper la lectura transversal.
 
 ## Fuentes CEN Prioritarias
 
@@ -96,6 +108,11 @@ Debe mostrar:
 - Nodos/subestaciones visibles.
 - Cross-filtering por nivel de tension de lineas.
 - Cross-filtering por tipo de tecnologia de centrales.
+- Leyenda transversal de tecnologias y tension.
+- Contador al filtrar tecnologia: centrales/BESS visibles y total del sistema.
+- Popup de central/BESS: tecnologia, capacidad instalada MW si existe fuente real, y coordenadas.
+- Popup de linea: nivel de tension, longitud aproximada y capacidad de transporte a `35°C` desde `linea-limites.json`.
+- Popup de subestacion/nodo: nivel de tension y coordenadas.
 
 No debe priorizar:
 - CMg promedio como KPI principal.
@@ -115,9 +132,13 @@ Mapa y filtros:
 - Mapa con centrales, nodos/subestaciones y lineas del sistema.
 - Lineas coloreadas por nivel de tension y filtrables por tension.
 - Centrales coloreadas por tecnologia y filtrables por tecnologia.
+- Los colores de tecnologia y tension deben ser exactamente los mismos que en Overview.
 - Filtro de ventana temporal, con maximo historico recomendado de 1 ano por consulta visual. Este maximo puede discutirse, pero la implementacion debe evitar cargar mas de lo necesario.
 - Filtro de central/generador.
 - Filtro de nodo/subestacion para obtener curva CMg de la fecha o ventana filtrada.
+- Popup de central/BESS: generacion real del rango, capacidad instalada MW si existe fuente real, tecnologia y CMg promedio del rango temporal seleccionado.
+- Popup de linea: nivel de tension y capacidad de transporte a `35°C`.
+- Popup de nodo/subestacion: nivel de tension y CMg del rango/fecha cuando exista.
 
 Graficos de analisis:
 - Para la misma fecha/ventana seleccionada, mostrar generacion real y CMg en el mismo grafico cuando ambos existan.
@@ -132,11 +153,14 @@ Rol: analisis de CMg por nodo/barra.
 Debe mostrar:
 - Mapa de nodos/subestaciones con CMg.
 - No mostrar centrales en esta seccion.
-- Lineas pueden mantenerse como contexto topologico si ayudan a ubicacion, pero no deben competir visualmente con los nodos.
+- Lineas pueden mantenerse como contexto topologico si ayudan a ubicacion, coloreadas por nivel de tension.
+- Nodos/subestaciones deben usar color por nivel de tension como base visual, y el valor CMg debe mostrarse en popup/tabla/curva sin romper la paleta transversal.
 - Filtro de fecha de analisis.
 - Filtro de nodo/subestacion.
 - Cross-filtering nodo-fecha: seleccionar nodo actualiza curva CMg para la fecha/ventana filtrada.
 - Fuente preferente: CMg definitivo descargado desde `https://www.coordinador.cl/costos-marginales/`.
+- Popup de nodo/subestacion: nivel de tension, CMg de la fecha/rango y trazabilidad del dato.
+- Mantener leyenda transversal de tecnologias y tension; si no hay centrales visibles, la leyenda tecnologica debe quedar como referencia global, no como capa activa.
 
 ### Transmision
 
@@ -145,12 +169,14 @@ Rol: flujos, cargabilidad y congestion de transmision.
 Debe mostrar:
 - Lineas y nodos/subestaciones.
 - No mostrar centrales.
-- Lineas coloreadas por cargabilidad cuando exista potencia transitada real.
+- Lineas coloreadas por nivel de tension como regla base transversal.
+- Cargabilidad se muestra como metrica operacional adicional cuando exista potencia transitada real, sin perder referencia de tension.
 - Filtro por nivel de tension.
 - Filtro por fecha/ventana temporal.
 - Filtro por linea.
 - Ranking de mayor cargabilidad.
-- Detalle de linea: flujo, limite, porcentaje de cargabilidad y estado.
+- Detalle de linea: flujo, capacidad de transporte a `35°C`, porcentaje de cargabilidad y estado.
+- Popup de linea: nivel de tension, longitud aproximada, capacidad de transporte a `35°C`, flujo real cuando exista y cargabilidad.
 
 Mantener:
 - Concepto actual de cargabilidad: `flujo / limite`.
