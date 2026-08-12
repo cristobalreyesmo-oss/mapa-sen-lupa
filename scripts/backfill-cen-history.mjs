@@ -38,9 +38,9 @@ for (const id of datasets) {
   const attempts = [];
   for (const date of dateList(startDate, endDate)) {
     try {
-      const dayRows = await requestDay(config, date);
-      attempts.push({ date, rows: dayRows.length });
-      rows.push(...dayRows);
+      const result = await requestDay(config, date);
+      attempts.push(result.error ? { date, rows: result.rows.length, partial: true, error: result.error } : { date, rows: result.rows.length });
+      rows.push(...result.rows);
       await delay(900);
     } catch (error) {
       attempts.push({ date, error: describeError(error) });
@@ -76,7 +76,11 @@ async function requestDay(config, date) {
       url.searchParams.set("apikey", apiKey);
     }
     const response = await fetch(url, { headers: apiHeaders() });
-    if (!response.ok) throw new Error(`${response.status} ${response.statusText} ${(await response.text().catch(() => "")).slice(0, 180)}`.trim());
+    if (!response.ok) {
+      const error = `${response.status} ${response.statusText} ${(await response.text().catch(() => "")).slice(0, 180)}`.trim();
+      if (rows.length) return { rows, error };
+      throw new Error(error);
+    }
     const json = await response.json();
     const pageRows = unwrapRows(json);
     if (!pageRows.length) break;
@@ -86,7 +90,7 @@ async function requestDay(config, date) {
     if (!Number.isFinite(totalPages) && pageRows.length < limit) break;
     await delay(500);
   }
-  return rows;
+  return { rows };
 }
 
 function normalizeCmg(rows) {
