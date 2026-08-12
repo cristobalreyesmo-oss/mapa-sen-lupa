@@ -93,8 +93,14 @@ docs/data/history/flujos/YYYY-MM.json
 ```
 
 Importadores locales para descargables reales CEN/Qlik:
-- `scripts/import-generacion-historica-real.mjs`: lee CSV ancho diario de generacion real, publica historico horario mensual por central y agregado mensual anual por tecnologia. La columna `Subtipo` separa BESS `Inyeccion` y `Retiro`; se conserva el signo real informado en el CSV.
-- `scripts/import-potencia-transitada-historica-real.mjs`: lee CSV historico de potencia transitada por tramo/linea, publica historico horario mensual de flujos.
+- `scripts/import-generacion-historica-real.mjs`: lee CSV ancho diario de generacion real desde `docs/data/generacion historica real/`, publica historico horario mensual por central y agregado mensual anual por tecnologia. La columna `Subtipo` separa BESS `Inyeccion` y `Retiro`; se conserva el signo real informado en el CSV.
+- `scripts/import-potencia-transitada-historica-real.mjs`: lee CSV historico de potencia transitada desde `docs/data/potencia transitada por lineas historico real/`, publica historico horario mensual de flujos por tramo/linea.
+
+Datos historicos reales publicados actualmente:
+- Generacion real por central: `docs/data/history/generacion/2026-01.json` a `2026-08.json`.
+- Generacion real por tecnologia/subtipo: `docs/data/history/generacion-tecnologia/2026.json`.
+- Potencia transitada por linea: `docs/data/history/flujos/2026-01.json` a `2026-06.json`.
+- CMg compacto parcial: `docs/data/history/cmg/2026-08.json`.
 
 ## Estructura Objetivo de la Pagina
 
@@ -145,10 +151,12 @@ Mapa y filtros:
 - Popup de nodo/subestacion: nivel de tension y CMg del rango/fecha cuando exista.
 
 Graficos de analisis:
+- El bloque superior de Generacion debe preferir `docs/data/history/generacion-tecnologia/YYYY.json` por ser liviano y anualizado.
 - Para la misma fecha/ventana seleccionada, mostrar generacion real y CMg en el mismo grafico cuando ambos existan.
 - El cruce debe ser por timestamp real, no por posicion de array.
 - Cross-filtering: seleccionar central, tecnologia, nodo o tension debe actualizar los graficos relacionados sin recargar toda la pagina.
 - Si falta generacion o CMg real para el cruce, mostrar `CEN no ha informado esta información` para la serie faltante.
+- BESS debe mostrarse separado por `Subtipo`: `BESS Inyeccion` y `BESS Retiro`. No invertir signos manualmente; conservar el signo real informado por CEN/Qlik.
 
 ### Costos Marginales
 
@@ -181,6 +189,7 @@ Debe mostrar:
 - Ranking de mayor cargabilidad.
 - Detalle de linea: flujo, capacidad de transporte a `35°C`, porcentaje de cargabilidad y estado.
 - Popup de linea: nivel de tension, longitud aproximada, capacidad de transporte a `35°C`, flujo real cuando exista y cargabilidad.
+- Para fecha de analisis 2026-01 a 2026-06, la vista debe preferir `docs/data/history/flujos/YYYY-MM.json` antes que datos live.
 
 Mantener:
 - Concepto actual de cargabilidad: `flujo / limite`.
@@ -216,6 +225,8 @@ npm run static:build:v2
 node --check scripts/fetch-cen-data.mjs
 node --check scripts/build-cen-etl.mjs
 node --check scripts/backfill-cen-history.mjs
+node --check scripts/import-generacion-historica-real.mjs
+node --check scripts/import-potencia-transitada-historica-real.mjs
 ```
 
 Nota: `npm test` puede fallar localmente si falta `vinext`.
@@ -229,11 +240,11 @@ Nota: `npm test` puede fallar localmente si falta `vinext`.
 ## Estado Actual
 
 - `docs/index.html` es unico HTML publicado.
-- Selector de fecha de analisis existe en la UI actual, pero la estructura debe reorganizarse segun este contrato antes de profundizar ETL.
+- La UI ya fue reorganizada inicialmente por secciones: Overview topologico, Generacion, Costos Marginales y Transmision.
 - Historico CMg compacto parcial existe para agosto 2026.
-- Generacion historica y flujos historicos estan preparados conceptualmente, pero falta ETL desde descargables oficiales CEN/Qlik porque API SIP ha devuelto `502`.
-- Generacion historica real 2026 ya puede importarse desde `docs/data/generacion historica real/*.csv` hacia `docs/data/history/generacion/` y `docs/data/history/generacion-tecnologia/`.
-- Potencia transitada historica real 2026 ya puede importarse desde `docs/data/potencia transitada por lineas historico real/*.csv` hacia `docs/data/history/flujos/`.
+- Generacion historica real 2026 ya esta importada desde `docs/data/generacion historica real/*.csv` hacia `docs/data/history/generacion/` y `docs/data/history/generacion-tecnologia/`.
+- Potencia transitada historica real 2026 ya esta importada desde `docs/data/potencia transitada por lineas historico real/*.csv` hacia `docs/data/history/flujos/` para enero-junio 2026.
+- La carpeta de potencia transitada contiene CSV real aunque originalmente se esperaba XLSX; mantener CSV como fuente preferente KISS cuando este disponible.
 - Se identificaron fuentes oficiales alternativas:
   - CMg definitivo desde `https://www.coordinador.cl/costos-marginales/`.
   - Generacion real desde pagina CEN/Qlik de generacion real.
@@ -241,8 +252,8 @@ Nota: `npm test` puede fallar localmente si falta `vinext`.
 
 ## Proximo Orden de Trabajo
 
-1. Reestructurar UI por secciones segun este contrato, sin cambiar aun el ETL profundo.
-2. Eliminar mezclas conceptuales: Overview topologico, CMg solo nodos, Transmision sin centrales, Generacion como analisis historico real.
-3. Definir modelos JSON compactos finales para CMg definitivo, generacion real y flujos.
-4. Implementar ETL desde descargables oficiales CEN priorizando CSV.
-5. Conectar UI a historicos reales bajo demanda.
+1. Validar en navegador el cruce central-generacion-CMg para fechas 2026 con historico real mensual.
+2. Mejorar matching de nombres entre lineas del modelo SEN y tramos Qlik si hay lineas sin emparejar.
+3. Incorporar CMg definitivo descargable desde `https://www.coordinador.cl/costos-marginales/` para reemplazar/fortalecer el respaldo API.
+4. Automatizar importadores de descargables reales cuando exista una ruta estable y liviana, manteniendo JSON compactos.
+5. Buscar fuente real de capacidad instalada de centrales/BESS; hasta entonces mostrar `CEN no ha informado esta información`.
