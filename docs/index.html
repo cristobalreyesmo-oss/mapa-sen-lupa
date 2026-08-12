@@ -1349,7 +1349,7 @@
   let genDays = 7;
   let analysisDate = "";
   let historyLoading = null;
-  const historyCache = { cmg: new Map(), generacion: new Map() };
+  const historyCache = { cmg: new Map(), generacion: new Map(), generacionTecnologia: new Map(), flujos: new Map() };
   const viewRefs = {
     overview: { mapId: "map", chartId: "cmg-chart", lensId: "lens-readout", popupId: "lens-popup", nameId: "node-name", detailId: "node-detail", cmgId: "node-cmg", valueId: "chart-value" },
     marginal: { mapId: "map-mc", chartId: "cmg-chart-mc", lensId: "lens-readout-mc", popupId: "lens-popup-mc", nameId: "node-name-mc", detailId: "node-detail-mc", cmgId: "node-cmg-mc", valueId: "chart-value-mc" },
@@ -1502,6 +1502,13 @@
     return values.length ? Math.round(values.reduce((sum, value) => sum + value, 0) / values.length) : NaN;
   }
   function lineFlow(feature, h) {
+    const historical = compactFlowHistoryFor(feature);
+    if (historical) {
+      const date = analysisDateOrLive();
+      const point = historical.hours.map((timestamp, index) => ({ timestamp, value: historical.values[index] }))
+        .find((row) => String(row.timestamp).slice(0, 10) === date && timestampHour(row.timestamp) === h && Number.isFinite(Number(row.value)));
+      if (point) return Math.abs(Number(point.value));
+    }
     const row = liveFlowValue(feature);
     return row && Number.isFinite(Number(row.valueMw)) ? Math.abs(Number(row.valueMw)) : NaN;
   }
@@ -1537,6 +1544,9 @@
     "Petróleo Diésel": "#8a6d3b",
     "Fuel Oil": "#8a6d3b",
     "Cogeneración": "#2a9d8f",
+    "BESS": "#9f7aea",
+    "BESS Inyeccion": "#6d5dfc",
+    "BESS Retiro": "#b7791f",
     "Otros": "#8b93a1",
     "Sin clasificar": "#8b93a1",
   };
@@ -1590,6 +1600,30 @@
     historyCache[dataset].set(month, data || null);
     return data || null;
   }
+  async function loadGenerationTechnologyYear(year) {
+    const y = String(year || analysisDateOrLive().slice(0, 4));
+    if (!/^\d{4}$/.test(y)) return null;
+    if (historyCache.generacionTecnologia.has(y)) return historyCache.generacionTecnologia.get(y);
+    const data = await fetchJson("./data/history/generacion-tecnologia/" + y + ".json");
+    historyCache.generacionTecnologia.set(y, data || null);
+    return data || null;
+  }
+  function generationTechnologyDataset() {
+    const year = String(analysisDateOrLive() || "").slice(0, 4);
+    const data = historyCache.generacionTecnologia.get(year);
+    if (!data || !Array.isArray(data.hours) || !Array.isArray(data.series)) return null;
+    return {
+      schema: data.schema,
+      source: data.source,
+      generatedAt: data.generatedAt,
+      granularity: "annual-monthly",
+      unit: data.unit || "GWh",
+      hours: data.hours,
+      series: data.series.map((row) => ({ technology: row.technology, subtype: row.subtype || "", values: row.values || [] })),
+      total: Array.isArray(data.total) ? data.total : data.hours.map((_, i) => data.series.reduce((sum, row) => sum + (Number(row.values?.[i]) || 0), 0)),
+      bessRule: data.bessRule || "",
+    };
+  }
   function compactSeriesForFeature(data, entityKey, feature) {
     if (!data || !Array.isArray(data.hours) || !Array.isArray(data[entityKey]) || !Array.isArray(data.values)) return null;
     const candidates = [feature.name, normalizeKey(feature.name), ...keyTokens(feature.name)];
@@ -1607,7 +1641,7 @@
     const date = analysisDateOrLive();
     if (!date) return;
     if (historyLoading) return historyLoading;
-    historyLoading = Promise.all([loadHistoryDataset("cmg", date), loadHistoryDataset("generacion", date)]).finally(() => { historyLoading = null; });
+    historyLoading = Promise.all([loadHistoryDataset("cmg", date), loadHistoryDataset("generacion", date), loadHistoryDataset("flujos", date), loadGenerationTechnologyYear(date.slice(0, 4))]).finally(() => { historyLoading = null; });
     return historyLoading;
   }
   function cmgVisibleHours() {
@@ -1621,10 +1655,11 @@
   }
   function genPerTech(gen) {
     return gen.series
-      .map((s) => ({ technology: s.technology, sum: s.values.reduce((a, b) => a + Math.max(0, Number(b) || 0), 0) }))
+      .map((s) => ({ technology: s.technology, sum: s.values.reduce((a, b) => a + Math.abs(Number(b) || 0), 0), signedSum: s.values.reduce((a, b) => a + (Number(b) || 0), 0) }))
       .sort((a, b) => b.sum - a.sum);
   }
   function genEnergyGWh(gen) {
+    if (gen.unit === "GWh") return gen.total.reduce((s, v) => s + (Number(v) || 0), 0);
     return gen.total.reduce((s, v) => s + Math.max(0, Number(v) || 0), 0) / 1000;
   }
   function dailyGenerationDataset(gen) {
@@ -1672,7 +1707,7 @@
       stack: "gen",
       data: s.values,
       barMaxWidth: 24,
-      itemStyle: { color: TECH_COLORS[s.technology] || "#8b93a1" },
+      itemStyle: { color: TECH_COLORS[s.technology] || TECH_COLORS[s.technology?.replace(/ Retiro| Inyeccion/g, "")] || "#8b93a1" },
       emphasis: { focus: "series" },
     }));
     series.push({
@@ -1697,7 +1732,7 @@
         formatter(params) {
           const list = Array.isArray(params) ? params : [params];
           const first = list[0];
-          const date = genFullLabel(gen.hours[first.dataIndex]);
+          const date = gen.granularity === "annual-monthly" ? String(gen.hours[first.dataIndex]) : genFullLabel(gen.hours[first.dataIndex]);
           const rows = list.map((p) =>
             '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:' + (p.color || "#fff") + ';margin-right:6px"></span>' +
             escapeHtml(p.seriesName) + ": <b>" + (Number.isFinite(p.value) ? Number(p.value).toLocaleString("es-CL") + " " + unit : "—") + "</b>"
@@ -1720,7 +1755,7 @@
         data: hours,
         axisLine: { lineStyle: { color: cssVar("--outline-variant", "#c3c5d9") } },
         axisTick: { show: false },
-        axisLabel: { color: cssVar("--secondary", "#5e5e5e"), fontSize: 10, interval: 1, formatter: (value, index) => genAxisLabel(value, index, gen.hours) },
+        axisLabel: { color: cssVar("--secondary", "#5e5e5e"), fontSize: 10, interval: 1, formatter: (value, index) => gen.granularity === "annual-monthly" ? String(value).slice(5, 7) + "/" + String(value).slice(2, 4) : genAxisLabel(value, index, gen.hours) },
       },
       yAxis: {
         type: "value",
@@ -1737,8 +1772,8 @@
       setGenText("gen-source", "Datos: " + CEN_NOT_INFORMED);
       return;
     }
-    const origin = gen.granularity === "daily" ? "Generación real diaria · API Operación CEN" : "Generación real horaria por central/unidad · API del Coordinador (CEN) · últimas " + gen.hours.length + " h secuenciales informadas";
-    const windowText = gen.granularity === "daily" ? " · desde " + gen.hours[0] + " hasta " + gen.hours[gen.hours.length - 1] : " · desde " + genFullLabel(gen.hours[0]) + " hasta " + genFullLabel(gen.hours[gen.hours.length - 1]);
+    const origin = gen.granularity === "annual-monthly" ? "Generación real histórica mensual · descarga CEN/Qlik" : gen.granularity === "daily" ? "Generación real diaria · API Operación CEN" : "Generación real horaria por central/unidad · API del Coordinador (CEN) · últimas " + gen.hours.length + " h secuenciales informadas";
+    const windowText = gen.granularity === "annual-monthly" ? " · meses " + gen.hours[0] + " → " + gen.hours[gen.hours.length - 1] : gen.granularity === "daily" ? " · desde " + gen.hours[0] + " hasta " + gen.hours[gen.hours.length - 1] : " · desde " + genFullLabel(gen.hours[0]) + " hasta " + genFullLabel(gen.hours[gen.hours.length - 1]);
     const updated = gen && gen.updatedAt ? " · actualizado " + String(gen.updatedAt).slice(0, 16).replace("T", " ") + " UTC" : "";
     const stale = gen.stale ? " · ultimo dato real disponible, API no informó actualización nueva" : "";
     setGenText("gen-source", "Datos: " + origin + windowText + updated + stale);
@@ -1755,13 +1790,13 @@
     const totalSum = perTech.reduce((a, b) => a + b.sum, 0) || 1;
     const dom = perTech[0];
     setGenText("kpi-gen-energy", energy.toFixed(1));
-    setGenText("kpi-gen-energy-note", gen.granularity === "daily" ? "GWh diarios · " + gen.hours[0] + " → " + gen.hours[gen.hours.length - 1] : gen.hours.length + " horas · " + genFullLabel(gen.hours[0]) + " → " + genFullLabel(gen.hours[gen.hours.length - 1]));
+    setGenText("kpi-gen-energy-note", gen.granularity === "annual-monthly" ? "GWh netos reales · " + gen.hours[0] + " → " + gen.hours[gen.hours.length - 1] : gen.granularity === "daily" ? "GWh diarios · " + gen.hours[0] + " → " + gen.hours[gen.hours.length - 1] : gen.hours.length + " horas · " + genFullLabel(gen.hours[0]) + " → " + genFullLabel(gen.hours[gen.hours.length - 1]));
     setGenText("kpi-gen-peak", peakMw.toLocaleString("es-CL"));
-    setGenText("kpi-gen-peak-note", "hora " + genHourLabel(gen.hours[peakIdx]));
+    setGenText("kpi-gen-peak-note", gen.granularity === "annual-monthly" ? "mes " + gen.hours[peakIdx] : "hora " + genHourLabel(gen.hours[peakIdx]));
     setGenText("kpi-gen-dominant", dom ? dom.technology : "—");
-    setGenText("kpi-gen-dominant-note", dom ? Math.round((dom.sum / totalSum) * 100) + "% del total · " + (dom.sum / 1000).toFixed(1) + " GWh" : "—");
+    setGenText("kpi-gen-dominant-note", dom ? Math.round((dom.sum / totalSum) * 100) + "% del total · " + (gen.unit === "GWh" ? dom.signedSum.toFixed(1) : (dom.sum / 1000).toFixed(1)) + " GWh" : "—");
     setGenText("kpi-gen-sources", String(gen.series.length));
-    setGenText("kpi-gen-sources-note", "barras apiladas por hora");
+    setGenText("kpi-gen-sources-note", gen.granularity === "annual-monthly" ? "series mensuales por tecnologia/subtipo" : "barras apiladas por hora");
   }
   function renderGenShare(gen) {
     const el = document.getElementById("gen-share");
@@ -1775,11 +1810,11 @@
     el.innerHTML = perTech
       .map((row) => {
         const pct = max ? Math.round((row.sum / max) * 100) : 0;
-        const color = TECH_COLORS[row.technology] || "#8b93a1";
+        const color = TECH_COLORS[row.technology] || TECH_COLORS[row.technology?.replace(/ Retiro| Inyeccion/g, "")] || "#8b93a1";
         return '<div class="flex items-center gap-3">' +
           '<span class="w-36 truncate text-label-mono text-secondary">' + escapeHtml(row.technology) + "</span>" +
           '<div class="flex-1 h-4 bg-surface-container-high overflow-hidden rounded-sm"><div class="h-full" style="width:' + pct + "%;background:" + color + '"></div></div>' +
-          '<span class="w-20 text-right text-caption font-label-mono text-on-surface">' + (row.sum / 1000).toFixed(1) + " GWh</span>" +
+          '<span class="w-20 text-right text-caption font-label-mono text-on-surface">' + (gen.unit === "GWh" ? row.signedSum.toFixed(1) : (row.sum / 1000).toFixed(1)) + " GWh</span>" +
           '<span class="w-12 text-right text-caption font-label-mono text-secondary">' + pct + "%</span>" +
           "</div>";
       })
@@ -1795,15 +1830,15 @@
     const peakIdx = gen.total.reduce((best, v, i) => (Number(v) || 0) > (Number(gen.total[best]) || 0) ? i : best, 0);
     const notes = [
       "Fuente: " + (gen.source || "API Operación CEN"),
-      gen.granularity === "daily" ? "Dato informado: generación diaria por tecnología en GWh desde " + gen.hours[0] + " hasta " + gen.hours[gen.hours.length - 1] : "Ventana analizada: últimas " + gen.hours.length + " horas disponibles (" + genFullLabel(gen.hours[0]) + " → " + genFullLabel(gen.hours[gen.hours.length - 1]) + ")",
-      gen.granularity === "daily" ? "Total diario informado: " + Number(gen.total[0] || 0).toLocaleString("es-CL") + " GWh" : "Máximo de la ventana: " + Math.round(gen.total[peakIdx] || 0).toLocaleString("es-CL") + " MW a las " + genHourLabel(gen.hours[peakIdx]),
-      "Lectura del gráfico: cada barra apila la generación de todas las tecnologías de esa hora; la línea blanca punteada es el total del sistema.",
-      gen.granularity === "daily" ? "El endpoint reportes/v3/generation no entrega serie horaria ni centrales: solo clasificación diaria por tecnología." : "Los valores son potencias por hora (MW). La energía acumulada de las 24 h se reporta en GWh.",
+      gen.granularity === "annual-monthly" ? "Dato historico real mensual desde " + gen.hours[0] + " hasta " + gen.hours[gen.hours.length - 1] + "." : gen.granularity === "daily" ? "Dato informado: generación diaria por tecnología en GWh desde " + gen.hours[0] + " hasta " + gen.hours[gen.hours.length - 1] : "Ventana analizada: últimas " + gen.hours.length + " horas disponibles (" + genFullLabel(gen.hours[0]) + " → " + genFullLabel(gen.hours[gen.hours.length - 1]) + ")",
+      gen.granularity === "annual-monthly" ? "Máximo mensual neto: " + Number(gen.total[peakIdx] || 0).toLocaleString("es-CL") + " GWh en " + gen.hours[peakIdx] : gen.granularity === "daily" ? "Total diario informado: " + Number(gen.total[0] || 0).toLocaleString("es-CL") + " GWh" : "Máximo de la ventana: " + Math.round(gen.total[peakIdx] || 0).toLocaleString("es-CL") + " MW a las " + genHourLabel(gen.hours[peakIdx]),
+      gen.granularity === "annual-monthly" ? "BESS se separa por Subtipo: Inyeccion y Retiro conservan el signo real informado por CEN." : "Lectura del gráfico: cada barra apila la generación de todas las tecnologías de esa hora; la línea blanca punteada es el total del sistema.",
+      gen.granularity === "annual-monthly" ? "Los valores estan en GWh y provienen del CSV historico real descargado desde CEN/Qlik." : gen.granularity === "daily" ? "El endpoint reportes/v3/generation no entrega serie horaria ni centrales: solo clasificación diaria por tecnología." : "Los valores son potencias por hora (MW). La energía acumulada de las 24 h se reporta en GWh.",
     ];
     el.innerHTML = notes.map((n) => "<li class=\"flex gap-2\"><span class=\"text-primary\">•</span><span>" + escapeHtml(n) + "</span></li>").join("");
   }
   function renderGenerationView() {
-    const gen = dailyGenerationDataset(liveData.generacion) || (liveData.generacion && liveData.generacion.hours && liveData.generacion.hours.length ? liveData.generacion : null);
+    const gen = generationTechnologyDataset() || dailyGenerationDataset(liveData.generacion) || (liveData.generacion && liveData.generacion.hours && liveData.generacion.hours.length ? liveData.generacion : null);
     renderGenSource(gen);
     renderGenKpis(gen);
     renderGenShare(gen);
@@ -1908,6 +1943,10 @@
       if (score > best.score) best = { score, row };
     }
     return best.score >= 2 ? best.row : null;
+  }
+  function compactFlowHistoryFor(feature) {
+    const data = historyCache.flujos.get(monthKeyFromDate(analysisDateOrLive()));
+    return compactSeriesForFeature(data, "lines", feature);
   }
   function liveGenEntry(feature) {
     if (!feature || !liveData.genByPlant.size) return null;
@@ -3221,6 +3260,12 @@
 
   function flowsStatusText() {
     const total = grouped.lines.length;
+    const historical = historyCache.flujos.get(monthKeyFromDate(analysisDateOrLive()));
+    if (historical && Array.isArray(historical.lines) && historical.lines.length) {
+      const matched = grouped.lines.filter((line) => compactFlowHistoryFor(line)).length;
+      const hours = selectedDayHours(historical.hours || []);
+      return total + " lineas · potencia transitada historica real CEN/Qlik · " + matched + " lineas emparejadas · " + hours.length + " h fecha análisis";
+    }
     const matched = grouped.lines.filter((line) => liveFlowValue(line)).length;
     return liveData.flowRows.length
       ? total + " lineas · potencia transitada real CEN · " + matched + " lineas emparejadas" + (liveData.flowStale ? " · ultimo dato real disponible" : "")
@@ -3487,6 +3532,10 @@
     return "Demanda real estimada API del Coordinador (CEN): " + values.length + " h informadas, desde " + shortTimestampLabel(values[0].timestamp).full + " hasta " + shortTimestampLabel(values[values.length - 1].timestamp).full + "." + stale;
   }
   function flowsApiText() {
+    const date = analysisDateOrLive();
+    const historical = historyCache.flujos.get(monthKeyFromDate(date));
+    const hours = selectedDayHours(historical?.hours || []);
+    if (hours.length) return "Potencia transitada historica real CEN/Qlik: " + hours.length + " h informadas para " + date + ".";
     if (!liveData.flowRows.length) return "Potencia transitada: " + CEN_NOT_INFORMED + ".";
     const window = globalWindowText();
     return "Potencia transitada real API del Coordinador (CEN): " + liveData.flowRows.length + " lineas informadas" + (window ? " en ventana " + window : "") + (liveData.flowStale ? ". Ultimo dato real disponible." : ".");
@@ -3497,8 +3546,9 @@
     if (el) el.textContent = text;
   }
   function genNote() {
-    const gen = dailyGenerationDataset(liveData.generacion) || (liveData.generacion && liveData.generacion.hours && liveData.generacion.hours.length ? liveData.generacion : null);
+    const gen = generationTechnologyDataset() || dailyGenerationDataset(liveData.generacion) || (liveData.generacion && liveData.generacion.hours && liveData.generacion.hours.length ? liveData.generacion : null);
     if (gen) {
+      if (gen.granularity === "annual-monthly") return "Generacion historica real mensual CEN/Qlik desde " + gen.hours[0] + " hasta " + gen.hours[gen.hours.length - 1] + ". BESS separado por Subtipo Inyeccion/Retiro y signo real informado.";
       const file = gen.granularity === "daily" ? "generacion-real-last-24h.json" : "generacion-real-central-latest.json";
       return genApiText() + " Fuente: " + file + " · actualizado " + String(gen.updatedAt || "").slice(0, 16).replace("T", " ") + " UTC.";
     }
@@ -3542,8 +3592,10 @@
     if (gen2Date) gen2Date.textContent = text;
     const gen2Status = document.getElementById("map-status-gen2");
     if (gen2Status) gen2Status.textContent = statusText;
+    const flowHistorical = historyCache.flujos.get(monthKeyFromDate(analysisDateOrLive()));
+    const flowHours = selectedDayHours(flowHistorical?.hours || []);
     const flowsDate = document.getElementById("flow-date");
-    if (flowsDate) flowsDate.textContent = liveData.flowRows.length ? "Ventana CEN: " + (windowText || "—") + " · potencia transitada real" + (liveData.flowStale ? " · ultimo dato real disponible" : "") : "Datos: potencia transitada: " + CEN_NOT_INFORMED;
+    if (flowsDate) flowsDate.textContent = flowHours.length ? "Fecha análisis: " + analysisDateOrLive() + " · potencia transitada histórica real · " + flowHours.length + " h" : liveData.flowRows.length ? "Ventana CEN: " + (windowText || "—") + " · potencia transitada real" + (liveData.flowStale ? " · ultimo dato real disponible" : "") : "Datos: potencia transitada: " + CEN_NOT_INFORMED;
     const flowsStatus = document.getElementById("map-status-flows");
     if (flowsStatus) flowsStatus.textContent = flowsStatusText();
     renderSectionNotes();
@@ -3674,7 +3726,7 @@
     document.querySelector('[data-view="' + name + '"]')?.classList.add("nav-active");
 
     if (name === "gen2") {
-      loadGenerationData().then(() => {
+      ensureAnalysisHistory().then(() => loadGenerationData()).then(() => {
         if (!maps.gen2) initGen2Map();
         renderGenerationView();
         setTimeout(() => { resizeVisuals(); refreshAll(); }, 0);
@@ -3684,7 +3736,7 @@
     }
 
     if (name === "flows") {
-      loadFlowData().then(() => refreshAll());
+      ensureAnalysisHistory().then(() => loadFlowData()).then(() => refreshAll());
     }
 
     if (!maps[name]) initMap(name);

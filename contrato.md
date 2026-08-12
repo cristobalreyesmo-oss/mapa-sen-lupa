@@ -92,6 +92,10 @@ docs/data/history/generacion-tecnologia/YYYY.json
 docs/data/history/flujos/YYYY-MM.json
 ```
 
+Importadores locales para descargables reales CEN/Qlik:
+- `scripts/import-generacion-historica-real.mjs`: lee CSV ancho diario de generacion real, publica historico horario mensual por central y agregado mensual anual por tecnologia. La columna `Subtipo` separa BESS `Inyeccion` y `Retiro`; se conserva el signo real informado en el CSV.
+- `scripts/import-potencia-transitada-historica-real.mjs`: lee CSV historico de potencia transitada por tramo/linea, publica historico horario mensual de flujos.
+
 ## Estructura Objetivo de la Pagina
 
 ### Overview
@@ -228,6 +232,8 @@ Nota: `npm test` puede fallar localmente si falta `vinext`.
 - Selector de fecha de analisis existe en la UI actual, pero la estructura debe reorganizarse segun este contrato antes de profundizar ETL.
 - Historico CMg compacto parcial existe para agosto 2026.
 - Generacion historica y flujos historicos estan preparados conceptualmente, pero falta ETL desde descargables oficiales CEN/Qlik porque API SIP ha devuelto `502`.
+- Generacion historica real 2026 ya puede importarse desde `docs/data/generacion historica real/*.csv` hacia `docs/data/history/generacion/` y `docs/data/history/generacion-tecnologia/`.
+- Potencia transitada historica real 2026 ya puede importarse desde `docs/data/potencia transitada por lineas historico real/*.csv` hacia `docs/data/history/flujos/`.
 - Se identificaron fuentes oficiales alternativas:
   - CMg definitivo desde `https://www.coordinador.cl/costos-marginales/`.
   - Generacion real desde pagina CEN/Qlik de generacion real.
