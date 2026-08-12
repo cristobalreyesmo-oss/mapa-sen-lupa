@@ -25,6 +25,10 @@ on:
         description: "Paginas maximas por dia"
         required: false
         default: "6"
+      start_page:
+        description: "Pagina inicial API"
+        required: false
+        default: "0"
 
 concurrency:
   group: backfill-cen-history
@@ -54,6 +58,7 @@ jobs:
           CEN_BACKFILL_END_DATE: ${{ github.event.inputs.end_date }}
           CEN_BACKFILL_LIMIT: ${{ github.event.inputs.limit }}
           CEN_BACKFILL_MAX_PAGES: ${{ github.event.inputs.max_pages }}
+          CEN_BACKFILL_START_PAGE: ${{ github.event.inputs.start_page }}
         run: node scripts/backfill-cen-history.mjs
 
       - name: Commit historico actualizado

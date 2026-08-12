@@ -15,6 +15,7 @@ const datasets = (process.env.CEN_BACKFILL_DATASETS || "cmg-real")
   .filter(Boolean);
 const limit = Math.max(100, Math.min(2000, Number(process.env.CEN_BACKFILL_LIMIT || 1000)));
 const maxPages = Math.max(1, Math.min(50, Number(process.env.CEN_BACKFILL_MAX_PAGES || 20)));
+const startPage = Math.max(0, Number(process.env.CEN_BACKFILL_START_PAGE || 0));
 
 const configs = {
   "cmg-real": { path: "/costo-marginal-real/v4/findByDate", query: { type: "DEFINITIVO", limit }, normalize: normalizeCmg, historyId: "cmg" },
@@ -39,7 +40,7 @@ for (const id of datasets) {
   for (const date of dateList(startDate, endDate)) {
     try {
       const result = await requestDay(config, date);
-      attempts.push(result.error ? { date, rows: result.rows.length, partial: true, error: result.error } : { date, rows: result.rows.length });
+      attempts.push(result.error ? { date, startPage: result.startPage, rows: result.rows.length, partial: true, error: result.error } : { date, startPage: result.startPage, rows: result.rows.length });
       rows.push(...result.rows);
       await delay(900);
     } catch (error) {
@@ -64,7 +65,7 @@ console.log(JSON.stringify(run, null, 2));
 
 async function requestDay(config, date) {
   const rows = [];
-  for (let page = 0; page < maxPages; page += 1) {
+  for (let page = startPage; page < startPage + maxPages; page += 1) {
     const url = new URL(baseUrl + config.path);
     url.searchParams.set("startDate", date);
     url.searchParams.set("endDate", date);
@@ -90,7 +91,7 @@ async function requestDay(config, date) {
     if (!Number.isFinite(totalPages) && pageRows.length < limit) break;
     await delay(500);
   }
-  return { rows };
+  return { rows, startPage };
 }
 
 function normalizeCmg(rows) {
