@@ -12,6 +12,25 @@ Regla principal: no se muestran datos simulados. Si CEN/API/descargables oficial
 - Sitio: `https://cristobalreyesmo-oss.github.io/mapa-sen-lupa/`
 - HTML publicado unico: `docs/index.html`
 - `docs/indexv2.html` fue eliminado por redundante.
+- GitHub Pages: branch `main`, carpeta `/docs` (build automatico en cada push; no hay workflow de deploy propio).
+
+### Comando de deploy (desde `C:\Visual SEN`)
+
+```bash
+npm run static:build:v2      # regenera docs/index.html + docs/data/sen-data.json
+```
+
+El repo remoto se actualiza clonando en temporal, copiando `docs/` (build v2) y `contrato.md`, y haciendo commit + push a `main`:
+
+```bash
+gh repo clone cristobalreyesmo-oss/mapa-sen-lupa $env:TEMP\sen-deploy
+# copiar docs/ y contrato.md desde el workspace al clone
+cd $env:TEMP\sen-deploy
+git add -A && git commit -m "Desplegar build v2"
+git push origin main
+```
+
+Nota: `C:\Visual SEN` no es repo git; el control de versiones vive solo en GitHub. Los workflows `update-cen-data.yml` y `backfill-cen-history.yml` hacen commit directo desde el runner de Actions.
 
 ## Principios de Diseno
 
@@ -19,7 +38,8 @@ Regla principal: no se muestran datos simulados. Si CEN/API/descargables oficial
 - Mantener MapLibre GL JS, Turf.js y ECharts lazy.
 - Mantener mapas grandes, panel lateral compacto y comportamiento responsive movil en una sola pagina.
 - El mapa debe venir centrado en el SEN por defecto. El boton `Centrar en SEN` puede mantenerse como accion de recuperacion, pero no debe ser necesario para iniciar el analisis.
-- Reemplazar filtros sueltos de `HORA` por controles de `FECHA DE ANALISIS` y, cuando corresponda, ventana temporal. La hora solo debe existir si es necesaria dentro de una fecha/ventana seleccionada.
+- Reemplazar filtros sueltos de `HORA` por controles de `FECHA DE ANALISIS` con rango `DESDE`/`HASTA` en formato calendario nativo (`type="date"`) y, cuando corresponda, ventana temporal. La hora solo debe existir si es necesaria dentro de una fecha/ventana seleccionada.
+- El rango `DESDE`/`HASTA` aplica a todos los datasets historicos bajo demanda: se cargan todos los meses del rango y se fusionan en una ventana continua; los mapas y KPIs que muestran un snapshot usan la fecha `HASTA` como fecha de analisis.
 - KISS: primero estructura clara y datos compactos; evitar llamadas CEN desde navegador; evitar graficos pesados al inicio; cargar historicos solo bajo demanda.
 
 ## Reglas de Datos Reales
@@ -217,6 +237,7 @@ Mantener:
 - Builder alias: `work/build-static-map-v2.mjs`, tambien escribe solo `docs/index.html`.
 - `docs/.nojekyll` debe existir.
 - MapLibre, Turf y ECharts se sirven desde `docs/vendor/`.
+- `sen-data.json` (modelo KMZ) NO va inline en el HTML: el builder lo publica en `docs/data/sen-data.json` y el navegador lo descarga con `fetch` async para no bloquear el primer render. Mantener el HTML publicado por debajo de ~300 KB.
 
 Comandos utiles:
 
@@ -242,6 +263,11 @@ Nota: `npm test` puede fallar localmente si falta `vinext`.
 
 - `docs/index.html` es unico HTML publicado.
 - La UI ya fue reorganizada inicialmente por secciones: Overview topologico, Generacion, Costos Marginales y Transmision.
+- Los filtros de fecha son rango `DESDE`/`HASTA` con calendario nativo en las 4 secciones; cargan todos los meses del rango y fusionan horas/valores en `mergedHistoryFor(dataset)`.
+- BESS se muestra como tecnologia unica neta (no como subtipo Inyeccion/Retiro); el retiro se visualiza como generacion negativa (barras bajo cero) en el grafico de generacion. Los datos ya estan netos: `generacion-tecnologia/YYYY.json` tiene una sola serie BESS con signo real (ej. -30.923 GWh en 2026-01).
+- `sen-data.json` se publica en `docs/data/sen-data.json` y se carga async; `docs/index.html` paso de ~1.4 MB a ~0.24 MB.
+- `fetchJson` usa `fetch(path)` sin `cache: no-store`: el navegador respeta el `max-age=600` + ETag que GitHub Pages sirve, cacheando `sen-data.json` y `history/*.json` entre visitas.
+- Desplegado en GitHub Pages: build v2 en `main`/`docs` (HTML ~255 KB + `sen-data.json` externo).
 - Historico CMg compacto parcial existe para agosto 2026.
 - Generacion historica real 2026 ya esta importada desde `docs/data/generacion historica real/*.csv` hacia `docs/data/history/generacion/` y `docs/data/history/generacion-tecnologia/`. BESS esta modelada como serie neta unica, no separada en Inyeccion/Retiro.
 - Potencia transitada historica real 2026 ya esta importada desde `docs/data/potencia transitada por lineas historico real/*.csv` hacia `docs/data/history/flujos/` para enero-junio 2026.
@@ -253,7 +279,7 @@ Nota: `npm test` puede fallar localmente si falta `vinext`.
 
 ## Proximo Orden de Trabajo
 
-1. Validar fluidez en navegador y reducir cargas iniciales si algun JSON mensual sigue afectando interaccion.
+1. Validar en navegador los filtros `DESDE`/`HASTA` multi-mes y el merge continuo (especialmente flujos enero-junio y generacion enero-agosto).
 2. Validar en navegador el cruce central-generacion-CMg para fechas 2026 con historico real mensual.
 3. Mejorar matching de nombres entre lineas del modelo SEN y tramos Qlik si hay lineas sin emparejar.
 4. Incorporar CMg definitivo descargable desde `https://www.coordinador.cl/costos-marginales/` para reemplazar/fortalecer el respaldo API.
