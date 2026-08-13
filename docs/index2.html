@@ -8,7 +8,7 @@
   } catch (e) {
     document.documentElement.className = "dark";
   }
-  window.SEN_BUILD_OPTIONS = {"lastDay":true};
+  window.SEN_BUILD_OPTIONS = {"lastDay":true,"catalog":false};
 </script>
 <head>
 <meta charset="utf-8"/>
@@ -1316,6 +1316,7 @@
   const layers = { lines: true, substations: true, plants: true, bess: true };
   const voltages = { "500": true, "220": true, "154": true };
   const liveData = { status: null, cmgOnline: new Map(), cmgRows: [], cmgHistory: new Map(), cmgHours: [], cmgStale: false, demanda: null, flows: new Map(), flowRows: [], flowStale: false, generacion: null, genByPlant: new Map(), genRows: [], genHours: [], genStale: false, loaded: false, generationLoaded: false, flowsLoaded: false, matchedFeatures: 0 };
+  const catalog = { enabled: Boolean(window.SEN_BUILD_OPTIONS?.catalog), loaded: false, centralsByKey: new Map(), substationsByKey: new Map(), subsByConnexion: new Map() };
   let echartsReady = null;
   let points = [];
   let substations = [];
@@ -2644,7 +2645,8 @@
       '<div class="popup-foot">Capacidad instalada: ' + installedCapacityLabel(feature) + '</div>' +
       '<div class="popup-row"><span class="popup-dot" style="background:#2b90e2"></span>' + (Number.isFinite(Number(mw)) ? Math.round(mw).toLocaleString("en-US") : CEN_NOT_INFORMED) + ' <span class="unit">MWh fecha</span></div>' +
       '<div class="popup-flow-row"><span class="popup-dot" style="background:#f97316"></span>' + (Number.isFinite(avg) ? avg.toLocaleString("en-US") : CEN_NOT_INFORMED) + ' <span class="unit">USD/MWh promedio rango</span></div>' +
-      '<div class="popup-foot">CMg hora visible: ' + (Number.isFinite(c) ? c.toLocaleString("en-US") + " USD/MWh" : CEN_NOT_INFORMED) + '</div>';
+      '<div class="popup-foot">CMg hora visible: ' + (Number.isFinite(c) ? c.toLocaleString("en-US") + " USD/MWh" : CEN_NOT_INFORMED) + '</div>' +
+      catalogHtml(feature);
     el.hidden = false;
     positionLensPopup(feature);
   }
@@ -2686,6 +2688,7 @@
       '<div class="popup-row"><span class="popup-dot" style="background:' + technologyColor(feature) + '"></span>' + (Number.isFinite(Number(mw)) ? Math.round(mw).toLocaleString("en-US") : CEN_NOT_INFORMED) + ' <span class="unit">MWh fecha</span></div>' +
       '<div class="popup-flow-row">' + (Number.isFinite(avg) ? avg : CEN_NOT_INFORMED) + ' <span class="unit">USD/MWh promedio rango</span></div>' +
       '<div class="popup-foot">CMg hora visible: ' + (Number.isFinite(c) ? c + " USD/MWh" : CEN_NOT_INFORMED) + '</div>' +
+      catalogHtml(feature) +
       '<div class="popup-foot">lat ' + feature.lat.toFixed(4) + ' · lon ' + feature.lon.toFixed(4) + '</div>';
   }
   function showGen2PointPopup(feature) {
@@ -2704,7 +2707,18 @@
     }
     const mw = genEnergy24(feature);
     document.getElementById("node-name-gen2").textContent = feature.name;
-    document.getElementById("node-meta-gen2").textContent = featureText(feature) + " · " + (gen2TypeOf(feature) || "nodo") + " · lat " + feature.lat.toFixed(4) + ", lon " + feature.lon.toFixed(4);
+    const metaParts = [featureText(feature) + " · " + (gen2TypeOf(feature) || "nodo") + " · lat " + feature.lat.toFixed(4) + ", lon " + feature.lon.toFixed(4)];
+    if (catalog.enabled && feature.cat) {
+      const cat = feature.cat;
+      if (Number.isFinite(cat.capacidadMw)) metaParts.push("Potencia neta: " + Number(cat.capacidadMw).toLocaleString("en-US") + " MW");
+      if (cat.propietario) metaParts.push("Propietario: " + cat.propietario);
+      if (cat.estado) metaParts.push("Estado: " + cat.estado);
+      if (cat.comuna && cat.region) metaParts.push(cat.comuna + " · " + cat.region);
+      if (cat.fechaOperacion) metaParts.push("Operación: " + cat.fechaOperacion);
+      if (cat.subName) metaParts.push("Conectada a: " + cat.subName);
+      if (Array.isArray(cat.centralNames)) metaParts.push("Centrales conectadas: " + cat.centralNames.join(", "));
+    }
+    document.getElementById("node-meta-gen2").textContent = metaParts.join(" · ");
     const cmgValue = cmg(feature, hour);
     document.getElementById("node-gen-gen2").textContent = Number.isFinite(Number(mw)) ? Math.round(mw).toLocaleString("en-US") : CEN_NOT_INFORMED;
     document.getElementById("node-cmg-gen2").textContent = Number.isFinite(cmgValue) ? cmgValue.toLocaleString("en-US") : CEN_NOT_INFORMED;
@@ -3237,6 +3251,20 @@
     return Math.round(total);
   }
 
+  function catalogHtml(feature) {
+    if (!catalog.enabled || !feature.cat) return "";
+    const cat = feature.cat;
+    const rows = [];
+    if (Number.isFinite(cat.capacidadMw)) rows.push("<div class=\"popup-foot\">Potencia neta: " + Number(cat.capacidadMw).toLocaleString("en-US") + " MW</div>");
+    if (cat.propietario) rows.push("<div class=\"popup-foot\">Propietario: " + escapeHtml(cat.propietario) + "</div>");
+    if (cat.estado) rows.push("<div class=\"popup-foot\">Estado: " + escapeHtml(cat.estado) + "</div>");
+    if (cat.comuna && cat.region) rows.push("<div class=\"popup-foot\">" + escapeHtml(cat.comuna) + " · " + escapeHtml(cat.region) + "</div>");
+    if (cat.fechaOperacion) rows.push("<div class=\"popup-foot\">Operación: " + escapeHtml(cat.fechaOperacion) + "</div>");
+    if (cat.nemotecnico) rows.push("<div class=\"popup-foot\">Nemotécnico: " + escapeHtml(cat.nemotecnico) + "</div>");
+    if (cat.subName) rows.push("<div class=\"popup-foot\">Conectada a: " + escapeHtml(cat.subName) + "</div>");
+    if (Array.isArray(cat.centralNames)) rows.push("<div class=\"popup-foot\">Centrales conectadas: " + escapeHtml(cat.centralNames.join(", ")) + "</div>");
+    return rows.join("");
+  }
   function pointPopupHtml(feature) {
     const kind = featureText(feature);
     const kicker = kind === "Subestación" ? "Nodo · Subestación" : kind;
@@ -3246,6 +3274,7 @@
       '<div class="popup-title">' + feature.name + '</div>' +
       '<div class="popup-foot">Tensión: ' + voltageLabel(feature) + '</div>' +
       '<div class="popup-row"><span class="popup-dot" style="background:' + dotColor + '"></span>' + (Number.isFinite(value) ? value : CEN_NOT_INFORMED) + ' <span class="unit">USD/MWh</span></div>' +
+      catalogHtml(feature) +
       '<div class="popup-foot">lat ' + feature.lat.toFixed(4) + ' · lon ' + feature.lon.toFixed(4) + ' · ' + formatHour(hour) + '</div>';
   }
 
@@ -3258,6 +3287,7 @@
       '<div class="popup-row"><span class="popup-dot" style="background:' + topologyPointProperties(feature).color + '"></span>' + escapeHtml(tech) + '</div>' +
       '<div class="popup-foot">Tensión: ' + voltageLabel(feature) + '</div>' +
       cap +
+      catalogHtml(feature) +
       '<div class="popup-foot">lat ' + feature.lat.toFixed(4) + ' · lon ' + feature.lon.toFixed(4) + '</div>';
   }
 
@@ -3992,6 +4022,67 @@
     if (maps.gen2) updateGen2MapData();
     renderGen2Ranking();
   }
+  async function loadCatalogData() {
+    if (!catalog.enabled || catalog.loaded) return;
+    try {
+      const [centrales, subestaciones] = await Promise.all([
+        fetchJson("./data/catalog/centrales.json"),
+        fetchJson("./data/catalog/subestaciones.json"),
+      ]);
+      if (!Array.isArray(centrales) || !Array.isArray(subestaciones)) return;
+      const centralsByKey = new Map();
+      const subsByKey = new Map();
+      centrales.forEach((r) => { const k = normalizeKey(r.nombre); if (k) centralsByKey.set(k, r); });
+      subestaciones.forEach((r) => { const k = normalizeKey(r.nombre); if (k) subsByKey.set(k, r); });
+      catalog.centralsByKey = centralsByKey;
+      catalog.substationsByKey = subsByKey;
+      const subsModel = substations.filter((f) => f.name);
+      const subsModelKeys = subsModel.map((f) => normalizeKey(f.name));
+      const subsModelTokens = subsModel.map((f) => keyTokens(f.name));
+      const subsMatchedNames = new Map();
+      for (const r of centrales) {
+        if (!r.conexion) continue;
+        const target = matchCatalogName(r.conexion, subsModelKeys, subsModelTokens);
+        if (target >= 0) subsMatchedNames.set(r, subsModel[target].name);
+      }
+      const centralNamesBySub = new Map();
+      for (const [r, subName] of subsMatchedNames) {
+        if (!centralNamesBySub.has(subName)) centralNamesBySub.set(subName, []);
+        centralNamesBySub.get(subName).push(r.nombre);
+      }
+      points.forEach((feature) => {
+        const layer = layerOf(feature);
+        const rec = layer === "substation"
+          ? subsByKey.get(normalizeKey(feature.name))
+          : centralsByKey.get(normalizeKey(feature.name));
+        if (!rec) return;
+        feature.cat = rec;
+        if (layer !== "substation" && subsMatchedNames.has(rec)) feature.cat.subName = subsMatchedNames.get(rec);
+      });
+      substations.forEach((feature) => {
+        const names = centralNamesBySub.get(feature.name);
+        if (names && names.length) feature.cat = { ...(feature.cat || {}), centralNames: names };
+      });
+      catalog.loaded = true;
+    } catch (error) {
+      // catalogo es opcional: si falla, la pagina funciona igual
+    }
+  }
+  function matchCatalogName(query, keys, tokensList) {
+    const exact = keys.indexOf(normalizeKey(query));
+    if (exact >= 0) return exact;
+    const qt = keyTokens(query);
+    if (!qt.length) return -1;
+    let best = { score: 0, index: -1 };
+    for (let i = 0; i < tokensList.length; i += 1) {
+      const st = tokensList[i];
+      if (!st.length) continue;
+      let score = 0;
+      for (const t of qt) if (st.includes(t)) score += 1;
+      if (score > best.score) best = { score, index: i };
+    }
+    return best.score >= 2 ? best.index : -1;
+  }
   async function loadLiveData() {
     try {
       const [status, cmgReal, demanda] = await Promise.all([
@@ -4080,6 +4171,7 @@
     setInterval(tickClock, 1000);
     switchView("overview");
     loadLiveData();
+    loadCatalogData();
   }
   boot();
 
