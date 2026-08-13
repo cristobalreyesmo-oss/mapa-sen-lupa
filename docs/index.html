@@ -789,21 +789,67 @@
   <section id="view-gen2" class="view hidden">
     <header class="mb-4">
       <h1 class="text-headline-md font-display text-on-surface mb-1">Generación</h1>
-      <p class="text-body-md text-secondary">Generación real por central/tecnología y CMg asociado al nodo para la fecha de análisis.</p>
+      <p class="text-body-md text-secondary">Generación real histórica mensual por tecnología, mapa de generación por nodo y top de centrales para la fecha de análisis.</p>
       <div id="gen2-date" class="text-caption font-label-mono text-primary mt-1">Datos: —</div>
     </header>
     <div class="grid grid-cols-4 md:grid-cols-12 gap-gutter">
-      <div class="col-span-4 md:col-span-4 bg-surface-container-lowest swiss-border p-2">
-        <div class="text-label-mono text-secondary mb-1 uppercase tracking-widest swiss-border-b pb-1">Generación 24 h</div>
-        <div class="flex items-baseline gap-2"><span id="k2-gen-now" class="text-headline-lg text-on-surface tracking-tighter">—</span><span class="text-caption text-secondary">MWh</span></div>
+      <div class="col-span-4 md:col-span-12 mt-gutter">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
+          <h2 class="text-headline-md font-display text-on-surface">Generación por Tecnología</h2>
+        </div>
+        <p class="text-body-md text-secondary">Generación real histórica mensual por tecnología, informada por CEN/Qlik.</p>
+        <div id="gen-source" class="text-caption font-label-mono text-primary mt-1">Datos: —</div>
       </div>
-      <div class="col-span-4 md:col-span-4 bg-surface-container-lowest swiss-border p-2">
-        <div class="text-label-mono text-secondary mb-1 uppercase tracking-widest swiss-border-b pb-1">Pico 24 h</div>
-        <div class="flex items-baseline gap-2"><span id="k2-gen-peak" class="text-headline-lg text-on-surface tracking-tighter">—</span><span class="text-caption text-secondary">MW</span></div>
+      <div class="col-span-4 md:col-span-3 bg-surface-container-lowest swiss-border p-3 flex flex-col">
+        <div class="text-label-mono text-secondary mb-2 uppercase tracking-widest swiss-border-b pb-1">Energía del periodo</div>
+        <div class="flex items-baseline gap-2 mb-2">
+          <span id="kpi-gen-energy" class="text-headline-lg text-on-surface tracking-tighter">—</span>
+          <span class="text-caption text-secondary">GWh</span>
+        </div>
+        <div id="kpi-gen-energy-note" class="text-caption text-secondary mt-auto">—</div>
       </div>
-      <div class="col-span-4 md:col-span-4 bg-surface-container-lowest swiss-border p-2">
-        <div class="text-label-mono text-secondary mb-1 uppercase tracking-widest swiss-border-b pb-1">CMg Promedio</div>
-        <div class="flex items-baseline gap-2"><span id="k2-cmg-avg" class="text-headline-lg text-on-surface tracking-tighter">—</span><span class="text-caption text-secondary">USD/MWh</span></div>
+      <div class="col-span-4 md:col-span-3 bg-surface-container-lowest swiss-border p-3 flex flex-col">
+        <div class="text-label-mono text-secondary mb-2 uppercase tracking-widest swiss-border-b pb-1">Mes Pico</div>
+        <div class="flex items-baseline gap-2 mb-2">
+          <span id="kpi-gen-peak" class="text-headline-lg text-on-surface tracking-tighter">—</span>
+          <span class="text-caption text-secondary">GWh</span>
+        </div>
+        <div id="kpi-gen-peak-note" class="text-caption text-secondary mt-auto">—</div>
+      </div>
+      <div class="col-span-4 md:col-span-3 bg-surface-container-lowest swiss-border p-3 flex flex-col">
+        <div class="text-label-mono text-secondary mb-2 uppercase tracking-widest swiss-border-b pb-1">Tecnología Dominante</div>
+        <div id="kpi-gen-dominant" class="text-headline-md text-on-surface font-bold mt-auto">—</div>
+        <div id="kpi-gen-dominant-note" class="text-caption text-secondary mt-2">—</div>
+      </div>
+      <div class="col-span-4 md:col-span-3 bg-surface-container-lowest swiss-border p-3 flex flex-col">
+        <div class="text-label-mono text-secondary mb-2 uppercase tracking-widest swiss-border-b pb-1">Fuentes con Datos</div>
+        <div class="flex items-baseline gap-2 mb-2">
+          <span id="kpi-gen-sources" class="text-headline-lg text-on-surface tracking-tighter">—</span>
+          <span class="text-caption text-secondary">tecnologías</span>
+        </div>
+        <div id="kpi-gen-sources-note" class="text-caption text-secondary mt-auto">—</div>
+      </div>
+      <div class="col-span-4 md:col-span-12 bg-surface-container-lowest swiss-border p-3 mt-gutter">
+        <div class="flex flex-wrap justify-between items-center swiss-border-b pb-2 mb-2 gap-3">
+          <div>
+            <div class="text-headline-md text-on-surface">Generación Mensual por Tecnología</div>
+            <div class="text-caption font-label-mono text-secondary mt-1">Barras por tecnología con el total mensual informado por CEN</div>
+          </div>
+          <div id="gen-chart-meta" class="text-caption font-label-mono text-secondary">Dato real CEN</div>
+        </div>
+        <div id="gen-chart" class="w-full" style="height: 380px"></div>
+      </div>
+      <div class="col-span-4 md:col-span-6 bg-surface-container-lowest swiss-border p-3 mt-gutter">
+        <div class="text-label-mono text-secondary uppercase tracking-widest swiss-border-b pb-1 mb-2">Participación por Tecnología</div>
+        <div id="gen-share" class="flex flex-col gap-3"></div>
+      </div>
+      <div class="col-span-4 md:col-span-6 bg-surface-container-lowest swiss-border p-3 mt-gutter">
+        <div class="text-label-mono text-secondary uppercase tracking-widest swiss-border-b pb-1 mb-2">Notas y Fuente</div>
+        <ul id="gen-notes" class="text-caption text-secondary space-y-3"></ul>
+      </div>
+      <div class="col-span-4 md:col-span-12 data-note" role="note">
+        <span class="material-symbols-outlined data-note-icon">info</span>
+        <div><span class="data-note-label">Fuente de datos: </span><span id="note-generation"></span></div>
       </div>
       <div class="col-span-4 md:col-span-12 bg-surface-container-lowest swiss-border p-3 mt-gutter">
         <div class="flex flex-wrap justify-between items-start gap-3 swiss-border-b pb-2 mb-3">
@@ -897,65 +943,6 @@
           <div id="gen2-ranking-status" class="text-caption font-label-mono text-secondary mt-1"></div>
         </div>
         <div id="gen2-ranking" class="p-3 grid grid-cols-1 md:grid-cols-2 gap-3"></div>
-      </div>
-      <div class="col-span-4 md:col-span-12 mt-gutter">
-        <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
-          <h2 class="text-headline-md font-display text-on-surface">Generación por Tecnología</h2>
-          <label class="flex items-center gap-2 text-label-mono text-secondary">VENTANA<select id="gen-days-select" class="glass-ctrl px-2 py-1 text-label-mono text-on-surface focus:border-primary"><option value="1">1 día</option><option value="2">2 días</option><option value="3">3 días</option><option value="4">4 días</option><option value="5">5 días</option><option value="6">6 días</option><option value="7" selected>7 días</option></select></label>
-        </div>
-        <p class="text-body-md text-secondary">Mezcla de generación real informada por CEN/Operación, desglosada por tecnología.</p>
-        <div id="gen-source" class="text-caption font-label-mono text-primary mt-1">Datos: —</div>
-      </div>
-      <div class="col-span-4 md:col-span-3 bg-surface-container-lowest swiss-border p-3 flex flex-col">
-        <div class="text-label-mono text-secondary mb-2 uppercase tracking-widest swiss-border-b pb-1">Energía · 24 h</div>
-        <div class="flex items-baseline gap-2 mb-2">
-          <span id="kpi-gen-energy" class="text-headline-lg text-on-surface tracking-tighter">—</span>
-          <span class="text-caption text-secondary">GWh</span>
-        </div>
-        <div id="kpi-gen-energy-note" class="text-caption text-secondary mt-auto">—</div>
-      </div>
-      <div class="col-span-4 md:col-span-3 bg-surface-container-lowest swiss-border p-3 flex flex-col">
-        <div class="text-label-mono text-secondary mb-2 uppercase tracking-widest swiss-border-b pb-1">Pico de Generación</div>
-        <div class="flex items-baseline gap-2 mb-2">
-          <span id="kpi-gen-peak" class="text-headline-lg text-on-surface tracking-tighter">—</span>
-          <span class="text-caption text-secondary">MW</span>
-        </div>
-        <div id="kpi-gen-peak-note" class="text-caption text-secondary mt-auto">—</div>
-      </div>
-      <div class="col-span-4 md:col-span-3 bg-surface-container-lowest swiss-border p-3 flex flex-col">
-        <div class="text-label-mono text-secondary mb-2 uppercase tracking-widest swiss-border-b pb-1">Tecnología Dominante</div>
-        <div id="kpi-gen-dominant" class="text-headline-md text-on-surface font-bold mt-auto">—</div>
-        <div id="kpi-gen-dominant-note" class="text-caption text-secondary mt-2">—</div>
-      </div>
-      <div class="col-span-4 md:col-span-3 bg-surface-container-lowest swiss-border p-3 flex flex-col">
-        <div class="text-label-mono text-secondary mb-2 uppercase tracking-widest swiss-border-b pb-1">Fuentes con Datos</div>
-        <div class="flex items-baseline gap-2 mb-2">
-          <span id="kpi-gen-sources" class="text-headline-lg text-on-surface tracking-tighter">—</span>
-          <span class="text-caption text-secondary">tecnologías</span>
-        </div>
-        <div id="kpi-gen-sources-note" class="text-caption text-secondary mt-auto">—</div>
-      </div>
-      <div class="col-span-4 md:col-span-12 bg-surface-container-lowest swiss-border p-3 mt-gutter">
-        <div class="flex flex-wrap justify-between items-center swiss-border-b pb-2 mb-2 gap-3">
-          <div>
-            <div class="text-headline-md text-on-surface">Mezcla Horaria de Generación</div>
-            <div class="text-caption font-label-mono text-secondary mt-1">Barras por tecnología con el total informado por CEN</div>
-          </div>
-          <div id="gen-chart-meta" class="text-caption font-label-mono text-secondary">Dato real CEN</div>
-        </div>
-        <div id="gen-chart" class="w-full" style="height: 380px"></div>
-      </div>
-      <div class="col-span-4 md:col-span-6 bg-surface-container-lowest swiss-border p-3 mt-gutter">
-        <div class="text-label-mono text-secondary uppercase tracking-widest swiss-border-b pb-1 mb-2">Participación por Tecnología</div>
-        <div id="gen-share" class="flex flex-col gap-3"></div>
-      </div>
-      <div class="col-span-4 md:col-span-6 bg-surface-container-lowest swiss-border p-3 mt-gutter">
-        <div class="text-label-mono text-secondary uppercase tracking-widest swiss-border-b pb-1 mb-2">Notas y Fuente</div>
-        <ul id="gen-notes" class="text-caption text-secondary space-y-3"></ul>
-      </div>
-      <div class="col-span-4 md:col-span-12 data-note" role="note">
-        <span class="material-symbols-outlined data-note-icon">info</span>
-        <div><span class="data-note-label">Fuente de datos: </span><span id="note-generation"></span></div>
       </div>
     </div>
     <div class="data-note" role="note">
@@ -1676,23 +1663,32 @@
     historyCache.generacionTecnologia.set(y, data || null);
     return data || null;
   }
+  async function ensureFlowsHistory() {
+    const manifest = await fetchJson("./data/history/manifest.json");
+    const months = (manifest?.datasets?.flujos?.months || []).map((m) => m.month).filter(Boolean);
+    return Promise.all(months.map((month) => loadHistoryDataset("flujos", month + "-01")));
+  }
+  function flowsAvailableRange() {
+    const hours = [];
+    historyCache.flujos.forEach((data) => {
+      if (data && Array.isArray(data.hours)) hours.push(...data.hours);
+    });
+    const sorted = [...new Set(hours)].sort();
+    return sorted.length ? { min: String(sorted[0]).slice(0, 10), max: String(sorted[sorted.length - 1]).slice(0, 10) } : null;
+  }
   function generationTechnologyDataset() {
     const year = String(analysisDateOrLive() || "").slice(0, 4);
     const data = historyCache.generacionTecnologia.get(year);
     if (!data || !Array.isArray(data.hours) || !Array.isArray(data.series)) return null;
-    const monthSet = analysisFrom || analysisTo ? new Set(rangeMonthKeys()) : null;
-    const keepIdx = monthSet ? data.hours.map((month, i) => (monthSet.has(String(month).slice(0, 7)) ? i : -1)).filter((i) => i >= 0) : null;
-    const hours = keepIdx && keepIdx.length ? keepIdx.map((i) => data.hours[i]) : data.hours;
-    const series = data.series.map((row) => ({ technology: row.technology, subtype: row.subtype || "", values: keepIdx && keepIdx.length ? keepIdx.map((i) => row.values[i]) : (row.values || []) }));
     return {
       schema: data.schema,
       source: data.source,
       generatedAt: data.generatedAt,
       granularity: "annual-monthly",
       unit: data.unit || "GWh",
-      hours,
-      series,
-      total: keepIdx && keepIdx.length ? hours.map((_, i) => series.reduce((sum, row) => sum + (Number(row.values?.[i]) || 0), 0)) : (Array.isArray(data.total) ? data.total : data.hours.map((_, i) => data.series.reduce((sum, row) => sum + (Number(row.values?.[i]) || 0), 0))),
+      hours: data.hours,
+      series: data.series.map((row) => ({ technology: row.technology, subtype: row.subtype || "", values: row.values || [] })),
+      total: Array.isArray(data.total) ? data.total : data.hours.map((_, i) => data.series.reduce((sum, row) => sum + (Number(row.values?.[i]) || 0), 0)),
       bessRule: data.bessRule || "",
     };
   }
@@ -2082,10 +2078,6 @@
     const m = String(timestamp || "").match(/(\d{4})-(\d{2})-(\d{2})[T\s](\d{2})/);
     return m ? { date: m[3] + "/" + m[2], hour: m[4] + "h", full: m[3] + "/" + m[2] + " " + m[4] + ":00 UTC" } : { date: "", hour: String(timestamp || ""), full: String(timestamp || "") };
   }
-  function avgCmg() {
-    const values = points.filter((f) => layerOf(f) === "substation").map((f) => cmg(f, hour)).filter(Number.isFinite);
-    return values.length ? Math.round(values.reduce((a, b) => a + b, 0) / values.length) : NaN;
-  }
   function cmgSeries(feature) {
     const compact = compactCmgHistoryFor(feature);
     if (compact) {
@@ -2364,7 +2356,6 @@
       setLayerVisibility(map);
       requestAnimationFrame(() => map.resize());
       updateGen2MapData();
-      renderGen2Kpis();
       renderGen2Ranking();
     });
     ["sen-substations", "sen-plants", "sen-bess"].forEach((layerId) => {
@@ -2740,7 +2731,6 @@
     renderGenFilter();
     if (gen2Selected && !genPassesFilter(gen2Selected)) gen2Selected = null;
     updateGen2MapData();
-    renderGen2Kpis();
     renderGen2Ranking();
     if (gen2Selected) renderGen2Detail(gen2Selected);
     else renderGen2Detail(null);
@@ -2784,20 +2774,6 @@
     updateMapData(maps.overview, "overview");
     renderKPIs();
     refreshPopup("overview");
-  }
-  function renderGen2Kpis() {
-    const cmgAvg = avgCmg();
-    const visible = filteredGenUnits().map((feature) => genEnergy24(feature)).filter(Number.isFinite);
-    const currentTotal = visible.reduce((sum, value) => sum + Number(value), 0);
-    const hourlyTotals = liveData.genHours.map((timestamp) => filteredGenUnits().reduce((sum, feature) => {
-      const entry = genEntry(feature);
-      const point = entry?.values?.find((item) => item.timestamp === timestamp);
-      return sum + (Number.isFinite(Number(point?.value)) ? Number(point.value) : 0);
-    }, 0));
-    const peak = hourlyTotals.length ? Math.max(...hourlyTotals) : NaN;
-    document.getElementById("k2-gen-now").textContent = visible.length ? Math.round(currentTotal).toLocaleString("en-US") : CEN_NOT_INFORMED;
-    document.getElementById("k2-gen-peak").textContent = Number.isFinite(peak) && peak > 0 ? Math.round(peak).toLocaleString("en-US") : CEN_NOT_INFORMED;
-    document.getElementById("k2-cmg-avg").textContent = Number.isFinite(cmgAvg) ? Math.round(cmgAvg).toLocaleString("en-US") : CEN_NOT_INFORMED;
   }
   function renderGen2Ranking() {
     const status = document.getElementById("gen2-ranking-status");
@@ -3670,7 +3646,9 @@
     const flowHistorical = mergedHistoryFor("flujos");
     const flowHours = selectedDayHours(flowHistorical?.hours || []);
     const flowsDate = document.getElementById("flow-date");
-    if (flowsDate) flowsDate.textContent = flowHours.length ? "Fecha análisis: " + analysisDateOrLive() + " · potencia transitada histórica real · " + flowHours.length + " h" : liveData.flowRows.length ? "Ventana CEN: " + (windowText || "—") + " · potencia transitada real" + (liveData.flowStale ? " · ultimo dato real disponible" : "") : "Datos: potencia transitada: " + CEN_NOT_INFORMED;
+    const flowRange = flowsAvailableRange();
+    const flowAvailableText = flowRange ? "Fechas disponibles: " + flowRange.min + " → " + flowRange.max + " (histórico real CEN/Qlik)" : (liveData.flowRows.length ? "Fechas disponibles: ventana CEN " + (windowText || "—") : "Fechas disponibles: " + CEN_NOT_INFORMED);
+    if (flowsDate) flowsDate.textContent = flowHours.length ? flowAvailableText + " · fecha análisis " + analysisDateOrLive() + " · " + flowHours.length + " h" : flowAvailableText + (liveData.flowRows.length && !flowRange ? (liveData.flowStale ? " · ultimo dato real disponible" : "") : "");
     const flowsStatus = document.getElementById("map-status-flows");
     if (flowsStatus) flowsStatus.textContent = flowsStatusText();
     renderSectionNotes();
@@ -3692,7 +3670,6 @@
     }
     renderOverviewTechFilter();
     renderGlobalLegends();
-    renderGen2Kpis();
     renderGen2Ranking();
     if (currentView === "gen2") renderGenerationView();
     renderKPIs();
@@ -3814,7 +3791,16 @@
     }
 
     if (name === "flows") {
-      ensureHistoryFor("flujos").then(() => loadFlowData()).then(() => refreshAll());
+      ensureFlowsHistory().then(() => ensureHistoryFor("flujos")).then(() => loadFlowData()).then(() => {
+        const range = flowsAvailableRange();
+        if (range) {
+          const fromInput = document.getElementById("analysis-from-flows");
+          const toInput = document.getElementById("analysis-to-flows");
+          if (fromInput) { fromInput.min = range.min; fromInput.max = range.max; }
+          if (toInput) { toInput.min = range.min; toInput.max = range.max; }
+        }
+        refreshAll();
+      });
     }
 
     if (!maps[name]) initMap(name);
@@ -3884,7 +3870,6 @@
     ingestGenerationData(generacion, centrales, generacionDiaria);
     renderGenFilter();
     if (maps.gen2) updateGen2MapData();
-    renderGen2Kpis();
     renderGen2Ranking();
   }
   async function loadLiveData() {
@@ -4067,10 +4052,6 @@
     applyGenFilter();
   });
   document.getElementById("gen-filter-reset").addEventListener("click", () => resetGenFilter(false));
-  document.getElementById("gen-days-select").addEventListener("change", (event) => {
-    genDays = Math.max(1, Math.min(7, Number(event.target.value) || 7));
-    renderGenerationView();
-  });
 
   document.getElementById("overview-tech-all")?.addEventListener("click", () => {
     overviewFilter.techs.clear();

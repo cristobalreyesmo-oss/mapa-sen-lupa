@@ -156,10 +156,12 @@ No debe priorizar:
 
 Rol: analisis historico real de generacion y captura de precios por generador/nodo.
 
-Parte superior:
-- Generacion historica real anual por tecnologia.
-- Participacion anualizada por tecnologia, similar al componente actual de share, pero ubicada arriba.
-- KPIs anuales por tecnologia cuando exista data real.
+Orden de la seccion (parte superior):
+- Bloque "Generacion por Tecnologia" primero, con datos mensuales reales de los 12 meses del ano (`generacion-tecnologia/YYYY.json`), grafico apilado mensual, participacion por tecnologia y KPIs del periodo mensual (Energia del periodo, Mes Pico, Tecnologia Dominante, Fuentes con Datos).
+- El bloque de tecnologia NO usa selector de dias ni etiquetas horarias: es historico mensual real.
+- No existen KPIs de "Generacion 24 h", "Pico 24 h" ni "CMg Promedio" globales al inicio de la seccion; fueron eliminados.
+- Luego el mapa de generacion por nodo (filtros de tecnologia, central, tension y nodo).
+- Al final "Top Centrales en Generacion" (ranking de centrales por MWh en la fecha de analisis).
 
 Mapa y filtros:
 - Mapa con centrales, nodos/subestaciones y lineas del sistema.
@@ -214,6 +216,7 @@ Debe mostrar:
 - Detalle de linea: flujo, capacidad de transporte a `35°C`, porcentaje de cargabilidad y estado.
 - Popup de linea: nivel de tension, longitud aproximada, capacidad de transporte a `35°C`, flujo real cuando exista y cargabilidad.
 - Para fecha de analisis dentro de la ultima semana, la vista debe preferir `docs/data/history/flujos/YYYY-MM.json` antes que datos live; fuera de esa ventana no hay historico (retencion ultima semana) y se muestra `En Desarrollo` o el dato live disponible.
+- La seccion Transmision debe indicar SIEMPRE cuales son las fechas disponibles: el rotulo `flow-date` del header muestra "Fechas disponibles: {min} → {max}" derivado de las horas de flujos historicos cargados (`manifest.json` lista los meses existentes; se cargan al entrar a la vista), junto al contexto de la fecha de analisis (`N h` historicas), la ventana CEN live o `En Desarrollo` si no hay dato. Los inputs `DESDE`/`HASTA` de flujos se restringen a ese rango disponible.
 
 Mantener:
 - Concepto actual de cargabilidad: `flujo / limite`.
@@ -275,6 +278,9 @@ Nota: `npm test` puede fallar localmente si falta `vinext`.
 - Generacion historica real 2026-01 a 2026-08 importada desde CSVs hacia `docs/data/history/generacion/` y `docs/data/history/generacion-tecnologia/`; desde ahora la fuente preferente es backfill API CEN con retencion de 12 meses. BESS esta modelada como serie neta unica, no separada en Inyeccion/Retiro.
 - Potencia transitada historica real enero-junio 2026 importada desde CSVs hacia `docs/data/history/flujos/`; la retencion actual conserva solo la ultima semana (se prunaron los meses anteriores).
 - `mergedHistoryFor(dataset)` fue optimizado de O(n²) a O(n) usando Maps de indices, reduciendo el costo de fusionar multiples meses (generacion ~1187 centrales x ~744 h x N meses).
+- La seccion Generacion fue reordenada segun el contrato: el bloque "Generacion por Tecnologia" (mensual real, 12 meses) quedo arriba, se eliminaron los KPIs globales de "Generacion 24 h", "Pico 24 h" y "CMg Promedio", y el bloque se desacoplo del selector de dias (sin etiquetas horarias). `generationTechnologyDataset()` ya no filtra por mes de analisis: muestra el ano completo.
+- La seccion Transmision indica SIEMPRE las fechas disponibles en `flow-date` ("Fechas disponibles: min → max"), cargando los meses de flujos listados en `manifest.json` al entrar a la vista y restringiendo los inputs `DESDE`/`HASTA` al rango disponible (ultima semana).
+- Cuando un dato no existe, la UI muestra exactamente `En Desarrollo` (constante `CEN_NOT_INFORMED`), reemplazando el texto anterior "CEN no ha informado esta informacion".
 - La carpeta de potencia transitada contiene CSV real aunque originalmente se esperaba XLSX; mantener CSV como fuente preferente KISS cuando este disponible.
 - Se identificaron fuentes oficiales alternativas:
   - CMg definitivo desde `https://www.coordinador.cl/costos-marginales/`.
