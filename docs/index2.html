@@ -9,6 +9,7 @@
     document.documentElement.className = "dark";
   }
   window.SEN_BUILD_OPTIONS = {"lastDay":true,"catalog":false};
+  window.SEN_CATALOG = null;
 </script>
 <head>
 <meta charset="utf-8"/>
@@ -4024,12 +4025,24 @@
   }
   async function loadCatalogData() {
     if (!catalog.enabled || catalog.loaded) return;
-    try {
-      const [centrales, subestaciones] = await Promise.all([
-        fetchJson("./data/catalog/centrales.json"),
-        fetchJson("./data/catalog/subestaciones.json"),
-      ]);
-      if (!Array.isArray(centrales) || !Array.isArray(subestaciones)) return;
+    let centrales = null;
+    let subestaciones = null;
+    if (window.SEN_CATALOG) {
+      centrales = window.SEN_CATALOG.centrales;
+      subestaciones = window.SEN_CATALOG.subestaciones;
+    } else {
+      try {
+        const fetched = await Promise.all([
+          fetchJson("./data/catalog/centrales.json"),
+          fetchJson("./data/catalog/subestaciones.json"),
+        ]);
+        centrales = fetched[0];
+        subestaciones = fetched[1];
+      } catch (error) {
+        // catalogo es opcional: si falla, la pagina funciona igual
+      }
+    }
+    if (!Array.isArray(centrales) || !Array.isArray(subestaciones)) return;
       const centralsByKey = new Map();
       const subsByKey = new Map();
       centrales.forEach((r) => { const k = normalizeKey(r.nombre); if (k) centralsByKey.set(k, r); });
@@ -4064,9 +4077,6 @@
         if (names && names.length) feature.cat = { ...(feature.cat || {}), centralNames: names };
       });
       catalog.loaded = true;
-    } catch (error) {
-      // catalogo es opcional: si falla, la pagina funciona igual
-    }
   }
   function matchCatalogName(query, keys, tokensList) {
     const exact = keys.indexOf(normalizeKey(query));
