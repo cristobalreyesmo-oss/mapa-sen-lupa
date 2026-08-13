@@ -117,10 +117,12 @@ Importadores locales para descargables reales CEN/Qlik:
 - `scripts/import-potencia-transitada-historica-real.mjs`: lee CSV historico de potencia transitada desde `docs/data/potencia transitada por lineas historico real/`, publica historico horario mensual de flujos por tramo/linea.
 
 Datos historicos reales publicados actualmente:
-- Generacion real por central: `docs/data/history/generacion/2026-01.json` a `2026-08.json`.
+- Generacion real por central: `docs/data/history/generacion/2026-01.json` a `2026-08.json` (historico completo).
 - Generacion real por tecnologia/subtipo: `docs/data/history/generacion-tecnologia/2026.json`.
-- Potencia transitada por linea: `docs/data/history/flujos/2026-01.json` a `2026-06.json`.
-- CMg compacto parcial: `docs/data/history/cmg/2026-08.json`.
+- Potencia transitada por linea: `docs/data/history/flujos/2026-06.json` (solo el ultimo mes para mantener la pagina liviana).
+- CMg compacto: `docs/data/history/cmg/2026-05.json` a `2026-07.json` (ultimos 3 meses con dato DEFINITIVO disponible; agosto aun sin publicar por CEN).
+
+Regla de retencion de historico: para mantener el despliegue liviano, CMg conserva los ultimos 3 meses con dato DEFINITIVO disponible y flujos el ultimo mes; generacion se mantiene completa. Ajustar al hacer backfill nuevo.
 
 ## Estructura Objetivo de la Pagina
 
@@ -268,7 +270,7 @@ Nota: `npm test` puede fallar localmente si falta `vinext`.
 - `sen-data.json` se publica en `docs/data/sen-data.json` y se carga async; `docs/index.html` paso de ~1.4 MB a ~0.24 MB.
 - `fetchJson` usa `fetch(path)` sin `cache: no-store`: el navegador respeta el `max-age=600` + ETag que GitHub Pages sirve, cacheando `sen-data.json` y `history/*.json` entre visitas.
 - Desplegado en GitHub Pages: build v2 en `main`/`docs` (HTML ~255 KB + `sen-data.json` externo).
-- Historico CMg compacto parcial existe para agosto 2026.
+- Historico CMg compacto para mayo, junio y julio 2026 (ultimos 3 meses con dato DEFINITIVO; agosto aun sin publicar por CEN).
 - Generacion historica real 2026 ya esta importada desde `docs/data/generacion historica real/*.csv` hacia `docs/data/history/generacion/` y `docs/data/history/generacion-tecnologia/`. BESS esta modelada como serie neta unica, no separada en Inyeccion/Retiro.
 - Potencia transitada historica real 2026 ya esta importada desde `docs/data/potencia transitada por lineas historico real/*.csv` hacia `docs/data/history/flujos/` para enero-junio 2026.
 - La carpeta de potencia transitada contiene CSV real aunque originalmente se esperaba XLSX; mantener CSV como fuente preferente KISS cuando este disponible.
