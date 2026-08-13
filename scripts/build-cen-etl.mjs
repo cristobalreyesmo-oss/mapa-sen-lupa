@@ -16,12 +16,14 @@ const generacionCentral = readJson(path.join(dataDir, "generacion-real-central-l
 const generacionDiaria = readJson(path.join(dataDir, "generacion-real-last-24h.json"));
 const flujos = readJson(path.join(dataDir, "potencia-transitada-latest.json"));
 
-const manifest = {
+const manifest = readJson(path.join(historyDir, "manifest.json")) || {
   schema: "sen-etl-manifest-v1",
   generatedAt: new Date().toISOString(),
   window: status.globalWindow || { startDate: status.startDate || "", endDate: status.endDate || "" },
   datasets: {},
 };
+manifest.generatedAt = new Date().toISOString();
+manifest.window = status.globalWindow || { startDate: status.startDate || "", endDate: status.endDate || "" };
 
 buildStatus();
 buildCmg();
