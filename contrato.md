@@ -4,7 +4,7 @@
 
 Construir una pagina web estatica y liviana para explorar el Sistema Electrico Nacional de Chile con datos reales del Coordinador Electrico Nacional (CEN). La pagina debe separar claramente topologia, generacion, costos marginales y transmision, manteniendo el diseno actual y evitando mezclar indicadores sin contexto.
 
-Regla principal: no se muestran datos simulados. Si CEN/API/descargables oficiales no entregan una informacion, la UI debe mostrar exactamente `CEN no ha informado esta información`.
+Regla principal: no se muestran datos simulados. Si CEN/API/descargables oficiales no entregan una informacion, la UI debe mostrar exactamente `En Desarrollo`.
 
 ## URL y Deploy
 
@@ -49,9 +49,9 @@ Nota: `C:\Visual SEN` no es repo git; el control de versiones vive solo en GitHu
 - No interpolar, no rellenar horas faltantes, no inventar centrales, nodos, flujos, CMg, capacidades instaladas ni capacidades de transporte.
 - Si una actualizacion falla (`429`, `404`, timeout, `502`) y existe ultimo dato real bueno, se conserva como `stale: true` y se rotula `ultimo dato real disponible`.
 - Cada dataset debe conservar trazabilidad: fuente, fecha/rango, formato original y timestamp de actualizacion.
-- La capacidad instalada de centrales/BESS solo se muestra si existe fuente real CEN/catalogo oficial. Si falta, usar `CEN no ha informado esta información`.
+- La capacidad instalada de centrales/BESS solo se muestra si existe fuente real CEN/catalogo oficial. Si falta, usar `En Desarrollo`.
 - La capacidad de transporte de lineas a `35°C` se toma desde `public/linea-limites.json`, campo `c35` o `limit` cuando `primaryRating` sea `c35`.
-- El nivel de tension de lineas y subestaciones/nodos debe venir del modelo, nombre/carpeta o dataset real. Si no se puede determinar de forma trazable, usar `CEN no ha informado esta información`.
+- El nivel de tension de lineas y subestaciones/nodos debe venir del modelo, nombre/carpeta o dataset real. Si no se puede determinar de forma trazable, usar `En Desarrollo`.
 
 ## Reglas Visuales Transversales
 
@@ -73,7 +73,8 @@ Nota: `C:\Visual SEN` no es repo git; el control de versiones vive solo en GitHu
 
 ### Generacion
 
-- Fuente objetivo: descargables oficiales CEN/Qlik de `Generacion Real`:
+- Fuente objetivo: API CEN `generacion-real` via backfill (`scripts/backfill-cen-history.mjs`), con retencion de ultimos 12 meses.
+- Descargables oficiales CEN/Qlik de `Generacion Real` como respaldo:
   - ERNC horaria por central.
   - Generacion real mensual por tecnologia.
   - Generacion real horaria por tecnologia.
@@ -117,12 +118,12 @@ Importadores locales para descargables reales CEN/Qlik:
 - `scripts/import-potencia-transitada-historica-real.mjs`: lee CSV historico de potencia transitada desde `docs/data/potencia transitada por lineas historico real/`, publica historico horario mensual de flujos por tramo/linea.
 
 Datos historicos reales publicados actualmente:
-- Generacion real por central: `docs/data/history/generacion/2026-01.json` a `2026-08.json` (historico completo).
+- Generacion real por central: `docs/data/history/generacion/` desde backfill API CEN, retencion ultimos 12 meses.
 - Generacion real por tecnologia/subtipo: `docs/data/history/generacion-tecnologia/2026.json`.
-- Potencia transitada por linea: `docs/data/history/flujos/2026-06.json` (solo el ultimo mes para mantener la pagina liviana).
+- Potencia transitada por linea: `docs/data/history/flujos/` solo la ultima semana (se prunan los meses anteriores para mantener la pagina liviana).
 - CMg compacto: `docs/data/history/cmg/2026-05.json` a `2026-07.json` (ultimos 3 meses con dato DEFINITIVO disponible; agosto aun sin publicar por CEN).
 
-Regla de retencion de historico: para mantener el despliegue liviano, CMg conserva los ultimos 3 meses con dato DEFINITIVO disponible y flujos el ultimo mes; generacion se mantiene completa. Ajustar al hacer backfill nuevo.
+Regla de retencion de historico: para mantener el despliegue liviano, CMg conserva los ultimos 3 meses con dato DEFINITIVO disponible, generacion los ultimos 12 meses desde la API CEN y flujos solo la ultima semana. El backfill y los importadores deben prunar archivos fuera de estas ventanas. Ajustar al hacer backfill nuevo.
 
 ## Estructura Objetivo de la Pagina
 
@@ -177,7 +178,7 @@ Graficos de analisis:
 - Para la misma fecha/ventana seleccionada, mostrar generacion real y CMg en el mismo grafico cuando ambos existan.
 - El cruce debe ser por timestamp real, no por posicion de array.
 - Cross-filtering: seleccionar central, tecnologia, nodo o tension debe actualizar los graficos relacionados sin recargar toda la pagina.
-- Si falta generacion o CMg real para el cruce, mostrar `CEN no ha informado esta información` para la serie faltante.
+- Si falta generacion o CMg real para el cruce, mostrar `En Desarrollo` para la serie faltante.
 - BESS no debe mostrarse como dos tecnologias separadas. Debe ser una sola serie/central neta `BESS`, donde la inyeccion aparece positiva y el retiro aparece negativo segun el signo real informado por CEN/Qlik.
 - Para rendimiento, la UI no debe cargar generacion mensual pesada ni flujos historicos al iniciar. Debe cargar solo el historico necesario para la seccion activa: CMg en Costos Marginales, generacion en Generacion, flujos en Transmision, y `generacion-tecnologia/YYYY.json` como agregado liviano.
 
@@ -212,7 +213,7 @@ Debe mostrar:
 - Ranking de mayor cargabilidad.
 - Detalle de linea: flujo, capacidad de transporte a `35°C`, porcentaje de cargabilidad y estado.
 - Popup de linea: nivel de tension, longitud aproximada, capacidad de transporte a `35°C`, flujo real cuando exista y cargabilidad.
-- Para fecha de analisis 2026-01 a 2026-06, la vista debe preferir `docs/data/history/flujos/YYYY-MM.json` antes que datos live.
+- Para fecha de analisis dentro de la ultima semana, la vista debe preferir `docs/data/history/flujos/YYYY-MM.json` antes que datos live; fuera de esa ventana no hay historico (retencion ultima semana) y se muestra `En Desarrollo` o el dato live disponible.
 
 Mantener:
 - Concepto actual de cargabilidad: `flujo / limite`.
@@ -271,8 +272,9 @@ Nota: `npm test` puede fallar localmente si falta `vinext`.
 - `fetchJson` usa `fetch(path)` sin `cache: no-store`: el navegador respeta el `max-age=600` + ETag que GitHub Pages sirve, cacheando `sen-data.json` y `history/*.json` entre visitas.
 - Desplegado en GitHub Pages: build v2 en `main`/`docs` (HTML ~255 KB + `sen-data.json` externo).
 - Historico CMg compacto para mayo, junio y julio 2026 (ultimos 3 meses con dato DEFINITIVO; agosto aun sin publicar por CEN).
-- Generacion historica real 2026 ya esta importada desde `docs/data/generacion historica real/*.csv` hacia `docs/data/history/generacion/` y `docs/data/history/generacion-tecnologia/`. BESS esta modelada como serie neta unica, no separada en Inyeccion/Retiro.
-- Potencia transitada historica real 2026 ya esta importada desde `docs/data/potencia transitada por lineas historico real/*.csv` hacia `docs/data/history/flujos/` para enero-junio 2026.
+- Generacion historica real 2026-01 a 2026-08 importada desde CSVs hacia `docs/data/history/generacion/` y `docs/data/history/generacion-tecnologia/`; desde ahora la fuente preferente es backfill API CEN con retencion de 12 meses. BESS esta modelada como serie neta unica, no separada en Inyeccion/Retiro.
+- Potencia transitada historica real enero-junio 2026 importada desde CSVs hacia `docs/data/history/flujos/`; la retencion actual conserva solo la ultima semana (se prunaron los meses anteriores).
+- `mergedHistoryFor(dataset)` fue optimizado de O(n²) a O(n) usando Maps de indices, reduciendo el costo de fusionar multiples meses (generacion ~1187 centrales x ~744 h x N meses).
 - La carpeta de potencia transitada contiene CSV real aunque originalmente se esperaba XLSX; mantener CSV como fuente preferente KISS cuando este disponible.
 - Se identificaron fuentes oficiales alternativas:
   - CMg definitivo desde `https://www.coordinador.cl/costos-marginales/`.
@@ -281,9 +283,10 @@ Nota: `npm test` puede fallar localmente si falta `vinext`.
 
 ## Proximo Orden de Trabajo
 
-1. Validar en navegador los filtros `DESDE`/`HASTA` multi-mes y el merge continuo (especialmente flujos enero-junio y generacion enero-agosto).
-2. Validar en navegador el cruce central-generacion-CMg para fechas 2026 con historico real mensual.
+1. Validar en navegador los filtros `DESDE`/`HASTA` multi-mes y el merge continuo (flujos ultima semana y generacion ultimos 12 meses desde API).
+2. Validar en navegador el cruce central-generacion-CMg para fechas con historico real mensual.
 3. Mejorar matching de nombres entre lineas del modelo SEN y tramos Qlik si hay lineas sin emparejar.
 4. Incorporar CMg definitivo descargable desde `https://www.coordinador.cl/costos-marginales/` para reemplazar/fortalecer el respaldo API.
 5. Automatizar importadores de descargables reales cuando exista una ruta estable y liviana, manteniendo JSON compactos.
-6. Buscar fuente real de capacidad instalada de centrales/BESS; hasta entonces mostrar `CEN no ha informado esta información`.
+6. Buscar fuente real de capacidad instalada de centrales/BESS; hasta entonces mostrar `En Desarrollo`.
+7. Completar backfill de generacion real desde API CEN para cubrir la ventana de 12 meses (2025-09 a 2026-08).

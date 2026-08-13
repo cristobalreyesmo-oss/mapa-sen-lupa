@@ -1349,7 +1349,7 @@
   let gen2ChartHoverKey = "";
   const genFilter = { techs: new Set(), plants: new Set(), query: "" };
   const overviewFilter = { techs: new Set() };
-  const CEN_NOT_INFORMED = "CEN no ha informado esta información";
+  const CEN_NOT_INFORMED = "En Desarrollo";
   let genDays = 7;
   let analysisFrom = "";
   let analysisTo = "";
@@ -1628,13 +1628,17 @@
         datas.forEach((d) => (d[entityKey] || []).forEach((row) => {
           if (!seen.has(row.key)) { seen.add(row.key); entities.push(row); }
         }));
+        const indexByDataset = datas.map((d) => ({
+          entity: new Map((d[entityKey] || []).map((row, i) => [row.key, i])),
+          hour: new Map((d.hours || []).map((h, i) => [h, i])),
+        }));
         const values = entities.map((entity) => hours.map((h) => {
-          for (const d of datas) {
-            const idx = d[entityKey].findIndex((row) => row.key === entity.key);
-            if (idx >= 0) {
-              const hi = d.hours.indexOf(h);
-              if (hi >= 0) return d.values[idx][hi];
-            }
+          for (let di = 0; di < datas.length; di += 1) {
+            const idx = indexByDataset[di].entity.get(entity.key);
+            if (idx === undefined) continue;
+            const hi = indexByDataset[di].hour.get(h);
+            if (hi === undefined) continue;
+            return datas[di].values[idx][hi];
           }
           return undefined;
         }));
