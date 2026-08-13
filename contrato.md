@@ -16,6 +16,20 @@ Regla principal: no se muestran datos simulados. Si CEN/API/descargables oficial
 - `docs/index3.html`: variante A/B de informacion (flag `{ lastDay: true, catalog: true }`). Igual que `index2` pero enriquece popups y panel lateral con el catalogo Infotecnica (capacidad neta, propietario, estado, comuna/region, fecha operacion, nemotecnico) y el vinculo central↔subestacion. Sirve para medir si "mas info disponible" mejora la pagina contra `index2`; si gana, se mergea a index/index2 y se elimina.
 - GitHub Pages: branch `main`, carpeta `/docs` (build automatico en cada push; no hay workflow de deploy propio).
 
+### Respaldo del estado bueno
+
+El estado aprobado como "bueno" (index/index2 + fix de rendimiento + catalogo Infotecnica + index3) esta respaldado en el tag inmutable `respaldo-bueno-2026-08-13` (apuntando a `28c8f17` de `main`). Los tags no los toca el cron ni los deploys.
+
+Restauracion si una prueba sale mal:
+
+```bash
+git checkout respaldo-bueno-2026-08-13 -- docs/ contrato.md
+git commit -m "Restaurar estado bueno desde respaldo-bueno-2026-08-13"
+git push origin main
+```
+
+`index3.html` es una PRUEBA A/B de informacion: el estado bueno respaldado incluye tanto index/index2 (que ya estan buenos) como index3 (prueba). Quitar index3 del deploy no borra el respaldo; index3 se puede eliminar de `docs/` en un futuro deploy sin afectar el tag.
+
 ### Comando de deploy (desde `C:\Visual SEN`)
 
 ```bash
