@@ -1713,6 +1713,39 @@
     };
   }
   const seriesMatchCache = new WeakMap();
+  const seriesIndexCache = new WeakMap();
+  function entityAliasIndex(data, entityKey) {
+    let byEntity = seriesIndexCache.get(data);
+    if (!byEntity) {
+      byEntity = new Map();
+      seriesIndexCache.set(data, byEntity);
+    }
+    if (byEntity.has(entityKey)) return byEntity.get(entityKey);
+    const exact = new Map();
+    const tokens = new Map();
+    const tokenless = [];
+    for (let i = 0; i < (data[entityKey] || []).length; i += 1) {
+      const row = data[entityKey][i] || {};
+      const aliases = [row.key, row.name, ...(row.aliases || [])].map(normalizeKey).filter(Boolean);
+      let hasToken = false;
+      const seen = new Set();
+      aliases.forEach((alias) => {
+        if (alias && !exact.has(alias)) exact.set(alias, i);
+        const ks = keyTokens(alias);
+        if (ks.length) hasToken = true;
+        ks.forEach((token) => {
+          if (seen.has(token)) return;
+          seen.add(token);
+          if (!tokens.has(token)) tokens.set(token, new Set());
+          tokens.get(token).add(i);
+        });
+      });
+      if (!hasToken) tokenless.push(i);
+    }
+    const index = { exact, tokens, tokenless };
+    byEntity.set(entityKey, index);
+    return index;
+  }
   function compactSeriesForFeature(data, entityKey, feature) {
     if (!data || !Array.isArray(data.hours) || !Array.isArray(data[entityKey]) || !Array.isArray(data.values)) return null;
     let byFeature = seriesMatchCache.get(data);
@@ -1725,18 +1758,31 @@
       const index = byFeature.get(featureKey);
       return index === -1 ? null : { hours: data.hours, values: data.values[index] || [], meta: data[entityKey][index] };
     }
+    const index = entityAliasIndex(data, entityKey);
     const candidates = [feature.name, normalizeKey(feature.name), ...keyTokens(feature.name)];
-    let best = { score: 0, index: -1 };
-    for (let i = 0; i < data[entityKey].length; i += 1) {
-      const row = data[entityKey][i] || {};
-      const aliases = [row.key, row.name, ...(row.aliases || [])].map(normalizeKey).filter(Boolean);
-      if (aliases.some((alias) => candidates.some((candidate) => normalizeKey(candidate) === alias))) {
-        byFeature.set(featureKey, i);
-        return { hours: data.hours, values: data.values[i] || [], meta: row };
-      }
-      const score = Math.max(0, ...aliases.flatMap((alias) => candidates.map((candidate) => matchScore(normalizeKey(candidate), alias))));
-      if (score > best.score) best = { score, index: i };
+    let exactBest = Infinity;
+    for (const candidate of candidates) {
+      const exactIndex = index.exact.get(normalizeKey(candidate));
+      if (exactIndex !== undefined && exactIndex < exactBest) exactBest = exactIndex;
     }
+    if (exactBest !== Infinity) {
+      byFeature.set(featureKey, exactBest);
+      return { hours: data.hours, values: data.values[exactBest] || [], meta: data[entityKey][exactBest] };
+    }
+    const candTokens = new Set(candidates.flatMap(keyTokens));
+    const candidateIndices = new Set();
+    candTokens.forEach((token) => {
+      const set = index.tokens.get(token);
+      if (set) set.forEach((i) => candidateIndices.add(i));
+    });
+    index.tokenless.forEach((i) => candidateIndices.add(i));
+    let best = { score: 0, index: -1 };
+    candidateIndices.forEach((i) => {
+      const aliases = (data[entityKey][i] || {});
+      const aliasList = [aliases.key, aliases.name, ...(aliases.aliases || [])].map(normalizeKey).filter(Boolean);
+      const score = Math.max(0, ...aliasList.flatMap((alias) => candidates.map((candidate) => matchScore(normalizeKey(candidate), alias))));
+      if (score > best.score) best = { score, index: i };
+    });
     byFeature.set(featureKey, best.index);
     return best.score >= 2 && best.index >= 0 ? { hours: data.hours, values: data.values[best.index] || [], meta: data[entityKey][best.index] } : null;
   }
@@ -2013,13 +2059,43 @@
     if (!key) return NaN;
     if (liveData.cmgOnline.has(key)) return liveData.cmgOnline.get(key).value;
     const compact = key.replace(/\b\d{2,3}\b/g, "").trim();
+    const query = compact || key;
+    const index = liveAliasIndex(liveData.cmgOnline);
     let best = { score: 0, value: NaN };
-    for (const [barKey, row] of liveData.cmgOnline) {
-      if (compact && (barKey.includes(compact) || compact.includes(barKey))) return row.value;
-      const score = matchScore(compact || key, barKey);
-      if (score > best.score) best = { score, value: row.value };
+    for (const barKey of index.fuzzyKeys(query)) {
+      const score = matchScore(query, barKey);
+      if (score > best.score) best = { score, value: liveData.cmgOnline.get(barKey).value };
     }
     return best.score >= 2 ? best.value : NaN;
+  }
+  const liveIndexCache = new WeakMap();
+  function liveAliasIndex(map) {
+    let index = liveIndexCache.get(map);
+    if (!index) {
+      const exact = new Map();
+      const tokens = new Map();
+      map.forEach((entry, alias) => {
+        if (alias && !exact.has(alias)) exact.set(alias, entry);
+        keyTokens(alias).forEach((token) => {
+          if (!tokens.has(token)) tokens.set(token, new Set());
+          tokens.get(token).add(alias);
+        });
+      });
+      index = {
+        exact,
+        fuzzyKeys(query) {
+          const queryTokens = keyTokens(query);
+          const candidateKeys = new Set();
+          queryTokens.forEach((token) => {
+            const set = tokens.get(token);
+            if (set) set.forEach((key) => candidateKeys.add(key));
+          });
+          return candidateKeys;
+        },
+      };
+      liveIndexCache.set(map, index);
+    }
+    return index;
   }
   function cmgHistoryFor(feature) {
     if (!feature || !liveData.cmgHistory.size) return null;
@@ -2029,7 +2105,11 @@
       const direct = liveData.cmgHistory.get(normalizeKey(candidate));
       if (direct) return direct;
     }
-    for (const [alias, entry] of liveData.cmgHistory.entries()) {
+    const index = liveAliasIndex(liveData.cmgHistory);
+    const candidateKeys = new Set(candidates.flatMap((candidate) => [...index.fuzzyKeys(candidate)]));
+    for (const alias of candidateKeys) {
+      const entry = liveData.cmgHistory.get(alias);
+      if (!entry) continue;
       const score = Math.max(...candidates.map((candidate) => matchScore(normalizeKey(candidate), alias)));
       if (score > best.score) best = { score, entry };
     }
@@ -2045,11 +2125,12 @@
     if (!key) return null;
     if (liveData.flows.has(key)) return liveData.flows.get(key);
     const compact = key.replace(/\b\d{2,3}\b/g, "").trim();
+    const query = compact || key;
+    const index = liveAliasIndex(liveData.flows);
     let best = { score: 0, row: null };
-    for (const [lineKey, row] of liveData.flows) {
-      if (compact && (lineKey.includes(compact) || compact.includes(lineKey))) return row;
-      const score = matchScore(compact || key, lineKey);
-      if (score > best.score) best = { score, row };
+    for (const lineKey of index.fuzzyKeys(query)) {
+      const score = matchScore(query, lineKey);
+      if (score > best.score) best = { score, row: liveData.flows.get(lineKey) };
     }
     return best.score >= 2 ? best.row : null;
   }
@@ -2063,11 +2144,12 @@
     if (!key) return null;
     if (liveData.genByPlant.has(key)) return liveData.genByPlant.get(key);
     const compact = key.replace(/\b\d{2,3}\b/g, "").trim();
+    const query = compact || key;
+    const index = liveAliasIndex(liveData.genByPlant);
     let best = { score: 0, row: null };
-    for (const [plantKey, row] of liveData.genByPlant) {
-      if (compact && (plantKey.includes(compact) || compact.includes(plantKey))) return row;
-      const score = matchScore(compact || key, plantKey);
-      if (score > best.score) best = { score, row };
+    for (const plantKey of index.fuzzyKeys(query)) {
+      const score = matchScore(query, plantKey);
+      if (score > best.score) best = { score, row: liveData.genByPlant.get(plantKey) };
     }
     return best.score >= 2 ? best.row : null;
   }

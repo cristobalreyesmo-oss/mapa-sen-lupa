@@ -1,14 +1,14 @@
 {
   "id": "centrales",
   "ok": false,
-  "updatedAt": "2026-08-13T19:17:23.531Z",
-  "error": "502 Bad Gateway {\"message\": \"Internal server error\"}",
+  "updatedAt": "2026-08-12T16:38:42.637Z",
+  "error": "403 Forbidden Authentication parameters missing",
   "attempts": [
     {
       "path": "/centrales/v4/findByDate",
-      "startDate": "2026-08-07",
-      "endDate": "2026-08-13",
-      "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
+      "startDate": "2026-08-12",
+      "endDate": "2026-08-12",
+      "error": "403 Forbidden Authentication parameters missing"
     }
   ],
   "records": []
