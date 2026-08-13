@@ -12,6 +12,7 @@ Regla principal: no se muestran datos simulados. Si CEN/API/descargables oficial
 - Sitio: `https://cristobalreyesmo-oss.github.io/mapa-sen-lupa/`
 - HTML publicado unico: `docs/index.html`
 - `docs/indexv2.html` fue eliminado por redundante.
+- `docs/index2.html`: variante A/B "ultimo dia" (misma plantilla con flag `lastDay`), generada por `build-static-map-v2.mjs`; cada seccion se auto-limita a su ultimo dia con datos para comparar rendimiento/simplicidad contra `index.html`. Ambos conviven en `main` hasta decidir el ganador.
 - GitHub Pages: branch `main`, carpeta `/docs` (build automatico en cada push; no hay workflow de deploy propio).
 
 ### Comando de deploy (desde `C:\Visual SEN`)
@@ -157,11 +158,15 @@ No debe priorizar:
 Rol: analisis historico real de generacion y captura de precios por generador/nodo.
 
 Orden de la seccion (parte superior):
-- Bloque "Generacion por Tecnologia" primero, con datos mensuales reales de los 12 meses del ano (`generacion-tecnologia/YYYY.json`), grafico apilado mensual, participacion por tecnologia y KPIs del periodo mensual (Energia del periodo, Mes Pico, Tecnologia Dominante, Fuentes con Datos).
+- Bloque "Filtro de Centrales" PRIMERO (arriba de todo), con seleccion de tecnologias, busqueda de central y seleccionar/limpiar/reset. Aplica al mapa de generacion por nodo, al ranking y a los popups.
+- Luego el bloque "Generacion por Tecnologia", con datos mensuales reales de los 12 meses del ano (`generacion-tecnologia/YYYY.json`), grafico apilado mensual, participacion por tecnologia y KPIs del periodo mensual (Energia del periodo, Mes Pico, Tecnologia Dominante, Fuentes con Datos).
 - El bloque de tecnologia NO usa selector de dias ni etiquetas horarias: es historico mensual real.
 - No existen KPIs de "Generacion 24 h", "Pico 24 h" ni "CMg Promedio" globales al inicio de la seccion; fueron eliminados.
 - Luego el mapa de generacion por nodo (filtros de tecnologia, central, tension y nodo).
 - Al final "Top Centrales en Generacion" (ranking de centrales por MWh en la fecha de analisis).
+
+Rendimiento del filtro:
+- Al pinchar una tecnologia o un checkbox de central, la UI no debe congelarse. `compactSeriesForFeature` (matching nombre central/serie) esta memoizado por objeto `data` (WeakMap): el match se calcula una vez por central y se reutiliza en el render del mapa, ranking y filtros, eliminando el escaneo O(n²) de `matchScore`/`normalizeKey` por clic.
 
 Mapa y filtros:
 - Mapa con centrales, nodos/subestaciones y lineas del sistema.
@@ -280,6 +285,10 @@ Nota: `npm test` puede fallar localmente si falta `vinext`.
 - `mergedHistoryFor(dataset)` fue optimizado de O(n²) a O(n) usando Maps de indices, reduciendo el costo de fusionar multiples meses (generacion ~1187 centrales x ~744 h x N meses).
 - La seccion Generacion fue reordenada segun el contrato: el bloque "Generacion por Tecnologia" (mensual real, 12 meses) quedo arriba, se eliminaron los KPIs globales de "Generacion 24 h", "Pico 24 h" y "CMg Promedio", y el bloque se desacoplo del selector de dias (sin etiquetas horarias). `generationTechnologyDataset()` ya no filtra por mes de analisis: muestra el ano completo.
 - La seccion Transmision indica SIEMPRE las fechas disponibles en `flow-date` ("Fechas disponibles: min → max"), cargando los meses de flujos listados en `manifest.json` al entrar a la vista y restringiendo los inputs `DESDE`/`HASTA` al rango disponible (ultima semana).
+- Fechas disponibles reales por seccion (agosto 2026): Generacion por Tecnologia 2026-01 a 2026-08 (mensual); Generacion por Nodo 2026-01-01 a 2026-08-12 (horaria, junio cortado al 18 y agosto al 12); Transmision/Flujos solo 2026-06-19 a 2026-06-25 (una semana); CMg sin datos aun (ver Estado CMg abajo). No existe un dia comun entre secciones.
+- Estado CMg: los archivos `docs/data/cmg-real-latest.json`, `cmg-online-latest.json` y `live/cmg-current.json` estan vacios (`ok:false`, error 403/fetch failed). Causa: la API SIP del CEN exige `user_key`/`apiKey`, que solo existe en GitHub Secrets (`CEN_API_KEY`, `CEN_OPERACION_USER_KEY`); las corridas locales sin variable de entorno devuelven `403 Forbidden Authentication parameters missing`. El historico `history/cmg/` no existe y `progress.json` solo registra importaciones de CSV Qlik (generacion y potencia transitada), que no requieren API key. El backfill de CMg via workflow (`backfill-cen-history.yml` con `CEN_BACKFILL_DATASETS=cmg-real,cmg-online`) queda pendiente; soporta hasta `CEN_BACKFILL_MAX_PAGES=50` por dia.
+- Variante `docs/index2.html` (A/B "ultimo dia"): misma plantilla con flag `lastDay`; al entrar a cada seccion fija `DESDE`/`HASTA` al ultimo dia con datos de ese dataset (gen→2026-08-12, flujos→2026-06-25, cmg→ultimo disponible) y carga solo el ultimo mes. Permite comparar el lag del filtro y la carga contra `index.html` (que mantiene el rango completo).
+- `compactSeriesForFeature` memoizado con WeakMap keyed por `data`: elimina el O(n²) del matching de nombres en cada clic de filtro de Generacion (se escaneaban las ~200 centrales por cada central renderizada, con regex de normalizacion). Aplica a index e index2.
 - Cuando un dato no existe, la UI muestra exactamente `En Desarrollo` (constante `CEN_NOT_INFORMED`), reemplazando el texto anterior "CEN no ha informado esta informacion".
 - La carpeta de potencia transitada contiene CSV real aunque originalmente se esperaba XLSX; mantener CSV como fuente preferente KISS cuando este disponible.
 - Se identificaron fuentes oficiales alternativas:
@@ -296,3 +305,6 @@ Nota: `npm test` puede fallar localmente si falta `vinext`.
 5. Automatizar importadores de descargables reales cuando exista una ruta estable y liviana, manteniendo JSON compactos.
 6. Buscar fuente real de capacidad instalada de centrales/BESS; hasta entonces mostrar `En Desarrollo`.
 7. Completar backfill de generacion real desde API CEN para cubrir la ventana de 12 meses (2025-09 a 2026-08).
+8. Ejecutar backfill de CMg via GitHub Actions (la key vive en Secrets): disparar `backfill-cen-history.yml` con `datasets=cmg-real,cmg-online`, `start_date=2026-01-01`, `end_date=2026-08-12`, `max_pages=20`; luego `update-cen-data.yml` para el live de CMg; sincronizar `docs/data/*` resultantes y rebuild.
+9. Reordenar la seccion Generacion (filtro arriba) y memoizar `compactSeriesForFeature` en `work/static-map-layout-v2.mjs` (ya documentado arriba como pendiente de aplicar).
+10. Generar `docs/index2.html` con flag `lastDay` (A/B) y decidir ganador entre `index.html` y `index2.html`.
