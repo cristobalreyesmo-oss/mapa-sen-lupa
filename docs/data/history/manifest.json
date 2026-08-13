@@ -1,1 +1,1 @@
-{"schema":"sen-etl-manifest-v1","generatedAt":"2026-08-13T16:08:47.408Z","window":{"startDate":"2026-08-07","endDate":"2026-08-13"},"datasets":{"cmg":{"months":[{"month":"2026-08","file":"history/cmg/2026-08.json"}]}}}
+{"schema":"sen-etl-manifest-v1","generatedAt":"2026-08-13T16:22:13.893Z","window":{"startDate":"2026-08-07","endDate":"2026-08-13"},"datasets":{"cmg":{"months":[{"month":"2026-06","file":"history/cmg/2026-06.json"},{"month":"2026-07","file":"history/cmg/2026-07.json"},{"month":"2026-08","file":"history/cmg/2026-08.json"}]}}}
