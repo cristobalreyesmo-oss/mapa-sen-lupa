@@ -1420,7 +1420,7 @@
     }
     if (gen2Chart) { gen2Chart.dispose(); gen2Chart = null; if (gen2Selected) renderGen2Detail(gen2Selected); }
     renderGlobalLegends();
-    refreshAll();
+    if (grouped) refreshAll();
   }
 
   function validFeature(feature) {
