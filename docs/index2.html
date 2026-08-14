@@ -411,7 +411,7 @@
     .maplibregl-ctrl-group button { width: 38px !important; height: 38px !important; }
     .maplibregl-ctrl-attrib { max-width: calc(100vw - 24px); font-size: 9px; }
     #cmg-chart, #cmg-chart-mc { min-height: 190px; }
-    #chart-gen2 { min-height: 260px !important; }
+    #chart-gen2 { min-height: 300px !important; }
     #gen-chart { height: 360px !important; }
     #line-list { max-height: 220px; }
     table.data-table { min-width: 560px; }
@@ -934,7 +934,7 @@
                 <span class="text-label-mono text-secondary uppercase tracking-widest">Generación y CMg · fecha análisis</span>
                 <span id="chart-value-gen2" class="text-headline-md font-bold text-on-surface">—</span>
               </div>
-              <div id="chart-gen2" class="w-full flex-1" style="min-height:240px"></div>
+              <div id="chart-gen2" class="w-full flex-1" style="min-height:300px"></div>
             </div>
           </div>
         </div>
@@ -2823,14 +2823,14 @@
         textStyle: { color: onSurface, fontFamily: "'JetBrains Mono', monospace", fontSize: 11 },
         axisPointer: { type: "line", lineStyle: { color: outlineVariant, width: 1 } },
       },
-      legend: { bottom: 0, icon: "roundRect", itemWidth: 10, itemHeight: 4, textStyle: { color: secondary, fontFamily: "'JetBrains Mono', monospace", fontSize: 10 }, data: series.map((s) => s.name) },
-      grid: { left: 56, right: 62, top: 36, bottom: 34 },
+      legend: { top: 0, icon: "roundRect", itemWidth: 12, itemHeight: 4, itemGap: 10, textStyle: { color: secondary, fontFamily: "'JetBrains Mono', monospace", fontSize: 9 }, data: series.map((s) => s.name) },
+      grid: { left: 44, right: 50, top: 28, bottom: 26 },
       xAxis: {
         type: "category",
         data: hours,
         axisLine: { lineStyle: { color: outlineVariant } },
         axisTick: { show: false },
-        axisLabel: { color: secondary, fontFamily: "'JetBrains Mono', monospace", fontSize: 10, interval: 0, formatter: (value, index) => genAxisLabel(value, index, hours) },
+        axisLabel: { color: secondary, fontFamily: "'JetBrains Mono', monospace", fontSize: 9, interval: "auto", formatter: (value, index) => genAxisLabel(value, index, hours) },
       },
       yAxis: [
         points.length ? {
