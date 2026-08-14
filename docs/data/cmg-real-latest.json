@@ -1,7 +1,7 @@
 {
   "id": "cmg-real",
   "ok": false,
-  "updatedAt": "2026-08-14T18:02:57.954Z",
+  "updatedAt": "2026-08-14T19:10:27.742Z",
   "error": "429  {\"message\":\"Too Many Requests\"}",
   "attempts": [
     {
