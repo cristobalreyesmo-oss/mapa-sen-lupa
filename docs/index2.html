@@ -2810,7 +2810,7 @@
       series.push({ name: "Generación", type: "line", yAxisIndex: 0, data: gen, symbol: "none", lineStyle: { color: "#2b90e2", width: 2, cap: "round" }, areaStyle: { color: "rgba(43,144,226,0.18)" } });
       series.push({ name: "CMg", type: "line", yAxisIndex: 1, data: cmg24, symbol: "none", lineStyle: { color: "#f97316", width: 2, cap: "round" } });
     } else {
-      series.push({ name: "CMg", type: "line", yAxisIndex: 1, data: cmgPoints.map((point) => point.value), symbol: "none", lineStyle: { color: "#f97316", width: 2, cap: "round" }, areaStyle: { color: "rgba(249,115,22,0.12)" } });
+      series.push({ name: "CMg", type: "line", yAxisIndex: 0, data: cmgPoints.map((point) => point.value), symbol: "none", lineStyle: { color: "#f97316", width: 2, cap: "round" }, areaStyle: { color: "rgba(249,115,22,0.12)" } });
     }
     gen2Chart.setOption({
       backgroundColor: "transparent",
