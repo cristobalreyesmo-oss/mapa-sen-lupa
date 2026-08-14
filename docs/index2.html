@@ -3262,6 +3262,7 @@
     if (cat.comuna && cat.region) rows.push("<div class=\"popup-foot\">" + escapeHtml(cat.comuna) + " · " + escapeHtml(cat.region) + "</div>");
     if (cat.fechaOperacion) rows.push("<div class=\"popup-foot\">Operación: " + escapeHtml(cat.fechaOperacion) + "</div>");
     if (cat.nemotecnico) rows.push("<div class=\"popup-foot\">Nemotécnico: " + escapeHtml(cat.nemotecnico) + "</div>");
+    if (Array.isArray(cat.kv) && cat.kv.length) rows.push("<div class=\"popup-foot\">Nivel de tensión: " + cat.kv.join(" · ") + " kV</div>");
     if (cat.subName) rows.push("<div class=\"popup-foot\">Conectada a: " + escapeHtml(cat.subName) + "</div>");
     if (Array.isArray(cat.centralNames)) rows.push("<div class=\"popup-foot\">Centrales conectadas: " + escapeHtml(cat.centralNames.join(", ")) + "</div>");
     return rows.join("");

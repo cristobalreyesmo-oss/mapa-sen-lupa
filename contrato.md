@@ -10,10 +10,10 @@ Regla principal: no se muestran datos simulados. Si CEN/API/descargables oficial
 
 - Repositorio: `https://github.com/cristobalreyesmo-oss/mapa-sen-lupa`
 - Sitio: `https://cristobalreyesmo-oss.github.io/mapa-sen-lupa/`
-- HTML publicado unico: `docs/index.html`
+- Pagina principal (raiz `/`): `docs/index.html` = REDIRECT (meta refresh 0) a `docs/index3.html`. La pagina final de produccion es `index3.html`.
 - `docs/indexv2.html` fue eliminado por redundante.
-- `docs/index2.html`: variante A/B "ultimo dia" (misma plantilla con flag `lastDay`), generada por `build-static-map-v2.mjs`; cada seccion se auto-limita a su ultimo dia con datos para comparar rendimiento/simplicidad contra `index.html`. Ambos conviven en `main` hasta decidir el ganador.
-- `docs/index3.html`: variante A/B de informacion (flag `{ lastDay: true, catalog: true }`). Igual que `index2` pero enriquece popups y panel lateral con el catalogo Infotecnica (capacidad neta, propietario, estado, comuna/region, fecha operacion, nemotecnico) y el vinculo central↔subestacion. Sirve para medir si "mas info disponible" mejora la pagina contra `index2`; si gana, se mergea a index/index2 y se elimina.
+- `docs/index2.html`: variante A/B "ultimo dia" (misma plantilla con flag `lastDay`), generada por `build-static-map-v2.mjs`; cada seccion se auto-limita a su ultimo dia con datos. Se conserva como variante accesible directamente.
+- `docs/index3.html`: PAGINA FINAL (flag `{ lastDay: true, catalog: true }`). Igual que `index2` pero enriquece popups y panel lateral con el catalogo Infotecnica (capacidad neta, propietario, estado, comuna/region, fecha operacion, nemotecnico, nivel de tension) y el vinculo central↔subestacion. Lleva el catalogo INLINEADO en el HTML (variable `window.SEN_CATALOG`, inyectada por `build-static-map-v2.mjs` desde `docs/data/catalog/*.json`), por lo que funciona abriendo el HTML localmente y en GitHub sin fetch (pesa ~1.3 MB). Las paginas index/index2 NO llevan catalogo (`SEN_CATALOG = null`).
 - GitHub Pages: branch `main`, carpeta `/docs` (build automatico en cada push; no hay workflow de deploy propio).
 
 ### Respaldo del estado bueno
@@ -28,7 +28,7 @@ git commit -m "Restaurar estado bueno desde respaldo-bueno-2026-08-13"
 git push origin main
 ```
 
-`index3.html` es una PRUEBA A/B de informacion: el estado bueno respaldado incluye tanto index/index2 (que ya estan buenos) como index3 (prueba). Quitar index3 del deploy no borra el respaldo; index3 se puede eliminar de `docs/` en un futuro deploy sin afectar el tag.
+`index3.html` es la PAGINA FINAL aprobada; el estado bueno respaldado (tag `respaldo-bueno-2026-08-13`) incluye index/index2 (variantes) y index3 (final). Quitar variantes del deploy no borra el respaldo; se pueden eliminar de `docs/` en un futuro deploy sin afectar el tag.
 
 ### Comando de deploy (desde `C:\Visual SEN`)
 
