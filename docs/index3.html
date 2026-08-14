@@ -1446,6 +1446,11 @@
     const v = voltage(feature);
     return v === "other" ? CEN_NOT_INFORMED : v + " kV";
   }
+  function tensionLabel(feature) {
+    const cat = feature && feature.cat;
+    if (cat && Array.isArray(cat.kv) && cat.kv.length) return cat.kv.join(" · ") + " kV";
+    return voltageLabel(feature);
+  }
   function voltageColor(kv) {
     if (kv === "500") return cssVar("--primary", "#003ec7");
     if (kv === "220") return cssVar("--secondary", "#5e5e5e");
@@ -1563,6 +1568,20 @@
     const match = String(date || "").match(/^(\d{4})-(\d{2})/);
     return match ? match[1] + "-" + match[2] : "";
   }
+  function previousMonthKey(yearMonth) {
+    let [y, m] = String(yearMonth || "").split("-").map(Number);
+    if (!y || !m) return "";
+    m -= 1;
+    if (m < 1) { m = 12; y -= 1; }
+    return String(y).padStart(4, "0") + "-" + String(m).padStart(2, "0");
+  }
+  async function ensureHistoryForBestDay(datasets) {
+    const base = monthKeyFromDate(analysisDateOrLive());
+    const months = [...new Set([...rangeMonthKeys(), previousMonthKey(base)].filter(Boolean))];
+    const jobs = [];
+    datasets.forEach((dataset) => months.forEach((month) => jobs.push(loadHistoryDataset(dataset, month))));
+    return Promise.all(jobs);
+  }
   function analysisDateOrLive() {
     const date = analysisTo || analysisFrom;
     if (date) return date;
@@ -1679,13 +1698,42 @@
     const sorted = [...new Set(hours)].sort();
     return sorted.length ? { min: String(sorted[0]).slice(0, 10), max: String(sorted[sorted.length - 1]).slice(0, 10) } : null;
   }
+  function datasetHours(dataset) {
+    const hours = [];
+    historyCache[dataset].forEach((data) => {
+      if (data && Array.isArray(data.hours)) hours.push(...data.hours);
+    });
+    return hours;
+  }
+  function dayHourCounts(hours) {
+    const counts = {};
+    (hours || []).forEach((h) => {
+      const day = String(h || "").slice(0, 10);
+      if (day) counts[day] = (counts[day] || 0) + 1;
+    });
+    return counts;
+  }
+  // ponytail: dia por mejor cobertura dentro de los meses cargados (CMg >= 8h y, si aplica, gen >= 8h).
+  // Si el mes actual no tiene ningun dia bueno de CMg, cargar el mes anterior al entrar a gen2.
+  function bestQualityDay(requireGen) {
+    const cmg = dayHourCounts([...datasetHours("cmg"), ...(liveData.cmgHours || [])]);
+    const gen = requireGen ? dayHourCounts([...datasetHours("generacion"), ...(liveData.genHours || [])]) : null;
+    const days = Object.keys(cmg).filter((day) => cmg[day] >= 8 && (!requireGen || (gen[day] || 0) >= 8)).sort();
+    if (days.length) return days[days.length - 1];
+    const fallback = Object.keys(cmg).filter((day) => !requireGen || (gen[day] || 0) > 0).sort((a, b) => cmg[b] - cmg[a] || (b < a ? -1 : 1));
+    return fallback.length ? fallback[0] : "";
+  }
   function lastDayForView() {
     if (currentView === "gen2") {
+      const day = bestQualityDay(true);
+      if (day) return day;
       const gen = mergedHistoryFor("generacion");
       const hours = [...(gen?.hours || []), ...(liveData.genHours || [])].filter(Boolean).sort();
       return hours.length ? String(hours[hours.length - 1]).slice(0, 10) : "";
     }
     if (currentView === "flows") return flowsAvailableRange()?.max || "";
+    const day = bestQualityDay(false);
+    if (day) return day;
     const visible = cmgVisibleHours();
     const hours = [...(visible.hours || []), ...(liveData.cmgHours || [])].filter(Boolean).sort();
     return hours.length ? String(hours[hours.length - 1]).slice(0, 10) : "";
@@ -2643,6 +2691,7 @@
       '<div class="popup-kicker">' + featureText(feature) + ' · ' + formatHour(hour) + '</div>' +
       '<div class="popup-title">' + escapeHtml(feature.name) + '</div>' +
       '<div class="popup-foot">Tecnología: ' + escapeHtml(gen2TechLabel(feature)) + '</div>' +
+      '<div class="popup-foot">Tensión: ' + tensionLabel(feature) + '</div>' +
       '<div class="popup-foot">Capacidad instalada: ' + installedCapacityLabel(feature) + '</div>' +
       '<div class="popup-row"><span class="popup-dot" style="background:#2b90e2"></span>' + (Number.isFinite(Number(mw)) ? Math.round(mw).toLocaleString("en-US") : CEN_NOT_INFORMED) + ' <span class="unit">MWh fecha</span></div>' +
       '<div class="popup-flow-row"><span class="popup-dot" style="background:#f97316"></span>' + (Number.isFinite(avg) ? avg.toLocaleString("en-US") : CEN_NOT_INFORMED) + ' <span class="unit">USD/MWh promedio rango</span></div>' +
@@ -2685,6 +2734,7 @@
     return '<div class="popup-kicker">' + kicker + '</div>' +
       '<div class="popup-title">' + feature.name + '</div>' +
       '<div class="popup-foot">Tecnología: ' + escapeHtml(gen2TechLabel(feature)) + '</div>' +
+      '<div class="popup-foot">Tensión: ' + tensionLabel(feature) + '</div>' +
       '<div class="popup-foot">Capacidad instalada: ' + installedCapacityLabel(feature) + '</div>' +
       '<div class="popup-row"><span class="popup-dot" style="background:' + technologyColor(feature) + '"></span>' + (Number.isFinite(Number(mw)) ? Math.round(mw).toLocaleString("en-US") : CEN_NOT_INFORMED) + ' <span class="unit">MWh fecha</span></div>' +
       '<div class="popup-flow-row">' + (Number.isFinite(avg) ? avg : CEN_NOT_INFORMED) + ' <span class="unit">USD/MWh promedio rango</span></div>' +
@@ -2720,7 +2770,7 @@
       if (Array.isArray(cat.centralNames)) metaParts.push("Centrales conectadas: " + cat.centralNames.join(", "));
     }
     document.getElementById("node-meta-gen2").textContent = metaParts.join(" · ");
-    const cmgValue = cmg(feature, hour);
+    const cmgValue = averageCmgForFeature(feature);
     document.getElementById("node-gen-gen2").textContent = Number.isFinite(Number(mw)) ? Math.round(mw).toLocaleString("en-US") : CEN_NOT_INFORMED;
     document.getElementById("node-cmg-gen2").textContent = Number.isFinite(cmgValue) ? cmgValue.toLocaleString("en-US") : CEN_NOT_INFORMED;
     document.getElementById("chart-value-gen2").textContent = Number.isFinite(Number(mw)) ? Math.round(mw).toLocaleString("en-US") + " MWh fecha" : CEN_NOT_INFORMED;
@@ -2735,25 +2785,33 @@
     const entry = genEntry(feature);
     const dayPoints = entry && Array.isArray(entry.values) ? entry.values.filter((point) => inRangeDate(String(point.timestamp || "").slice(0, 10)) && Number.isFinite(Number(point.value))) : [];
     const points = dayPoints.length ? dayPoints : (entry && isLiveMode() && Array.isArray(entry.values) ? entry.values.filter((point) => Number.isFinite(Number(point.value))).slice(-24) : []);
-    if (!points.length) {
+    const cmgPoints = cmgSeries(feature).filter((point) => Number.isFinite(Number(point.value)));
+    if (!points.length && !cmgPoints.length) {
       gen2Chart.setOption({
         backgroundColor: "transparent",
         title: { text: CEN_NOT_INFORMED, left: "center", top: "middle", textStyle: { color: cssVar("--secondary", "#5e5e5e"), fontSize: 12, fontFamily: "'JetBrains Mono', monospace" } },
       }, true);
       return;
     }
-    const hours = points.map((point) => shortTimestampLabel(point.timestamp).date + "\n" + shortTimestampLabel(point.timestamp).hour);
-    const gen = points.map((point) => Math.round(Number(point.value)));
-    const cmg24 = [];
-    const cmgPoints = cmgSeries(feature);
-    points.forEach((point) => {
-      const timestamp = String(point.timestamp || "");
-      const matched = cmgPoints.find((row) => row.timestamp === timestamp);
-      cmg24.push(matched && Number.isFinite(Number(matched.value)) ? matched.value : cmg(feature, timestampHour(timestamp)));
-    });
+    const xSource = points.length ? points : cmgPoints;
+    const hours = xSource.map((point) => String(point.timestamp || ""));
     const secondary = cssVar("--secondary", "#5e5e5e");
     const onSurface = cssVar("--on-surface", "#151c27");
     const outlineVariant = cssVar("--outline-variant", "#c3c5d9");
+    const series = [];
+    if (points.length) {
+      const gen = points.map((point) => Math.round(Number(point.value)));
+      const cmgByTimestamp = new Map(cmgPoints.map((row) => [String(row.timestamp), row.value]));
+      const cmg24 = points.map((point) => {
+        const timestamp = String(point.timestamp || "");
+        const matched = cmgByTimestamp.get(timestamp);
+        return matched !== undefined && Number.isFinite(Number(matched)) ? matched : cmg(feature, timestampHour(timestamp));
+      });
+      series.push({ name: "Generación", type: "line", yAxisIndex: 0, data: gen, symbol: "none", lineStyle: { color: "#2b90e2", width: 2, cap: "round" }, areaStyle: { color: "rgba(43,144,226,0.18)" } });
+      series.push({ name: "CMg", type: "line", yAxisIndex: 1, data: cmg24, symbol: "none", lineStyle: { color: "#f97316", width: 2, cap: "round" } });
+    } else {
+      series.push({ name: "CMg", type: "line", yAxisIndex: 1, data: cmgPoints.map((point) => point.value), symbol: "none", lineStyle: { color: "#f97316", width: 2, cap: "round" }, areaStyle: { color: "rgba(249,115,22,0.12)" } });
+    }
     gen2Chart.setOption({
       backgroundColor: "transparent",
       animation: false,
@@ -2765,24 +2823,24 @@
         textStyle: { color: onSurface, fontFamily: "'JetBrains Mono', monospace", fontSize: 11 },
         axisPointer: { type: "line", lineStyle: { color: outlineVariant, width: 1 } },
       },
-      legend: { bottom: 0, icon: "roundRect", itemWidth: 10, itemHeight: 4, textStyle: { color: secondary, fontFamily: "'JetBrains Mono', monospace", fontSize: 10 } },
+      legend: { bottom: 0, icon: "roundRect", itemWidth: 10, itemHeight: 4, textStyle: { color: secondary, fontFamily: "'JetBrains Mono', monospace", fontSize: 10 }, data: series.map((s) => s.name) },
       grid: { left: 56, right: 62, top: 36, bottom: 34 },
       xAxis: {
         type: "category",
         data: hours,
         axisLine: { lineStyle: { color: outlineVariant } },
         axisTick: { show: false },
-        axisLabel: { color: secondary, fontFamily: "'JetBrains Mono', monospace", fontSize: 10 },
+        axisLabel: { color: secondary, fontFamily: "'JetBrains Mono', monospace", fontSize: 10, interval: 0, formatter: (value, index) => genAxisLabel(value, index, hours) },
       },
       yAxis: [
-        {
+        points.length ? {
           type: "value",
           name: "MW",
           nameTextStyle: { color: secondary, fontFamily: "'JetBrains Mono', monospace", fontSize: 10 },
           axisLabel: { color: secondary, fontFamily: "'JetBrains Mono', monospace", fontSize: 10 },
           axisLine: { show: false },
           splitLine: { show: true, lineStyle: { color: outlineVariant, width: 0.5, type: "dashed" } },
-        },
+        } : null,
         {
           type: "value",
           name: "USD/MWh",
@@ -2791,26 +2849,8 @@
           axisLine: { show: false },
           splitLine: { show: false },
         },
-      ],
-      series: [
-        {
-          name: "Generación",
-          type: "line",
-          yAxisIndex: 0,
-          data: gen,
-          symbol: "none",
-          lineStyle: { color: "#2b90e2", width: 2, cap: "round" },
-          areaStyle: { color: "rgba(43,144,226,0.18)" },
-        },
-        {
-          name: "CMg",
-          type: "line",
-          yAxisIndex: 1,
-          data: cmg24,
-          symbol: "none",
-          lineStyle: { color: "#f97316", width: 2, cap: "round" },
-        },
-      ],
+      ].filter(Boolean),
+      series,
     }, true);
     scrollBelowNav(el.closest(".border"));
   }
@@ -3274,7 +3314,7 @@
     const dotColor = layerOf(feature) === "substation" ? voltageColor(voltage(feature)) : cmgColor(value);
     return '<div class="popup-kicker">' + kicker + '</div>' +
       '<div class="popup-title">' + feature.name + '</div>' +
-      '<div class="popup-foot">Tensión: ' + voltageLabel(feature) + '</div>' +
+      '<div class="popup-foot">Tensión: ' + tensionLabel(feature) + '</div>' +
       '<div class="popup-row"><span class="popup-dot" style="background:' + dotColor + '"></span>' + (Number.isFinite(value) ? value : CEN_NOT_INFORMED) + ' <span class="unit">USD/MWh</span></div>' +
       catalogHtml(feature) +
       '<div class="popup-foot">lat ' + feature.lat.toFixed(4) + ' · lon ' + feature.lon.toFixed(4) + ' · ' + formatHour(hour) + '</div>';
@@ -3287,7 +3327,7 @@
     return '<div class="popup-kicker">Topología SEN · ' + kind + '</div>' +
       '<div class="popup-title">' + escapeHtml(feature.name) + '</div>' +
       '<div class="popup-row"><span class="popup-dot" style="background:' + topologyPointProperties(feature).color + '"></span>' + escapeHtml(tech) + '</div>' +
-      '<div class="popup-foot">Tensión: ' + voltageLabel(feature) + '</div>' +
+      '<div class="popup-foot">Tensión: ' + tensionLabel(feature) + '</div>' +
       cap +
       catalogHtml(feature) +
       '<div class="popup-foot">lat ' + feature.lat.toFixed(4) + ' · lon ' + feature.lon.toFixed(4) + '</div>';
@@ -3930,7 +3970,7 @@
     document.querySelector('[data-view="' + name + '"]')?.classList.add("nav-active");
 
     if (name === "gen2") {
-      ensureHistoryFor("cmg", "generacion", "generacion-tecnologia").then(() => loadGenerationData()).then(() => {
+      ensureHistoryForBestDay(["cmg", "generacion"]).then(() => ensureHistoryFor("generacion-tecnologia")).then(() => loadGenerationData()).then(() => {
         if (!maps.gen2) initGen2Map();
         applyLastDayScope();
         renderGenerationView();
@@ -4131,7 +4171,7 @@
       liveData.matchedFeatures = points.filter((feature) => Number.isFinite(liveCmgValue(feature))).length;
       if (!analysisFrom && !analysisTo) analysisTo = analysisDateOrLive();
       syncAnalysisDateInputs();
-      ensureHistoryFor("cmg").then(() => { syncHourToAnalysisWindow(); refreshAll(); });
+      ensureHistoryForBestDay(["cmg"]).then(() => { applyLastDayScope(); syncHourToAnalysisWindow(); refreshAll(); });
       updateDates();
       syncHourToAnalysisWindow();
       refreshAll();
