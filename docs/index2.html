@@ -1123,6 +1123,26 @@
       <div id="mc-date" class="text-caption font-label-mono text-primary mt-1">Datos: —</div>
     </header>
     <div class="grid grid-cols-4 md:grid-cols-12 gap-gutter">
+      <div class="col-span-4 md:col-span-12 bg-surface-container-lowest swiss-border mt-gutter">
+        <div class="p-3 swiss-border-b flex flex-wrap justify-between items-center gap-4">
+          <div>
+            <div class="text-headline-md text-on-surface">CMg Mensual por Nodo</div>
+            <div id="cmg-month-status" class="text-caption font-label-mono text-secondary mt-1">Cargando CMg mensual...</div>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button id="cmg-month-all" class="toggle">Todos</button>
+            <button id="cmg-month-clear" class="toggle">Limpiar</button>
+            <label class="flex items-center gap-2 text-label-mono text-secondary">MES<input id="cmg-month" type="month" value="2026-07" class="glass-ctrl px-2 py-1 text-label-mono text-on-surface focus:border-primary"></label>
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center gap-2 p-3" id="cmg-month-nodes"></div>
+        <div class="p-3 relative">
+          <div id="cmg-month-chart" style="width:100%;min-height:320px;"></div>
+          <div id="cmg-month-empty" class="hidden absolute inset-0 flex items-center justify-center text-caption font-label-mono text-secondary">Selecciona al menos un nodo para ver su curva CMg.</div>
+          <div class="text-caption font-label-mono text-secondary mt-1">Curva CMg horaria por nodo · click en un nodo para alternarlo.</div>
+        </div>
+      </div>
+
       <div class="col-span-4 md:col-span-12 bg-surface-container-lowest swiss-border p-3">
         <div class="flex flex-wrap justify-between items-center swiss-border-b pb-2 mb-2 gap-3">
           <div>
@@ -1177,21 +1197,6 @@
               <div class="text-caption font-label-mono text-secondary mt-1">Eje: fecha de análisis seleccionada; usa histórico CEN cuando existe.</div>
             </div>
           </div>
-        </div>
-      </div>
-
-      <div class="col-span-4 md:col-span-12 bg-surface-container-lowest swiss-border mt-gutter">
-        <div class="p-3 swiss-border-b flex flex-wrap justify-between items-center gap-4">
-          <div>
-            <div class="text-headline-md text-on-surface">CMg Mensual por Nodo</div>
-            <div id="cmg-month-status" class="text-caption font-label-mono text-secondary mt-1">Cargando CMg mensual...</div>
-          </div>
-          <label class="flex items-center gap-2 text-label-mono text-secondary">MES<input id="cmg-month" type="month" value="2026-07" class="glass-ctrl px-2 py-1 text-label-mono text-on-surface focus:border-primary"></label>
-        </div>
-        <div class="flex flex-wrap items-center gap-2 p-3" id="cmg-month-nodes"></div>
-        <div class="p-3">
-          <div id="cmg-month-chart" style="width:100%;min-height:320px;"></div>
-          <div class="text-caption font-label-mono text-secondary mt-1">Curva CMg horaria por nodo · julio 2026; click en un nodo para alternarlo.</div>
         </div>
       </div>
 
@@ -3074,6 +3079,7 @@
     const el = document.getElementById("cmg-month-chart");
     const status = document.getElementById("cmg-month-status");
     const monthInput = document.getElementById("cmg-month");
+    const emptyEl = document.getElementById("cmg-month-empty");
     if (!el || !window.echarts) return;
     const month = (monthInput?.value || "2026-07").slice(0, 7);
     if (cmgMonthLoaded !== month) {
@@ -3088,12 +3094,26 @@
       }
     }
     if (!cmgMonthData || !cmgMonthData.series || !cmgMonthData.series.length) {
+      if (emptyEl) {
+        emptyEl.textContent = "Sin datos CMg para " + month + ".";
+        emptyEl.classList.remove("hidden");
+      }
+      el.classList.add("hidden");
+      if (cmgMonthChart) cmgMonthChart.clear();
       if (status) status.textContent = "Sin datos para " + month;
-      el.innerHTML = '<div class="text-caption font-label-mono text-secondary p-4">Sin datos CMg para ' + escapeHtml(month) + '.</div>';
       return;
     }
     const { hours, series } = cmgMonthData;
     const visible = series.map((_, index) => index).filter((index) => cmgMonthFilter.has(index));
+    if (!visible.length) {
+      if (emptyEl) emptyEl.classList.remove("hidden");
+      el.classList.add("hidden");
+      if (cmgMonthChart) cmgMonthChart.clear();
+      if (status) status.textContent = "Ningún nodo seleccionado · " + month;
+      return;
+    }
+    if (emptyEl) emptyEl.classList.add("hidden");
+    el.classList.remove("hidden");
     if (status) status.textContent = visible.length + " de " + series.length + " nodos visibles · " + month;
     if (!cmgMonthChart) cmgMonthChart = window.echarts.init(el);
     cmgMonthChart.setOption({
@@ -3111,15 +3131,15 @@
       legend: { show: visible.length > 1, textStyle: { color: cssVar("--on-surface-variant", "#434656") }, inactiveColor: cssVar("--outline-variant", "#c3c5d9"), bottom: 0 },
       xAxis: { type: "category", data: hours, boundaryGap: false, axisLine: { lineStyle: { color: cssVar("--outline-variant", "#c3c5d9") } }, axisLabel: { color: cssVar("--on-surface-variant", "#434656"), formatter: (value) => String(value).slice(5, 10) } },
       yAxis: { type: "value", name: "USD/MWh", nameTextStyle: { color: cssVar("--secondary", "#5e5e5e") }, splitLine: { lineStyle: { color: cssVar("--outline-variant", "#c3c5d9") } }, axisLabel: { color: cssVar("--on-surface-variant", "#434656") } },
-      series: series.map((row, index) => ({
-        name: row.name,
+      series: visible.map((index) => ({
+        name: series[index].name,
         type: "line",
         showSymbol: false,
         smooth: false,
         connectNulls: true,
         lineStyle: { width: 1.8 },
         emphasis: { focus: "series" },
-        data: row.values,
+        data: series[index].values,
         itemStyle: { color: CMG_MONTH_COLORS[index % CMG_MONTH_COLORS.length] },
       })),
     }, true);
@@ -4599,6 +4619,16 @@
   });
 
   document.getElementById("cmg-month")?.addEventListener("change", () => renderCmgMonthly());
+  document.getElementById("cmg-month-all")?.addEventListener("click", () => {
+    if (cmgMonthData?.series) cmgMonthData.series.forEach((_, index) => cmgMonthFilter.add(index));
+    renderCmgMonthNodeButtons();
+    renderCmgMonthly();
+  });
+  document.getElementById("cmg-month-clear")?.addEventListener("click", () => {
+    cmgMonthFilter.clear();
+    renderCmgMonthNodeButtons();
+    renderCmgMonthly();
+  });
   document.getElementById("cmg-month-nodes")?.addEventListener("click", (event) => {
     const button = event.target.closest("[data-cmg-node]");
     if (!button) return;
