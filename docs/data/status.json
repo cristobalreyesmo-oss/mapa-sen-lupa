@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-15T19:12:26.354Z",
+  "generatedAt": "2026-08-15T19:32:23.385Z",
   "baseUrl": "https://sipub.api.coordinador.cl:443",
   "startDate": "2026-08-09",
   "endDate": "2026-08-15",
@@ -63,8 +63,6 @@
       "id": "cmg-real",
       "file": "data/cmg-real-latest.json",
       "ok": true,
-      "stale": true,
-      "error": "429  {\"message\":\"Too Many Requests\"}",
       "records": 1603,
       "rawCount": 2000,
       "sampleKeys": [
@@ -80,7 +78,7 @@
         "fecha_hora",
         "fecha_minuto"
       ],
-      "updatedAt": "2026-08-15T18:45:40.525Z",
+      "updatedAt": "2026-08-15T19:32:34.864Z",
       "source": "/costo-marginal-real/v4/findByDate",
       "range": {
         "startDate": "2026-08-09",
@@ -91,7 +89,7 @@
           "path": "/costo-marginal-real/v4/findByDate",
           "startDate": "2026-08-09",
           "endDate": "2026-08-15",
-          "error": "429  {\"message\":\"Too Many Requests\"}"
+          "rows": 2000
         }
       ]
     },
@@ -102,7 +100,7 @@
       "records": 0,
       "rawCount": 0,
       "sampleKeys": [],
-      "updatedAt": "2026-08-15T19:12:40.967Z",
+      "updatedAt": "2026-08-15T19:32:37.084Z",
       "source": "/demanda-real-estimada/v4/findByDate",
       "range": {
         "startDate": "2026-08-09",
@@ -185,7 +183,7 @@
           "path": "/generacion-real/v3/findByDate",
           "startDate": "2026-08-14",
           "endDate": "2026-08-14",
-          "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
+          "error": "429  {\"message\":\"Too Many Requests\"}"
         },
         {
           "path": "/generacion-real/v3/findByDate",
@@ -209,7 +207,7 @@
           "path": "/generacion-real/v3/findByDate",
           "startDate": "2026-08-10",
           "endDate": "2026-08-10",
-          "error": "429  {\"message\":\"Too Many Requests\"}"
+          "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
         },
         {
           "path": "/generacion-real/v3/findByDate",
