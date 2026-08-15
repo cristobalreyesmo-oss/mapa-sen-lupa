@@ -175,6 +175,10 @@ Debe mostrar:
 - Popup de central/BESS: tecnologia, capacidad instalada MW si existe fuente real, y coordenadas.
 - Popup de linea: nivel de tension, longitud aproximada y capacidad de transporte a `35°C` desde `linea-limites.json`.
 - Popup de subestacion/nodo: nivel de tension y coordenadas.
+- Toolbar de analisis con CTA para elegir el tipo de interaccion sobre el mapa:
+  - `Lente Generacion`: mousemove dibuja el lente Turf y el readout muestra el mix de generacion por tecnologia (barras apiladas con la paleta `TECH_COLORS`, suma `genEnergy24` por `gen2TechLabel`) de las plantas dentro del radio + popup del nodo mas cercano.
+  - `Explorar Topologia`: mousemove NO dibuja el lente; el click abre la inspeccion completa (S/E con centrales conectadas via `cat.centralNames`, lineas con km/kV/cargabilidad, centrales con capacidad/tecnologia/combustible/propietario/region via catalogo).
+  - Estado centralizado en `overviewTool` (`lens` default | `explore`).
 
 No debe priorizar:
 - CMg promedio como KPI principal.
@@ -218,6 +222,8 @@ Graficos de analisis:
 - Cross-filtering: seleccionar central, tecnologia, nodo o tension debe actualizar los graficos relacionados sin recargar toda la pagina.
 - Si falta generacion o CMg real para el cruce, mostrar `En Desarrollo` para la serie faltante.
 - El grafico del nodo (ECharts `chart-gen2`) usa `genAxisLabel` en el eje X (fecha solo cuando cambia el dia + hora cada 6 h) y leyenda con las series presentes. Si el nodo no tiene generacion pero si CMg (ej. subestacion), se dibuja la curva CMg sola (no se muestra solo `En Desarrollo`).
+- Hover estilo "sun-map" (Fase 1, KISS): al pasar el cursor sobre un punto del mapa de generacion se resuelve el feature exacto con `queryRenderedFeatures` (`updateGen2LensDirect` + `featureFromProps`) y se dibuja el arco orbital del nodo (`setLensArcs`: generacion azul / CMg naranja) + popup anclado al nodo + readout con el nodo explorado. NO se dibuja el circulo Turf de 34 km en gen2. Fase 2 (snap ±N km) pendiente de prueba si el targeting directo se siente fragil.
+- Tooltip del chart del nodo: `formatter` con `22/07 · 05:00` (fecha · hora) y cada serie con unidad (Generacion `X MW` / CMg `Y USD/MWh`).
 - BESS no debe mostrarse como dos tecnologias separadas. Debe ser una sola serie/central neta `BESS`, donde la inyeccion aparece positiva y el retiro aparece negativo segun el signo real informado por CEN/Qlik.
 - Para rendimiento, la UI no debe cargar generacion mensual pesada ni flujos historicos al iniciar. Debe cargar solo el historico necesario para la seccion activa: CMg en Costos Marginales, generacion en Generacion, flujos en Transmision, y `generacion-tecnologia/YYYY.json` como agregado liviano.
 
@@ -328,6 +334,7 @@ Nota: `npm test` puede fallar localmente si falta `vinext`.
 - Seleccion de dia por mejor calidad: `lastDayForView`/`applyLastDayScope` eligen el dia con mayor cobertura CMg (>= 8 h; en Generacion por Nodo tambien generacion >= 8 h) dentro de los meses cargados, con `ensureHistoryForBestDay` cargando el mes anterior como respaldo. El dia de analisis hoy es `2026-07-22` (24 h CMg + 24 h generacion). En el grafico del nodo (`buildGen2Chart`) el eje X usa `genAxisLabel` (fecha al cambiar de dia + hora cada 6 h), la leyenda muestra solo las series presentes y, si el nodo no tiene generacion pero si CMg, se dibuja la curva CMg sola. La tarjeta `CMg` del panel lateral muestra el promedio del rango (`averageCmgForFeature`). El nivel de tension en popups se resuelve con `tensionLabel` (catalogo `cat.kv` cuando existe, fallback `voltageLabel`).
 - Cuando un dato no existe, la UI muestra exactamente `En Desarrollo` (constante `CEN_NOT_INFORMED`), reemplazando el texto anterior "CEN no ha informado esta informacion".
 - La carpeta de potencia transitada contiene CSV real aunque originalmente se esperaba XLSX; mantener CSV como fuente preferente KISS cuando este disponible.
+- UI/UX (KISS): toolbar de analisis en Overview con CTA `Lente Generacion` / `Explorar Topologia` (`overviewTool`). El lente muestra el mix de generacion por tecnologia (barras `TECH_COLORS`, suma `genEnergy24` por `gen2TechLabel`) en el readout; el modo explorar desactiva el lente y deja el click para inspeccionar topologia. En Generacion, el hover sobre un punto dibuja el arco orbital del nodo directo (sin circulo Turf, `updateGen2LensDirect`) y el tooltip del chart muestra `22/07 · 05:00` con unidades.
 - Se identificaron fuentes oficiales alternativas:
   - CMg definitivo desde `https://www.coordinador.cl/costos-marginales/`.
   - Generacion real desde pagina CEN/Qlik de generacion real.
@@ -348,3 +355,4 @@ Nota: `npm test` puede fallar localmente si falta `vinext`.
 11. ~~Eliminar el congelamiento de index/index2~~ HECHO: cold pass del matching CMg bajo de ~87 s a ~2 s con `entityAliasIndex` (indice por tokens) + `liveAliasIndex` para lookups live. Validar en navegador: pagina responsiva <1 s y clics de filtro inmediatos.
 12. Integrar catalogo Infotecnica en index3 (lastDay + catalog): `import-infotecnica.mjs` -> `docs/data/catalog/*.json`; `loadCatalog` en el layout; popups/panel lateral con capacidad neta, propietario, estado, comuna/region, fecha, nemotecnico; vinculo central↔subestacion en ambos sentidos. Medir en navegador si "mas info" mejora vs index2; si gana, merge a index/index2 y eliminar index3. Los reportes se re-importan manualmente cuando el CEN actualice.
 13. ~~Dia por mejor calidad de datos~~ HECHO: `lastDayForView`/`applyLastDayScope` eligen el dia con mayor cobertura horaria (CMg >= 8 h; en Generacion por Nodo tambien generacion >= 8 h) dentro de los meses cargados, con `ensureHistoryForBestDay` (rango + mes anterior) como respaldo. El grafico del nodo usa `genAxisLabel`, leyenda con series presentes, curva CMg sola si no hay generacion, y la tarjeta `CMg` del panel muestra el promedio del rango. `tensionLabel` resuelve el nivel de tension con `cat.kv` del catalogo cuando existe.
+14. ~~Toolbar de analisis en Overview + hover sun-map + tooltip hora/valor~~ HECHO (desplegado): toolbar `Lente Generacion`/`Explorar Topologia` en Overview; hover directo sobre nodos en Generacion con arco orbital (sin circulo Turf, `updateGen2LensDirect`); tooltip del chart con `fecha · hora` y unidades. Pendiente de probar en navegador: Fase 2 del hover (snap ±N km) si el targeting directo se siente fragil, y decidir si el mix del lente gana vs el resumen topologico.

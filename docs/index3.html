@@ -470,6 +470,28 @@
     pointer-events: none;
   }
   .lens-readout strong { color: var(--on-surface); font-size: 13px; }
+  .lens-mix {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 4px;
+    min-width: 180px;
+  }
+  .lens-mix-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .lens-mix-bar {
+    height: 8px;
+    min-width: 2px;
+    border-radius: 1px;
+  }
+  .lens-mix-label {
+    font-size: 10px;
+    color: var(--on-surface);
+    white-space: nowrap;
+  }
 
   .lens-popup {
     position: absolute;
@@ -1018,6 +1040,10 @@
             <button type="button" data-voltage="220" class="toggle active">220 kV</button>
             <button type="button" data-voltage="154" class="toggle active">154 kV</button>
             <span class="text-label-mono text-secondary mx-1">|</span>
+            <span class="text-label-mono text-secondary">Análisis:</span>
+            <button id="overview-tool-lens" type="button" class="toggle active">Lente Generación</button>
+            <button id="overview-tool-explore" type="button" class="toggle">Explorar Topología</button>
+            <span class="text-label-mono text-secondary mx-1">|</span>
             <span class="text-label-mono text-secondary">Tecnología:</span>
             <button id="overview-tech-all" class="toggle active">Todas</button>
             <div id="overview-techs" class="flex flex-wrap items-center gap-2"></div>
@@ -1339,6 +1365,7 @@
   let gen2ChartHoverKey = "";
   const genFilter = { techs: new Set(), plants: new Set(), query: "" };
   const overviewFilter = { techs: new Set() };
+  let overviewTool = "lens";
   const CEN_NOT_INFORMED = "En Desarrollo";
   let genDays = 7;
   let analysisFrom = "";
@@ -2552,54 +2579,6 @@
       positionLensLabels(lensNode, LENS_RADIUS_KM * 0.55, genEnergy24(lensNode), cmg(lensNode, hour));
     });
   }
-  function updateGen2Lens(lon, lat) {
-    const map = maps.gen2;
-    if (!map || !map.isStyleLoaded()) return;
-    const center = turf.point([lon, lat]);
-    const circle = turf.circle(center, LENS_RADIUS_KM, { steps: 80, units: "kilometers" });
-    map.getSource("lens").setData(circle);
-    const visible = points.filter((feature) => {
-      const layer = layerOf(feature);
-      if (layer === "substation") return layers.substations;
-      if (layer === "plant") return layers.plants;
-      if (layer === "bess") return layers.bess;
-      return false;
-    });
-    const nearby = visible
-      .map((feature) => ({
-        feature,
-        distance: turf.distance(center, turf.point([feature.lon, feature.lat]), { units: "kilometers" }),
-        mw: genEnergy24(feature),
-      }))
-      .filter((row) => row.distance <= LENS_RADIUS_KM)
-      .sort((a, b) => b.mw - a.mw)
-      .slice(0, 6);
-    const readout = document.getElementById("lens-readout-gen2");
-    if (!nearby.length) {
-      readout.innerHTML = "<strong>Lupa operacional</strong><span>Sin activos visibles dentro del radio.</span>";
-      hideLensPopup();
-      hideLensArcs();
-      lensNodeKey = null;
-      lensNode = null;
-      return;
-    }
-    const realRows = nearby.filter((row) => Number.isFinite(Number(row.mw)));
-    const total = realRows.reduce((s, r) => s + Number(r.mw), 0);
-    readout.innerHTML = realRows.length
-      ? "<strong>" + realRows.length + " activos · " + Math.round(total).toLocaleString("en-US") + " MW</strong><span>Mayor señal: " + realRows[0].feature.name + " (" + Math.round(realRows[0].mw).toLocaleString("en-US") + " MW)</span>"
-      : "<strong>Lupa operacional</strong><span>Sin centrales despachadas dentro del radio.</span>";
-    const nearest = nearby.slice().sort((a, b) => a.distance - b.distance)[0];
-    const key = nearest.feature.name + "|" + nearest.feature.lat + "|" + nearest.feature.lon;
-    if (key !== lensNodeKey) {
-      lensNodeKey = key;
-      lensNode = nearest.feature;
-      showLensPopup(nearest.feature);
-      setLensArcs(nearest.feature);
-      updateGen2ChartHover(nearest.feature);
-    } else {
-      positionLensPopup(nearest.feature);
-    }
-  }
   function clearGen2Lens() {
     const map = maps.gen2;
     if (!map || !map.isStyleLoaded()) return;
@@ -2822,6 +2801,15 @@
         borderColor: outlineVariant,
         textStyle: { color: onSurface, fontFamily: "'JetBrains Mono', monospace", fontSize: 11 },
         axisPointer: { type: "line", lineStyle: { color: outlineVariant, width: 1 } },
+        formatter: (params) => {
+          const items = Array.isArray(params) ? params : [params];
+          const first = items[0];
+          const m = String(first.axisValue || "").match(/(\d{4})-(\d{2})-(\d{2})[T\s](\d{2})/);
+          const header = m ? m[3] + "/" + m[2] + " · " + m[4] + ":00" : String(first.axisValue || "");
+          return '<div style="font-weight:bold;font-size:12px;margin-bottom:4px;">' + header + "</div>" + items.map((p) =>
+            p.marker + " <b>" + p.seriesName + "</b>: " + (Number.isFinite(Number(p.value)) ? Number(p.value).toLocaleString("en-US") : CEN_NOT_INFORMED) + (p.seriesName === "CMg" ? " USD/MWh" : " MW")
+          ).join("<br/>");
+        },
       },
       legend: { top: 0, icon: "roundRect", itemWidth: 12, itemHeight: 4, itemGap: 10, textStyle: { color: secondary, fontFamily: "'JetBrains Mono', monospace", fontSize: 9 }, data: series.map((s) => s.name) },
       grid: { left: 44, right: 50, top: 28, bottom: 26 },
@@ -3131,9 +3119,10 @@
   function updateLensMove(viewKey, event) {
     const map = maps[viewKey];
     if (!map || !map.isStyleLoaded()) return;
+    if (viewKey === "overview" && overviewTool === "explore") return;
     const pointHit = map.queryRenderedFeatures(event.point, { layers: ["sen-substations", "sen-plants", "sen-bess"] })[0];
     if (pointHit) {
-      if (viewKey === "gen2") updateGen2Lens(event.lngLat.lng, event.lngLat.lat);
+      if (viewKey === "gen2") updateGen2LensDirect(featureFromProps(pointHit));
       else updateLens(viewKey, event.lngLat.lng, event.lngLat.lat);
       return;
     }
@@ -3144,8 +3133,36 @@
       showLineHover(viewKey, event.lngLat, lineHit);
       return;
     }
-    if (viewKey === "gen2") updateGen2Lens(event.lngLat.lng, event.lngLat.lat);
+    if (viewKey === "gen2") clearGen2Lens();
     else updateLens(viewKey, event.lngLat.lng, event.lngLat.lat);
+  }
+  function featureFromProps(pointHit) {
+    const props = pointHit.properties || {};
+    const name = String(props.name || "");
+    const lon = Number(props.lon);
+    const lat = Number(props.lat);
+    return points.find((feature) => feature.name === name && feature.lon === lon && feature.lat === lat) || null;
+  }
+  function updateGen2LensDirect(feature) {
+    if (!feature) return;
+    const key = feature.name + "|" + feature.lat + "|" + feature.lon;
+    if (key !== lensNodeKey) {
+      lensNodeKey = key;
+      lensNode = feature;
+      showLensPopup(feature);
+      setLensArcs(feature);
+      updateGen2ChartHover(feature);
+    } else {
+      positionLensPopup(feature);
+    }
+    const readout = document.getElementById("lens-readout-gen2");
+    if (readout) {
+      const mw = genEnergy24(feature);
+      const c = cmg(feature, hour);
+      readout.innerHTML = "<strong>" + escapeHtml(feature.name) + "</strong><span>" +
+        featureText(feature) + " · " + (Number.isFinite(Number(mw)) ? Math.round(mw).toLocaleString("en-US") + " MWh" : CEN_NOT_INFORMED) +
+        " · CMg " + (Number.isFinite(Number(c)) ? c.toLocaleString("en-US") : CEN_NOT_INFORMED) + " USD/MWh</span>";
+    }
   }
 
   function showLineHover(viewKey, lngLat, feature) {
@@ -3221,12 +3238,23 @@
       return;
     }
     if (viewKey === "overview") {
-      const counts = nearby.reduce((acc, row) => {
-        const key = featureText(row.feature);
-        acc[key] = (acc[key] || 0) + 1;
-        return acc;
-      }, {});
-      readout.innerHTML = "<strong>" + nearby.length + " activos topológicos</strong><span>" + Object.entries(counts).map(([k, v]) => k + ": " + v).join(" · ") + "</span>";
+      const mix = {};
+      nearby.forEach((row) => {
+        const feature = row.feature;
+        const layer = layerOf(feature);
+        if (layer !== "plant" && layer !== "bess") return;
+        const mw = genEnergy24(feature);
+        if (!Number.isFinite(Number(mw)) || mw <= 0) return;
+        const label = gen2TechLabel(feature);
+        mix[label] = (mix[label] || 0) + Number(mw);
+      });
+      const totalMw = Object.values(mix).reduce((sum, value) => sum + value, 0);
+      const top = Object.entries(mix).sort((a, b) => b[1] - a[1]).slice(0, 6);
+      const bars = top.map(([label, mw]) => {
+        const pct = totalMw > 0 ? Math.round((mw / totalMw) * 100) : 0;
+        return '<div class="lens-mix-row"><span class="lens-mix-bar" style="width:' + Math.max(2, pct) + '%;background:' + (TECH_COLORS[label] || cssVar("--outline-variant", "#c3c5d9")) + '"></span><span class="lens-mix-label">' + escapeHtml(label) + " " + Math.round(mw).toLocaleString("en-US") + " MWh</span></div>";
+      }).join("");
+      readout.innerHTML = "<strong>" + nearby.length + " activos · " + Math.round(totalMw).toLocaleString("en-US") + " MWh generación</strong>" + bars;
     } else {
       readout.innerHTML = "<strong>" + nearby.length + " activos · CMg " + Math.round(nearby.reduce((s, r) => s + r.value, 0) / nearby.length) + " USD/MWh</strong><span>Mayor señal: " + nearby[0].feature.name + " (" + nearby[0].value + ")</span>";
     }
@@ -3261,9 +3289,28 @@
     const map = maps[viewKey];
     if (!map || !map.isStyleLoaded()) return;
     map.getSource("lens").setData({ type: "FeatureCollection", features: [] });
-    document.getElementById(ref.lensId).innerHTML = "<strong>Lupa operacional</strong><span>Mueve el cursor para activar Turf.</span>";
+    document.getElementById(ref.lensId).innerHTML = viewKey === "overview" && overviewTool === "explore"
+      ? "<strong>Explorar Topología</strong><span>Haz click sobre un elemento para inspeccionarlo.</span>"
+      : "<strong>Lupa operacional</strong><span>Mueve el cursor para activar Turf.</span>";
     hideHoverPopup(viewKey);
     updateChartHover(viewKey, selected);
+  }
+
+  function setOverviewTool(tool) {
+    overviewTool = tool;
+    document.getElementById("overview-tool-lens")?.classList.toggle("active", tool === "lens");
+    document.getElementById("overview-tool-explore")?.classList.toggle("active", tool === "explore");
+    const readout = document.getElementById("lens-readout");
+    if (readout) {
+      readout.innerHTML = tool === "lens"
+        ? "<strong>Lupa operacional</strong><span>Mueve el cursor para activar el lente de generación.</span>"
+        : "<strong>Explorar Topología</strong><span>Haz click sobre un elemento para inspeccionarlo.</span>";
+    }
+    const map = maps.overview;
+    if (map && map.isStyleLoaded() && map.getSource("lens")) {
+      map.getSource("lens").setData({ type: "FeatureCollection", features: [] });
+    }
+    hideHoverPopup("overview");
   }
 
   function closePopup(viewKey) {
@@ -4346,6 +4393,9 @@
       ["overview", "marginal", "flows", "gen2"].forEach((viewKey) => setLayerVisibility(maps[viewKey]));
     });
   });
+
+  document.getElementById("overview-tool-lens")?.addEventListener("click", () => setOverviewTool("lens"));
+  document.getElementById("overview-tool-explore")?.addEventListener("click", () => setOverviewTool("explore"));
 
   ["cmg-chart", "cmg-chart-mc"].forEach((canvasId) => {
     const canvas = document.getElementById(canvasId);
