@@ -8,6 +8,50 @@ Regla principal: no se muestran datos simulados. Si CEN/API/descargables oficial
 
 Regla de calidad de datos por seccion: cada seccion muestra el dia con mejor calidad de datos presente dentro de los meses cargados (mayor cobertura de horas reales), no el ultimo dato disponible ("ultima de las ultimas"). Concretamente, al entrar a una seccion con el flag `lastDay` se fija `DESDE`/`HASTA` al dia mas reciente donde CMg tenga >= 8 h informadas (y en Generacion por Nodo, ademas, generacion >= 8 h); si ningun dia califica, se usa el dia con mas horas CMg. Se cargan los meses del rango mas el mes anterior para poder encontrar el mejor dia si el mes actual esta vacio. Hoy el mejor dia comun es `2026-07-22` (CMg 24 h + generacion 24 h).
 
+## Brief de Contexto (empezar aqui)
+
+Pagina web estatica y liviana para explorar el Sistema Electrico Nacional (SEN) de Chile con datos reales del Coordinador Electrico Nacional (CEN). Una sola plantilla genera todo el sitio; el navegador consume solo JSON compactos bajo `docs/data/`. Regla de oro: nunca datos simulados; si CEN/API/descargable oficial no entrega una informacion, la UI muestra exactamente `En Desarrollo`. Secciones: Overview (topologia), Generacion, Costos Marginales y Transmision.
+
+### Donde vive cada cosa
+
+| Que | Ruta |
+|---|---|
+| Plantilla unica (HTML + CSS + JS del sitio) | `work/static-map-layout-v2.mjs` |
+| Builder (inyecta datos, catalogo, limites, banderas) | `work/build-static-map-v2.mjs` |
+| Modelo KMZ (1045 lineas, 5 tensiones) | `public/sen-data.json` → `docs/data/sen-data.json` |
+| Limites de linea a 35°C | `public/linea-limites.json` (inline en HTML via builder) |
+| Datos publicados | `docs/data/` (`live/`, `history/`, `catalog/`) |
+| Importadores de descargables reales CEN | `scripts/import-*.mjs` |
+| Workflows GitHub Actions (cron datos) | `.github/workflows/*.yml` |
+| Paginas publicadas (GitHub Pages `/docs`) | `docs/index.html` (redirect), `index2.html` (lastDay), `index3.html` (final, lastDay + catalogo) |
+| Registro de mejoras e historia | este mismo archivo, secciones `Brief de Mejoras e Historia` y `Estado Actual` |
+
+### Como fluyen los datos
+
+1. **Live + ETL compacto**: `update-cen-data.yml` (cron cada 15 min, secrets de GitHub) descarga CMg/demanda/generacion/flujos y normaliza a `docs/data/live/*.json` + `docs/data/history/*`.
+2. **Descargables reales (manual/local)**: `scripts/import-*.mjs` convierten TSV/CSV/XLSX oficiales CEN en JSON compactos (historico CMg, generacion, flujos, catalogo Infotecnica). Los brutos (cientos de MB) quedan fuera del repo.
+3. **Build**: `npm run static:build:v2` regenera `docs/index*.html` y `docs/data/sen-data.json`.
+4. **Deploy**: commit + push a `main` (ver regla en `## URL y Deploy`); GitHub Pages sirve `docs/` en cada push.
+
+### Como trabajar (loop corto)
+
+```bash
+node --check work/static-map-layout-v2.mjs   # sintaxis antes de build
+npm run static:build:v2                       # regenera docs/
+# abrir docs/index3.html en navegador (catalogo inline, funciona sin servidor)
+```
+
+Para ver cambios de datos (no de codigo) alcanza con recargar; el HTML publicado se actualiza al deployar. `C:\Visual SEN` no es repo git: el control de versiones vive solo en GitHub.
+
+### Donde estamos hoy (resumen)
+
+- Modelo con 1045 lineas en 5 niveles de tension (500/220/154/110/66 kV) y paleta transversal TSO (500 rojo → 66 purpura).
+- Ranking "Top Centrales en Generacion" y grafico "Generacion por Region" funcionales (fix de raiz en `switchView("gen2")`).
+- Grafico "CMg Mensual por Nodo": julio 2026 completo (744 h) para 7 nodos clave, multi-serie filtrable con paleta viva, va antes del mapa CMg.
+- Catalogo Infotecnica inlineado en `index3.html` (capacidad, propietario, region, fecha operacion, vinculo central↔S/E).
+- Dia de analisis por mejor calidad de datos: `2026-07-22` (CMg 24 h + generacion 24 h).
+- Datos reales: generacion historica 2026-01→2026-08, CMg definitivo julio 2026 (descargable `REAL-DEF`), flujos ultima semana, CMg live del cron.
+
 ## URL y Deploy
 
 - Repositorio: `https://github.com/cristobalreyesmo-oss/mapa-sen-lupa`
@@ -317,6 +361,8 @@ Nota: `npm test` puede fallar localmente si falta `vinext`.
 
 ## Estado Actual
 
+Estado del producto (resumen): el sitio esta desplegado y estable en `main`/`docs` (GitHub Pages). La pagina final es `index3.html` (lastDay + catalogo). Secciones operativas: Overview, Generacion (ranking + region + KPI mensuales), Costos Marginales (mapa CMg + tabla + CMg Mensual por Nodo) y Transmision (flujos ultima semana). Datos reales con fallback `En Desarrollo`; dia de analisis `2026-07-22`. Detalle en la seccion `Brief de Mejoras e Historia`.
+
 - `docs/index.html` es unico HTML publicado.
 - La UI ya fue reorganizada inicialmente por secciones: Overview topologico, Generacion, Costos Marginales y Transmision.
 - Los filtros de fecha son rango `DESDE`/`HASTA` con calendario nativo en las 4 secciones; cargan todos los meses del rango y fusionan horas/valores en `mergedHistoryFor(dataset)`.
@@ -347,6 +393,23 @@ Nota: `npm test` puede fallar localmente si falta `vinext`.
   - Generacion real desde pagina CEN/Qlik de generacion real.
   - Potencia transitada desde pagina CEN/Qlik de potencia transitada.
 
+## Brief de Mejoras e Historia
+
+Cronologia de trabajo, de lo mas reciente a lo inicial. Cada hito referencia archivos/funciones para navegar directo.
+
+- **CMg Mensual por Nodo (vista Costos Marginales)** — `work/export-cmg-nodos.mjs` extrae del TSV `REAL-DEF` las 7 barras principales (Charrúa 500, Pan de Azúcar 500, Puerto Montt 220, Quillota 220, Crucero 220, Cardones 500, Polpaico 500) hacia `docs/data/history/cmg-nodos/<mes>.json` (744 h, schema `sen-history-cmg-nodos-v1`). `renderCmgMonthly()` dibuja ECharts multi-linea con paleta viva (`CMG_MONTH_COLORS`); chips toggle por nodo (`cmgMonthFilter`) filtran las series visibles (`visible.map`), botones "Todos"/"Limpiar", estado `#cmg-month-empty` sin romper el canvas. Bloque PRIMERO en la vista (antes del mapa CMg). Hookeado en `switchView` marginal, `refreshAll`, `applyTheme` (dispose) y `resizeVisuals`. Solo julio por ahora.
+- **Fix ranking "Top Centrales" + "Generacion por Region"** — causa raiz: con `generacion-current.json`/`generacion-real-last-24h.json`/fallback todos `ok:false`, ninguna rama de `ingestGenerationData` seteaba `liveData.generacion` y `genFilter.plants` quedaba vacio pese al historial cargado. Fix: en `switchView("gen2")` tras `applyLastDayScope()` corre siempre `resetGenFilter(true)` + `renderGenFilter()` (static-map-layout-v2.mjs:4124). Nuevo bloque "Generacion por Region": barras horizontales por `feature.cat.region` (16 regiones + "Sin region") con `genEnergyFor(feature, day)`; input de FECHA y toggle `Global por region`.
+- **Lineas 110/66 kV + paleta TSO de 5 tensiones** — `work/extract-lines-kml.mjs` extrae 277 (110) + 311 (66) lineas del KMZ oficial; modelo pasa a 1045 lineas. `scripts/export-line-limits.py` regenera 1018 limites. Paleta transversal: 500 rojo, 220 naranja, 154 verde, 110 azul, 66 purpura (variables `--v500..--v66`, clases `swatch-v500..v66`). `voltage()`/`LINE_VOLTAGES`/`voltageColor` actualizados; capas, toggles y leyendas en gen2/overview/flows.
+- **Catalogo Infotecnica inlineado (index3)** — `scripts/import-infotecnica.mjs` (devDep `xlsx`) convierte `reporte_centrales.xlsx`/`reporte_subestaciones.xlsx` en `docs/data/catalog/*.json`. `build-static-map-v2.mjs` inyecta el catalogo en el HTML (`window.SEN_CATALOG`); popups y panel lateral muestran capacidad neta, propietario, estado, comuna/region, fecha operacion, nemotecnico y vinculo central↔S/E. Funciona abriendo el HTML localmente (sin fetch).
+- **Dia por mejor calidad de datos (lastDay)** — `lastDayForView`/`applyLastDayScope` eligen el dia con mayor cobertura CMg (>= 8 h; en Generacion por Nodo tambien generacion) dentro de los meses cargados; `ensureHistoryForBestDay` carga rango + mes anterior. Hoy el mejor dia comun es `2026-07-22`.
+- **Respaldo del estado bueno** — tag inmutable `respaldo-bueno-2026-08-13` (commit `28c8f17`) con index/index2 + fix rendimiento + catalogo + index3.
+- **Optimizacion de matching (87 s → 2 s)** — `entityAliasIndex` (indice por tokens + memoizacion WeakMap) y `liveAliasIndex` reemplazan el escaneo O(n²) en `compactSeriesForFeature`, `liveCmgValue`, `liveFlowValue`, `liveGenEntry` y `cmgHistoryFor`. Elimina falsos positivos por substring; ~43 subestaciones sin coincidencia quedan en `En Desarrollo` (correcto).
+- **ETL real del descargable CMg** — `import-cmg-historico-real.mjs` importa el TSV `REAL-DEF` del portal CEN (1 valor/hora `MIN=45`). Histrico `docs/data/history/cmg/2026-07.json` con el dia de analisis (24 h, 1633 nodos).
+- **BESS neta** — BESS se modela como una sola central/tecnologia neta (inyeccion positiva, retiro negativo segun signo real), no dos subtipos.
+- **Reorden de la seccion Generacion** — bloque "Generacion por Tecnologia" (mensual real, 12 meses) arriba; se eliminaron KPIs globales de "24 h"; "Filtro de Centrales" primero.
+- **Transmision con fechas disponibles** — `flow-date` muestra "Fechas disponibles: min → max" desde `manifest.json`; inputs restringidos al rango de flujos (ultima semana).
+- **Base inicial** — estructura en 4 secciones, mapa MapLibre + Turf + ECharts lazy, `DESDE`/`HASTA` nativos, `sen-data.json` externo async (HTML ~0.24 MB), toolbar `Lente Generacion`/`Explorar Topologia`, hover sun-map con arco orbital.
+
 ## Proximo Orden de Trabajo
 
 1. Validar en navegador los filtros `DESDE`/`HASTA` multi-mes y el merge continuo (flujos ultima semana y generacion ultimos 12 meses desde API).
@@ -363,3 +426,7 @@ Nota: `npm test` puede fallar localmente si falta `vinext`.
 12. Integrar catalogo Infotecnica en index3 (lastDay + catalog): `import-infotecnica.mjs` -> `docs/data/catalog/*.json`; `loadCatalog` en el layout; popups/panel lateral con capacidad neta, propietario, estado, comuna/region, fecha, nemotecnico; vinculo central↔subestacion en ambos sentidos. Medir en navegador si "mas info" mejora vs index2; si gana, merge a index/index2 y eliminar index3. Los reportes se re-importan manualmente cuando el CEN actualice.
 13. ~~Dia por mejor calidad de datos~~ HECHO: `lastDayForView`/`applyLastDayScope` eligen el dia con mayor cobertura horaria (CMg >= 8 h; en Generacion por Nodo tambien generacion >= 8 h) dentro de los meses cargados, con `ensureHistoryForBestDay` (rango + mes anterior) como respaldo. El grafico del nodo usa `genAxisLabel`, leyenda con series presentes, curva CMg sola si no hay generacion, y la tarjeta `CMg` del panel muestra el promedio del rango. `tensionLabel` resuelve el nivel de tension con `cat.kv` del catalogo cuando existe.
 14. ~~Toolbar de analisis en Overview + hover sun-map + tooltip hora/valor~~ HECHO (desplegado): toolbar `Lente Generacion`/`Explorar Topologia` en Overview; hover directo sobre nodos en Generacion con arco orbital (sin circulo Turf, `updateGen2LensDirect`); tooltip del chart con `fecha · hora` y unidades. Pendiente de probar en navegador: Fase 2 del hover (snap ±N km) si el targeting directo se siente fragil, y decidir si el mix del lente gana vs el resumen topologico.
+15. ~~Lineas 110/66 kV + paleta TSO 5 tensiones~~ HECHO: modelo 1045 lineas; toggles, leyendas y capas en gen2/overview/flows; `linea-limites.json` 1018 limites.
+16. ~~Fix ranking Top Centrales + Generacion por Region~~ HECHO: `resetGenFilter(true)` siempre tras `applyLastDayScope()` en `switchView("gen2")`; bloque regional con ECharts.
+17. ~~Grafico CMg Mensual por Nodo~~ HECHO (desplegado, commit `ec00bc3`): 7 nodos filtrables con paleta viva, botones "Todos"/"Limpiar", bloque antes del mapa CMg. Pendiente: importar otros meses TSV si el CEN los publica (el selector de MES ya los lee).
+18. Actualizar `contrato.md` con brief de contexto y de mejoras/historia para onboarding rapido en una terminal nueva.
