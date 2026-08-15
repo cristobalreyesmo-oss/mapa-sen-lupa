@@ -4121,6 +4121,8 @@
       ensureHistoryForBestDay(["cmg", "generacion"]).then(() => ensureHistoryFor("generacion-tecnologia")).then(() => loadGenerationData()).then(() => {
         if (!maps.gen2) initGen2Map();
         applyLastDayScope();
+        resetGenFilter(true);
+        renderGenFilter();
         renderGenerationView();
         setTimeout(() => { resizeVisuals(); refreshAll(); }, 0);
       });
