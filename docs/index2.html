@@ -1182,6 +1182,21 @@
 
       <div class="col-span-4 md:col-span-12 bg-surface-container-lowest swiss-border mt-gutter">
         <div class="p-3 swiss-border-b flex flex-wrap justify-between items-center gap-4">
+          <div>
+            <div class="text-headline-md text-on-surface">CMg Mensual por Nodo</div>
+            <div id="cmg-month-status" class="text-caption font-label-mono text-secondary mt-1">Cargando CMg mensual...</div>
+          </div>
+          <label class="flex items-center gap-2 text-label-mono text-secondary">MES<input id="cmg-month" type="month" value="2026-07" class="glass-ctrl px-2 py-1 text-label-mono text-on-surface focus:border-primary"></label>
+        </div>
+        <div class="flex flex-wrap items-center gap-2 p-3" id="cmg-month-nodes"></div>
+        <div class="p-3">
+          <div id="cmg-month-chart" style="width:100%;min-height:320px;"></div>
+          <div class="text-caption font-label-mono text-secondary mt-1">Curva CMg horaria por nodo · julio 2026; click en un nodo para alternarlo.</div>
+        </div>
+      </div>
+
+      <div class="col-span-4 md:col-span-12 bg-surface-container-lowest swiss-border mt-gutter">
+        <div class="p-3 swiss-border-b flex flex-wrap justify-between items-center gap-4">
           <h3 class="text-headline-md text-on-surface">Precio por Nodo de Barra</h3>
           <div id="table-status" class="text-caption font-label-mono text-secondary"></div>
         </div>
@@ -1390,6 +1405,11 @@
   let gen2Chart = null;
   let regionChart = null;
   let regionGlobal = false;
+  let cmgMonthChart = null;
+  let cmgMonthLoaded = null;
+  let cmgMonthData = null;
+  const cmgMonthFilter = new Set();
+  const CMG_MONTH_COLORS = ["#f97316", "#2563eb", "#16a34a", "#dc2626", "#7c3aed", "#0d9488", "#db2777"];
   let gen2Selected = null;
   let gen2CmgMax = 100;
   let lensNodeKey = null;
@@ -1485,6 +1505,7 @@
     }
     if (gen2Chart) { gen2Chart.dispose(); gen2Chart = null; if (gen2Selected) renderGen2Detail(gen2Selected); }
     if (regionChart) { regionChart.dispose(); regionChart = null; }
+    if (cmgMonthChart) { cmgMonthChart.dispose(); cmgMonthChart = null; }
     renderGlobalLegends();
     if (grouped) refreshAll();
   }
@@ -3049,6 +3070,72 @@
     }, true);
     regionChart.resize();
   }
+  async function renderCmgMonthly() {
+    const el = document.getElementById("cmg-month-chart");
+    const status = document.getElementById("cmg-month-status");
+    const monthInput = document.getElementById("cmg-month");
+    if (!el || !window.echarts) return;
+    const month = (monthInput?.value || "2026-07").slice(0, 7);
+    if (cmgMonthLoaded !== month) {
+      status.textContent = "Cargando CMg mensual " + month + "...";
+      const data = await fetchJson("./data/history/cmg-nodos/" + month + ".json");
+      cmgMonthLoaded = month;
+      cmgMonthData = data;
+      if (data) {
+        cmgMonthFilter.clear();
+        data.series.forEach((_, index) => cmgMonthFilter.add(index));
+        renderCmgMonthNodeButtons();
+      }
+    }
+    if (!cmgMonthData || !cmgMonthData.series || !cmgMonthData.series.length) {
+      if (status) status.textContent = "Sin datos para " + month;
+      el.innerHTML = '<div class="text-caption font-label-mono text-secondary p-4">Sin datos CMg para ' + escapeHtml(month) + '.</div>';
+      return;
+    }
+    const { hours, series } = cmgMonthData;
+    const visible = series.map((_, index) => index).filter((index) => cmgMonthFilter.has(index));
+    if (status) status.textContent = visible.length + " de " + series.length + " nodos visibles · " + month;
+    if (!cmgMonthChart) cmgMonthChart = window.echarts.init(el);
+    cmgMonthChart.setOption({
+      grid: { left: 8, right: 16, top: 12, bottom: 8, containLabel: true },
+      tooltip: {
+        trigger: "axis",
+        axisPointer: { type: "line", lineStyle: { color: cssVar("--outline", "#7c7f91"), width: 1 } },
+        formatter: (params) => {
+          const day = String(params[0]?.axisValue || "").slice(0, 10);
+          const head = '<div class="font-label-mono text-body-sm text-on-surface mb-1">' + escapeHtml(day) + '</div>';
+          const lines = params.map((p) => '<div class="flex items-center gap-2"><span style="width:10px;height:10px;background:' + p.color + ';display:inline-block"></span><span>' + escapeHtml(p.seriesName) + '</span><span class="font-label-mono ml-auto pl-4">' + (Number.isFinite(Number(p.value)) ? Number(p.value).toFixed(2) : "—") + ' USD/MWh</span></div>').join("");
+          return head + lines;
+        },
+      },
+      legend: { show: visible.length > 1, textStyle: { color: cssVar("--on-surface-variant", "#434656") }, inactiveColor: cssVar("--outline-variant", "#c3c5d9"), bottom: 0 },
+      xAxis: { type: "category", data: hours, boundaryGap: false, axisLine: { lineStyle: { color: cssVar("--outline-variant", "#c3c5d9") } }, axisLabel: { color: cssVar("--on-surface-variant", "#434656"), formatter: (value) => String(value).slice(5, 10) } },
+      yAxis: { type: "value", name: "USD/MWh", nameTextStyle: { color: cssVar("--secondary", "#5e5e5e") }, splitLine: { lineStyle: { color: cssVar("--outline-variant", "#c3c5d9") } }, axisLabel: { color: cssVar("--on-surface-variant", "#434656") } },
+      series: series.map((row, index) => ({
+        name: row.name,
+        type: "line",
+        showSymbol: false,
+        smooth: false,
+        connectNulls: true,
+        lineStyle: { width: 1.8 },
+        emphasis: { focus: "series" },
+        data: row.values,
+        itemStyle: { color: CMG_MONTH_COLORS[index % CMG_MONTH_COLORS.length] },
+      })),
+    }, true);
+    cmgMonthChart.resize();
+  }
+  function renderCmgMonthNodeButtons() {
+    const wrap = document.getElementById("cmg-month-nodes");
+    if (!wrap || !cmgMonthData) return;
+    wrap.innerHTML = cmgMonthData.series.map((row, index) => {
+      const color = CMG_MONTH_COLORS[index % CMG_MONTH_COLORS.length];
+      const active = cmgMonthFilter.has(index);
+      return '<button type="button" data-cmg-node="' + index + '" class="toggle ' + (active ? "active" : "") + '" style="' + (active ? 'border-color:' + color + ';' : "") + '">' +
+        '<span style="width:10px;height:10px;background:' + color + ';display:inline-block;margin-right:6px;opacity:' + (active ? "1" : "0.4") + '"></span>' +
+        escapeHtml(row.name) + '</button>';
+    }).join("");
+  }
   function visibleSubstationsFor(viewKey) {
     if (viewKey === "overview") return substations;
     if (viewKey === "flows") return substations;
@@ -4009,6 +4096,7 @@
     renderGlobalLegends();
     renderGen2Ranking();
     if (currentView === "gen2") renderGenerationView();
+    if (currentView === "marginal") renderCmgMonthly();
     renderKPIs();
     renderTable();
     renderFlowTable();
@@ -4146,6 +4234,7 @@
 
     if (!maps[name]) initMap(name);
     if (name === "overview" || name === "marginal") applyLastDayScope();
+    if (name === "marginal") renderCmgMonthly();
     setTimeout(() => { resizeVisuals(); refreshAll(); }, 0);
   }
 
@@ -4509,6 +4598,17 @@
     renderGen2Region();
   });
 
+  document.getElementById("cmg-month")?.addEventListener("change", () => renderCmgMonthly());
+  document.getElementById("cmg-month-nodes")?.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-cmg-node]");
+    if (!button) return;
+    const index = Number(button.dataset.cmgNode);
+    if (cmgMonthFilter.has(index)) cmgMonthFilter.delete(index);
+    else cmgMonthFilter.add(index);
+    renderCmgMonthNodeButtons();
+    renderCmgMonthly();
+  });
+
   ["cmg-chart", "cmg-chart-mc"].forEach((canvasId) => {
     const canvas = document.getElementById(canvasId);
     if (!canvas) return;
@@ -4573,6 +4673,7 @@
     if (genChart) genChart.resize();
     if (gen2Chart) gen2Chart.resize();
     if (regionChart) regionChart.resize();
+    if (cmgMonthChart) cmgMonthChart.resize();
   }
   window.addEventListener("resize", () => {
     clearTimeout(resizeTimer);
