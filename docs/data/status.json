@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-16T05:49:39.684Z",
+  "generatedAt": "2026-08-16T06:18:40.201Z",
   "baseUrl": "https://sipub.api.coordinador.cl:443",
   "startDate": "2026-08-10",
   "endDate": "2026-08-16",
@@ -27,6 +27,8 @@
       "id": "cmg-online",
       "file": "data/cmg-online-latest.json",
       "ok": true,
+      "stale": true,
+      "error": "429  {\"message\":\"Too Many Requests\"}",
       "records": 1603,
       "rawCount": 2000,
       "sampleKeys": [
@@ -53,7 +55,7 @@
           "path": "/costo-marginal-online/v4/findByDate",
           "startDate": "2026-08-10",
           "endDate": "2026-08-16",
-          "rows": 2000
+          "error": "429  {\"message\":\"Too Many Requests\"}"
         }
       ]
     },
@@ -64,7 +66,7 @@
       "records": 0,
       "rawCount": 0,
       "sampleKeys": [],
-      "updatedAt": "2026-08-16T05:49:54.225Z",
+      "updatedAt": "2026-08-16T06:18:44.859Z",
       "source": "/costo-marginal-real/v4/findByDate",
       "range": {
         "startDate": "2026-08-10",
@@ -86,7 +88,7 @@
       "records": 0,
       "rawCount": 0,
       "sampleKeys": [],
-      "updatedAt": "2026-08-16T05:49:56.843Z",
+      "updatedAt": "2026-08-16T06:18:47.666Z",
       "source": "/demanda-real-estimada/v4/findByDate",
       "range": {
         "startDate": "2026-08-10",
