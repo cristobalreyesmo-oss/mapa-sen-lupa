@@ -1,14 +1,14 @@
 {
   "id": "generacion-real",
   "ok": false,
-  "updatedAt": "2026-08-17T15:37:03.396Z",
+  "updatedAt": "2026-08-17T15:57:07.354Z",
   "error": "502 Bad Gateway {\"message\": \"Internal server error\"}",
   "attempts": [
     {
       "path": "/generacion-real/v3/findByDate",
       "startDate": "2026-08-17",
       "endDate": "2026-08-17",
-      "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
+      "error": "429  {\"message\":\"Too Many Requests\"}"
     },
     {
       "path": "/generacion-real/v3/findByDate",
@@ -20,7 +20,7 @@
       "path": "/generacion-real/v3/findByDate",
       "startDate": "2026-08-15",
       "endDate": "2026-08-15",
-      "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
+      "error": "429  {\"message\":\"Too Many Requests\"}"
     },
     {
       "path": "/generacion-real/v3/findByDate",
