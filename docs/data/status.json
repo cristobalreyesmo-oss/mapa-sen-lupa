@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-19T17:46:29.252Z",
+  "generatedAt": "2026-08-19T18:15:00.332Z",
   "baseUrl": "https://sipub.api.coordinador.cl:443",
   "startDate": "2026-08-13",
   "endDate": "2026-08-19",
@@ -42,7 +42,7 @@
         "fecha_hora",
         "fecha_minuto"
       ],
-      "updatedAt": "2026-08-19T17:46:40.071Z",
+      "updatedAt": "2026-08-19T18:15:11.830Z",
       "source": "/costo-marginal-online/v4/findByDate",
       "range": {
         "startDate": "2026-08-13",
@@ -64,7 +64,7 @@
       "records": 0,
       "rawCount": 0,
       "sampleKeys": [],
-      "updatedAt": "2026-08-19T17:46:42.721Z",
+      "updatedAt": "2026-08-19T18:15:16.002Z",
       "source": "/costo-marginal-real/v4/findByDate",
       "range": {
         "startDate": "2026-08-13",
@@ -86,7 +86,7 @@
       "records": 0,
       "rawCount": 0,
       "sampleKeys": [],
-      "updatedAt": "2026-08-19T17:46:44.670Z",
+      "updatedAt": "2026-08-19T18:15:18.479Z",
       "source": "/demanda-real-estimada/v4/findByDate",
       "range": {
         "startDate": "2026-08-13",
@@ -169,7 +169,7 @@
           "path": "/generacion-real/v3/findByDate",
           "startDate": "2026-08-18",
           "endDate": "2026-08-18",
-          "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
+          "error": "429  {\"message\":\"Too Many Requests\"}"
         },
         {
           "path": "/generacion-real/v3/findByDate",
@@ -193,7 +193,7 @@
           "path": "/generacion-real/v3/findByDate",
           "startDate": "2026-08-14",
           "endDate": "2026-08-14",
-          "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
+          "error": "429  {\"message\":\"Too Many Requests\"}"
         },
         {
           "path": "/generacion-real/v3/findByDate",
