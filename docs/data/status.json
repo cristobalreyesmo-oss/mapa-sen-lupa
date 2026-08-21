@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-21T19:53:56.106Z",
+  "generatedAt": "2026-08-21T20:11:24.698Z",
   "baseUrl": "https://sipub.api.coordinador.cl:443",
   "startDate": "2026-08-15",
   "endDate": "2026-08-21",
@@ -42,7 +42,7 @@
         "fecha_hora",
         "fecha_minuto"
       ],
-      "updatedAt": "2026-08-21T19:54:06.456Z",
+      "updatedAt": "2026-08-21T20:11:37.847Z",
       "source": "/costo-marginal-online/v4/findByDate",
       "range": {
         "startDate": "2026-08-15",
@@ -64,7 +64,7 @@
       "records": 0,
       "rawCount": 0,
       "sampleKeys": [],
-      "updatedAt": "2026-08-21T19:54:09.215Z",
+      "updatedAt": "2026-08-21T20:11:40.785Z",
       "source": "/costo-marginal-real/v4/findByDate",
       "range": {
         "startDate": "2026-08-15",
@@ -86,7 +86,7 @@
       "records": 0,
       "rawCount": 0,
       "sampleKeys": [],
-      "updatedAt": "2026-08-21T19:54:11.496Z",
+      "updatedAt": "2026-08-21T20:11:42.093Z",
       "source": "/demanda-real-estimada/v4/findByDate",
       "range": {
         "startDate": "2026-08-15",
