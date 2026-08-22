@@ -1,7 +1,7 @@
 {
   "id": "potencia-transitada",
   "ok": false,
-  "updatedAt": "2026-08-22T14:56:05.915Z",
+  "updatedAt": "2026-08-22T15:10:20.313Z",
   "error": "502 Bad Gateway {\"message\": \"Internal server error\"}",
   "attempts": [
     {
@@ -26,7 +26,7 @@
       "path": "/potencia-transitada/v4/findByDate",
       "startDate": "2026-08-19",
       "endDate": "2026-08-19",
-      "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
+      "error": "429  {\"message\":\"Too Many Requests\"}"
     },
     {
       "path": "/potencia-transitada/v4/findByDate",
