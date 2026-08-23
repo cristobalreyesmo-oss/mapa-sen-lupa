@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-23T16:10:10.844Z",
+  "generatedAt": "2026-08-23T16:39:36.127Z",
   "baseUrl": "https://sipub.api.coordinador.cl:443",
   "startDate": "2026-08-17",
   "endDate": "2026-08-23",
@@ -42,7 +42,7 @@
         "fecha_hora",
         "fecha_minuto"
       ],
-      "updatedAt": "2026-08-23T16:10:21.224Z",
+      "updatedAt": "2026-08-23T16:39:48.033Z",
       "source": "/costo-marginal-online/v4/findByDate",
       "range": {
         "startDate": "2026-08-17",
@@ -64,7 +64,7 @@
       "records": 0,
       "rawCount": 0,
       "sampleKeys": [],
-      "updatedAt": "2026-08-23T16:10:24.643Z",
+      "updatedAt": "2026-08-23T16:39:50.488Z",
       "source": "/costo-marginal-real/v4/findByDate",
       "range": {
         "startDate": "2026-08-17",
@@ -86,7 +86,7 @@
       "records": 0,
       "rawCount": 0,
       "sampleKeys": [],
-      "updatedAt": "2026-08-23T16:10:26.548Z",
+      "updatedAt": "2026-08-23T16:39:53.138Z",
       "source": "/demanda-real-estimada/v4/findByDate",
       "range": {
         "startDate": "2026-08-17",
@@ -156,7 +156,7 @@
       "id": "generacion-real",
       "file": "data/generacion-real-central-latest.json",
       "ok": false,
-      "error": "502 Bad Gateway {\"message\": \"Internal server error\"}",
+      "error": "429  {\"message\":\"Too Many Requests\"}",
       "records": 0,
       "attempts": [
         {
@@ -187,7 +187,7 @@
           "path": "/generacion-real/v3/findByDate",
           "startDate": "2026-08-19",
           "endDate": "2026-08-19",
-          "error": "429  {\"message\":\"Too Many Requests\"}"
+          "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
         },
         {
           "path": "/generacion-real/v3/findByDate",
@@ -199,7 +199,7 @@
           "path": "/generacion-real/v3/findByDate",
           "startDate": "2026-08-17",
           "endDate": "2026-08-17",
-          "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
+          "error": "429  {\"message\":\"Too Many Requests\"}"
         }
       ]
     },
