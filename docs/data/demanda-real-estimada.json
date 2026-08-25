@@ -1,7 +1,7 @@
 {
   "id": "demanda-real",
   "ok": false,
-  "updatedAt": "2026-08-25T04:29:23.170Z",
+  "updatedAt": "2026-08-25T05:04:48.671Z",
   "source": "/demanda-real-estimada/v4/findByDate",
   "range": {
     "startDate": "2026-08-19",
