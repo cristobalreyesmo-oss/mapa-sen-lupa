@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-26T20:17:14.425Z",
+  "generatedAt": "2026-08-26T23:47:41.975Z",
   "baseUrl": "https://sipub.api.coordinador.cl:443",
   "startDate": "2026-08-20",
   "endDate": "2026-08-26",
@@ -42,7 +42,7 @@
         "fecha_hora",
         "fecha_minuto"
       ],
-      "updatedAt": "2026-08-26T20:18:03.240Z",
+      "updatedAt": "2026-08-26T23:48:27.714Z",
       "source": "/costo-marginal-online/v4/findByDate",
       "range": {
         "startDate": "2026-08-20",
@@ -64,7 +64,7 @@
       "records": 0,
       "rawCount": 0,
       "sampleKeys": [],
-      "updatedAt": "2026-08-26T20:18:18.000Z",
+      "updatedAt": "2026-08-26T23:48:46.014Z",
       "source": "/costo-marginal-real/v4/findByDate",
       "range": {
         "startDate": "2026-08-20",
@@ -86,7 +86,7 @@
       "records": 0,
       "rawCount": 0,
       "sampleKeys": [],
-      "updatedAt": "2026-08-26T20:18:24.328Z",
+      "updatedAt": "2026-08-26T23:48:51.513Z",
       "source": "/demanda-real-estimada/v4/findByDate",
       "range": {
         "startDate": "2026-08-20",
@@ -156,7 +156,7 @@
       "id": "generacion-real",
       "file": "data/generacion-real-central-latest.json",
       "ok": false,
-      "error": "429  {\"message\":\"Too Many Requests\"}",
+      "error": "502 Bad Gateway {\"message\": \"Internal server error\"}",
       "records": 0,
       "attempts": [
         {
@@ -169,7 +169,7 @@
           "path": "/generacion-real/v3/findByDate",
           "startDate": "2026-08-25",
           "endDate": "2026-08-25",
-          "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
+          "error": "429  {\"message\":\"Too Many Requests\"}"
         },
         {
           "path": "/generacion-real/v3/findByDate",
@@ -193,13 +193,13 @@
           "path": "/generacion-real/v3/findByDate",
           "startDate": "2026-08-21",
           "endDate": "2026-08-21",
-          "error": "429  {\"message\":\"Too Many Requests\"}"
+          "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
         },
         {
           "path": "/generacion-real/v3/findByDate",
           "startDate": "2026-08-20",
           "endDate": "2026-08-20",
-          "error": "429  {\"message\":\"Too Many Requests\"}"
+          "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
         }
       ]
     },
