@@ -41704,5 +41704,16 @@
         }
       ]
     }
+  ],
+  "stale": true,
+  "staleReason": "429  {\"message\":\"Too Many Requests\"}",
+  "lastFetchAttemptAt": "2026-08-28T01:06:52.566Z",
+  "lastFetchAttempts": [
+    {
+      "path": "/costo-marginal-online/v4/findByDate",
+      "startDate": "2026-08-22",
+      "endDate": "2026-08-28",
+      "error": "429  {\"message\":\"Too Many Requests\"}"
+    }
   ]
 }
