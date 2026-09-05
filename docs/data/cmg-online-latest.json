@@ -41707,12 +41707,12 @@
   ],
   "stale": true,
   "staleReason": "429  {\"message\":\"Too Many Requests\"}",
-  "lastFetchAttemptAt": "2026-09-04T23:28:46.203Z",
+  "lastFetchAttemptAt": "2026-09-05T01:13:39.103Z",
   "lastFetchAttempts": [
     {
       "path": "/costo-marginal-online/v4/findByDate",
-      "startDate": "2026-08-29",
-      "endDate": "2026-09-04",
+      "startDate": "2026-08-30",
+      "endDate": "2026-09-05",
       "error": "429  {\"message\":\"Too Many Requests\"}"
     }
   ]

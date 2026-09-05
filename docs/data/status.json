@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-09-04T23:28:39.665Z",
+  "generatedAt": "2026-09-05T01:13:37.220Z",
   "baseUrl": "https://sipub.api.coordinador.cl:443",
-  "startDate": "2026-08-29",
-  "endDate": "2026-09-04",
+  "startDate": "2026-08-30",
+  "endDate": "2026-09-05",
   "cenWindowDays": 7,
   "globalWindow": {
-    "startDate": "2026-08-29",
-    "endDate": "2026-09-04"
+    "startDate": "2026-08-30",
+    "endDate": "2026-09-05"
   },
   "lookbackDays": 2,
   "cmgDays": 7,
@@ -53,8 +53,8 @@
       "attempts": [
         {
           "path": "/costo-marginal-online/v4/findByDate",
-          "startDate": "2026-08-29",
-          "endDate": "2026-09-04",
+          "startDate": "2026-08-30",
+          "endDate": "2026-09-05",
           "error": "429  {\"message\":\"Too Many Requests\"}"
         }
       ]
@@ -66,17 +66,17 @@
       "records": 0,
       "rawCount": 0,
       "sampleKeys": [],
-      "updatedAt": "2026-09-04T23:28:49.235Z",
+      "updatedAt": "2026-09-05T01:13:42.225Z",
       "source": "/costo-marginal-real/v4/findByDate",
       "range": {
-        "startDate": "2026-08-29",
-        "endDate": "2026-09-04"
+        "startDate": "2026-08-30",
+        "endDate": "2026-09-05"
       },
       "attempts": [
         {
           "path": "/costo-marginal-real/v4/findByDate",
-          "startDate": "2026-08-29",
-          "endDate": "2026-09-04",
+          "startDate": "2026-08-30",
+          "endDate": "2026-09-05",
           "rows": 0
         }
       ]
@@ -88,17 +88,17 @@
       "records": 0,
       "rawCount": 0,
       "sampleKeys": [],
-      "updatedAt": "2026-09-04T23:28:51.270Z",
+      "updatedAt": "2026-09-05T01:13:43.886Z",
       "source": "/demanda-real-estimada/v4/findByDate",
       "range": {
-        "startDate": "2026-08-29",
-        "endDate": "2026-09-04"
+        "startDate": "2026-08-30",
+        "endDate": "2026-09-05"
       },
       "attempts": [
         {
           "path": "/demanda-real-estimada/v4/findByDate",
-          "startDate": "2026-08-29",
-          "endDate": "2026-09-04",
+          "startDate": "2026-08-30",
+          "endDate": "2026-09-05",
           "rows": 0
         }
       ]
@@ -112,6 +112,12 @@
       "attempts": [
         {
           "path": "/potencia-transitada/v4/findByDate",
+          "startDate": "2026-09-05",
+          "endDate": "2026-09-05",
+          "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
+        },
+        {
+          "path": "/potencia-transitada/v4/findByDate",
           "startDate": "2026-09-04",
           "endDate": "2026-09-04",
           "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
@@ -144,12 +150,6 @@
           "path": "/potencia-transitada/v4/findByDate",
           "startDate": "2026-08-30",
           "endDate": "2026-08-30",
-          "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
-        },
-        {
-          "path": "/potencia-transitada/v4/findByDate",
-          "startDate": "2026-08-29",
-          "endDate": "2026-08-29",
           "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
         }
       ]
@@ -163,6 +163,12 @@
       "attempts": [
         {
           "path": "/generacion-real/v3/findByDate",
+          "startDate": "2026-09-05",
+          "endDate": "2026-09-05",
+          "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
+        },
+        {
+          "path": "/generacion-real/v3/findByDate",
           "startDate": "2026-09-04",
           "endDate": "2026-09-04",
           "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
@@ -183,7 +189,7 @@
           "path": "/generacion-real/v3/findByDate",
           "startDate": "2026-09-01",
           "endDate": "2026-09-01",
-          "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
+          "error": "429  {\"message\":\"Too Many Requests\"}"
         },
         {
           "path": "/generacion-real/v3/findByDate",
@@ -195,12 +201,6 @@
           "path": "/generacion-real/v3/findByDate",
           "startDate": "2026-08-30",
           "endDate": "2026-08-30",
-          "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
-        },
-        {
-          "path": "/generacion-real/v3/findByDate",
-          "startDate": "2026-08-29",
-          "endDate": "2026-08-29",
           "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
         }
       ]
@@ -214,8 +214,8 @@
       "attempts": [
         {
           "path": "/centrales/v4/findByDate",
-          "startDate": "2026-08-29",
-          "endDate": "2026-09-04",
+          "startDate": "2026-08-30",
+          "endDate": "2026-09-05",
           "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
         }
       ]
