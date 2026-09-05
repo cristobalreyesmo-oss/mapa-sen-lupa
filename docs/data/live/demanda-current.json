@@ -1,1 +1,1 @@
-{"schema":"sen-live-demanda-v1","ok":false,"stale":false,"updatedAt":"2026-09-05T12:52:03.235Z","source":"/demanda-real-estimada/v4/findByDate","range":{"startDate":"2026-08-30","endDate":"2026-09-05"},"latest":null}
+{"schema":"sen-live-demanda-v1","ok":false,"stale":false,"updatedAt":"2026-09-05T15:40:59.615Z","source":"/demanda-real-estimada/v4/findByDate","range":{"startDate":"2026-08-30","endDate":"2026-09-05"},"latest":null}
