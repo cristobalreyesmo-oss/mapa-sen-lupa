@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-09T19:52:56.946Z",
+  "generatedAt": "2026-09-09T22:02:26.133Z",
   "baseUrl": "https://sipub.api.coordinador.cl:443",
   "startDate": "2026-09-03",
   "endDate": "2026-09-09",
@@ -27,6 +27,8 @@
       "id": "cmg-online",
       "file": "data/cmg-online-latest.json",
       "ok": true,
+      "stale": true,
+      "error": "429  {\"message\":\"Too Many Requests\"}",
       "records": 1608,
       "rawCount": 2000,
       "sampleKeys": [
@@ -53,7 +55,7 @@
           "path": "/costo-marginal-online/v4/findByDate",
           "startDate": "2026-09-03",
           "endDate": "2026-09-09",
-          "rows": 2000
+          "error": "429  {\"message\":\"Too Many Requests\"}"
         }
       ]
     },
@@ -61,21 +63,14 @@
       "id": "cmg-real",
       "file": "data/cmg-real-latest.json",
       "ok": false,
+      "error": "429  {\"message\":\"Too Many Requests\"}",
       "records": 0,
-      "rawCount": 0,
-      "sampleKeys": [],
-      "updatedAt": "2026-09-09T19:53:09.772Z",
-      "source": "/costo-marginal-real/v4/findByDate",
-      "range": {
-        "startDate": "2026-09-03",
-        "endDate": "2026-09-09"
-      },
       "attempts": [
         {
           "path": "/costo-marginal-real/v4/findByDate",
           "startDate": "2026-09-03",
           "endDate": "2026-09-09",
-          "rows": 0
+          "error": "429  {\"message\":\"Too Many Requests\"}"
         }
       ]
     },
@@ -86,7 +81,7 @@
       "records": 0,
       "rawCount": 0,
       "sampleKeys": [],
-      "updatedAt": "2026-09-09T19:53:11.717Z",
+      "updatedAt": "2026-09-09T22:02:31.300Z",
       "source": "/demanda-real-estimada/v4/findByDate",
       "range": {
         "startDate": "2026-09-03",
@@ -187,7 +182,7 @@
           "path": "/generacion-real/v3/findByDate",
           "startDate": "2026-09-05",
           "endDate": "2026-09-05",
-          "error": "429  {\"message\":\"Too Many Requests\"}"
+          "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
         },
         {
           "path": "/generacion-real/v3/findByDate",
