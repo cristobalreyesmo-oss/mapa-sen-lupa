@@ -1,15 +1,24 @@
 {
   "id": "cmg-real",
   "ok": false,
-  "updatedAt": "2026-09-09T22:02:29.389Z",
-  "error": "429  {\"message\":\"Too Many Requests\"}",
+  "updatedAt": "2026-09-10T00:10:50.392Z",
+  "source": "/costo-marginal-real/v4/findByDate",
+  "range": {
+    "startDate": "2026-09-04",
+    "endDate": "2026-09-10"
+  },
   "attempts": [
     {
       "path": "/costo-marginal-real/v4/findByDate",
-      "startDate": "2026-09-03",
-      "endDate": "2026-09-09",
-      "error": "429  {\"message\":\"Too Many Requests\"}"
+      "startDate": "2026-09-04",
+      "endDate": "2026-09-10",
+      "rows": 0
     }
   ],
-  "records": []
+  "rawCount": 0,
+  "sampleKeys": [],
+  "sampleRows": [],
+  "records": [],
+  "hours": [],
+  "history": []
 }
