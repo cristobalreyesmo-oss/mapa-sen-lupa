@@ -1,8 +1,8 @@
 {
   "id": "potencia-transitada",
   "ok": false,
-  "updatedAt": "2026-09-10T00:11:02.838Z",
-  "error": "502 Bad Gateway {\"message\": \"Internal server error\"}",
+  "updatedAt": "2026-09-10T04:35:44.679Z",
+  "error": "429  {\"message\":\"Too Many Requests\"}",
   "attempts": [
     {
       "path": "/potencia-transitada/v4/findByDate",
@@ -26,7 +26,7 @@
       "path": "/potencia-transitada/v4/findByDate",
       "startDate": "2026-09-07",
       "endDate": "2026-09-07",
-      "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
+      "error": "429  {\"message\":\"Too Many Requests\"}"
     },
     {
       "path": "/potencia-transitada/v4/findByDate",
@@ -38,13 +38,13 @@
       "path": "/potencia-transitada/v4/findByDate",
       "startDate": "2026-09-05",
       "endDate": "2026-09-05",
-      "error": "429  {\"message\":\"Too Many Requests\"}"
+      "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
     },
     {
       "path": "/potencia-transitada/v4/findByDate",
       "startDate": "2026-09-04",
       "endDate": "2026-09-04",
-      "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
+      "error": "429  {\"message\":\"Too Many Requests\"}"
     }
   ],
   "records": []
