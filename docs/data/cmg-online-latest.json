@@ -41759,7 +41759,7 @@
   ],
   "stale": true,
   "staleReason": "429  {\"message\":\"Too Many Requests\"}",
-  "lastFetchAttemptAt": "2026-09-12T12:57:03.767Z",
+  "lastFetchAttemptAt": "2026-09-12T15:56:59.569Z",
   "lastFetchAttempts": [
     {
       "path": "/costo-marginal-online/v4/findByDate",
