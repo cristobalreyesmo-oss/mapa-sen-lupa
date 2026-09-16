@@ -1,8 +1,8 @@
 {
   "id": "potencia-transitada",
   "ok": false,
-  "updatedAt": "2026-09-16T19:47:21.516Z",
-  "error": "504 Gateway Time-out <html><body><h1>504 Gateway Time-out</h1>\nThe server didn't respond in time.\n</body></html>",
+  "updatedAt": "2026-09-16T22:26:19.719Z",
+  "error": "502 Bad Gateway {\"message\": \"Internal server error\"}",
   "attempts": [
     {
       "path": "/potencia-transitada/v4/findByDate",
@@ -14,7 +14,37 @@
       "path": "/potencia-transitada/v4/findByDate",
       "startDate": "2026-09-15",
       "endDate": "2026-09-15",
-      "error": "504 Gateway Time-out <html><body><h1>504 Gateway Time-out</h1>\nThe server didn't respond in time.\n</body></html>"
+      "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
+    },
+    {
+      "path": "/potencia-transitada/v4/findByDate",
+      "startDate": "2026-09-14",
+      "endDate": "2026-09-14",
+      "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
+    },
+    {
+      "path": "/potencia-transitada/v4/findByDate",
+      "startDate": "2026-09-13",
+      "endDate": "2026-09-13",
+      "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
+    },
+    {
+      "path": "/potencia-transitada/v4/findByDate",
+      "startDate": "2026-09-12",
+      "endDate": "2026-09-12",
+      "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
+    },
+    {
+      "path": "/potencia-transitada/v4/findByDate",
+      "startDate": "2026-09-11",
+      "endDate": "2026-09-11",
+      "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
+    },
+    {
+      "path": "/potencia-transitada/v4/findByDate",
+      "startDate": "2026-09-10",
+      "endDate": "2026-09-10",
+      "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
     }
   ],
   "records": []
