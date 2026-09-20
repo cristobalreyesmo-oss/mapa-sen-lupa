@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-20T01:36:01.886Z",
+  "generatedAt": "2026-09-20T06:58:17.263Z",
   "baseUrl": "https://sipub.api.coordinador.cl:443",
   "startDate": "2026-09-14",
   "endDate": "2026-09-20",
@@ -27,8 +27,6 @@
       "id": "cmg-online",
       "file": "data/cmg-online-latest.json",
       "ok": true,
-      "stale": true,
-      "error": "429  {\"message\":\"Too Many Requests\"}",
       "records": 1609,
       "rawCount": 2000,
       "sampleKeys": [
@@ -44,18 +42,18 @@
         "fecha_hora",
         "fecha_minuto"
       ],
-      "updatedAt": "2026-09-19T21:31:35.840Z",
+      "updatedAt": "2026-09-20T06:58:26.989Z",
       "source": "/costo-marginal-online/v4/findByDate",
       "range": {
-        "startDate": "2026-09-13",
-        "endDate": "2026-09-19"
+        "startDate": "2026-09-14",
+        "endDate": "2026-09-20"
       },
       "attempts": [
         {
           "path": "/costo-marginal-online/v4/findByDate",
           "startDate": "2026-09-14",
           "endDate": "2026-09-20",
-          "error": "429  {\"message\":\"Too Many Requests\"}"
+          "rows": 2000
         }
       ]
     },
@@ -66,7 +64,7 @@
       "records": 0,
       "rawCount": 0,
       "sampleKeys": [],
-      "updatedAt": "2026-09-20T01:36:07.365Z",
+      "updatedAt": "2026-09-20T06:58:30.226Z",
       "source": "/costo-marginal-real/v4/findByDate",
       "range": {
         "startDate": "2026-09-14",
@@ -88,7 +86,7 @@
       "records": 0,
       "rawCount": 0,
       "sampleKeys": [],
-      "updatedAt": "2026-09-20T01:36:09.102Z",
+      "updatedAt": "2026-09-20T06:58:32.292Z",
       "source": "/demanda-real-estimada/v4/findByDate",
       "range": {
         "startDate": "2026-09-14",
@@ -158,7 +156,7 @@
       "id": "generacion-real",
       "file": "data/generacion-real-central-latest.json",
       "ok": false,
-      "error": "502 Bad Gateway {\"message\": \"Internal server error\"}",
+      "error": "429  {\"message\":\"Too Many Requests\"}",
       "records": 0,
       "attempts": [
         {
@@ -177,7 +175,7 @@
           "path": "/generacion-real/v3/findByDate",
           "startDate": "2026-09-18",
           "endDate": "2026-09-18",
-          "error": "429  {\"message\":\"Too Many Requests\"}"
+          "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
         },
         {
           "path": "/generacion-real/v3/findByDate",
@@ -189,19 +187,19 @@
           "path": "/generacion-real/v3/findByDate",
           "startDate": "2026-09-16",
           "endDate": "2026-09-16",
-          "error": "429  {\"message\":\"Too Many Requests\"}"
+          "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
         },
         {
           "path": "/generacion-real/v3/findByDate",
           "startDate": "2026-09-15",
           "endDate": "2026-09-15",
-          "error": "429  {\"message\":\"Too Many Requests\"}"
+          "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
         },
         {
           "path": "/generacion-real/v3/findByDate",
           "startDate": "2026-09-14",
           "endDate": "2026-09-14",
-          "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
+          "error": "429  {\"message\":\"Too Many Requests\"}"
         }
       ]
     },
