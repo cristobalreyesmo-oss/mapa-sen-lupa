@@ -1,7 +1,7 @@
 {
   "id": "cmg-online",
   "ok": true,
-  "updatedAt": "2026-09-22T01:50:44.506Z",
+  "updatedAt": "2026-09-22T12:12:31.769Z",
   "source": "/costo-marginal-online/v4/findByDate",
   "range": {
     "startDate": "2026-09-16",
@@ -41827,17 +41827,6 @@
           "value": 44.7412
         }
       ]
-    }
-  ],
-  "stale": true,
-  "staleReason": "429  {\"message\":\"Too Many Requests\"}",
-  "lastFetchAttemptAt": "2026-09-22T06:56:03.375Z",
-  "lastFetchAttempts": [
-    {
-      "path": "/costo-marginal-online/v4/findByDate",
-      "startDate": "2026-09-16",
-      "endDate": "2026-09-22",
-      "error": "429  {\"message\":\"Too Many Requests\"}"
     }
   ]
 }

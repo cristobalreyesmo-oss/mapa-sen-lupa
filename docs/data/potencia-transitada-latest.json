@@ -1,7 +1,7 @@
 {
   "id": "potencia-transitada",
   "ok": false,
-  "updatedAt": "2026-09-22T06:56:20.191Z",
+  "updatedAt": "2026-09-22T12:12:51.172Z",
   "error": "502 Bad Gateway {\"message\": \"Internal server error\"}",
   "attempts": [
     {
