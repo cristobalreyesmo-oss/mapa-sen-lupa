@@ -1,9 +1,15 @@
 {
   "id": "generacion-real",
   "ok": false,
-  "updatedAt": "2026-09-27T22:05:35.165Z",
-  "error": "429  {\"message\":\"Too Many Requests\"}",
+  "updatedAt": "2026-09-28T00:40:12.897Z",
+  "error": "502 Bad Gateway {\"message\": \"Internal server error\"}",
   "attempts": [
+    {
+      "path": "/generacion-real/v3/findByDate",
+      "startDate": "2026-09-28",
+      "endDate": "2026-09-28",
+      "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
+    },
     {
       "path": "/generacion-real/v3/findByDate",
       "startDate": "2026-09-27",
@@ -14,37 +20,31 @@
       "path": "/generacion-real/v3/findByDate",
       "startDate": "2026-09-26",
       "endDate": "2026-09-26",
-      "error": "429  {\"message\":\"Too Many Requests\"}"
+      "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
     },
     {
       "path": "/generacion-real/v3/findByDate",
       "startDate": "2026-09-25",
       "endDate": "2026-09-25",
-      "error": "429  {\"message\":\"Too Many Requests\"}"
+      "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
     },
     {
       "path": "/generacion-real/v3/findByDate",
       "startDate": "2026-09-24",
       "endDate": "2026-09-24",
-      "error": "429  {\"message\":\"Too Many Requests\"}"
+      "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
     },
     {
       "path": "/generacion-real/v3/findByDate",
       "startDate": "2026-09-23",
       "endDate": "2026-09-23",
-      "error": "429  {\"message\":\"Too Many Requests\"}"
+      "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
     },
     {
       "path": "/generacion-real/v3/findByDate",
       "startDate": "2026-09-22",
       "endDate": "2026-09-22",
-      "error": "429  {\"message\":\"Too Many Requests\"}"
-    },
-    {
-      "path": "/generacion-real/v3/findByDate",
-      "startDate": "2026-09-21",
-      "endDate": "2026-09-21",
-      "error": "429  {\"message\":\"Too Many Requests\"}"
+      "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
     }
   ],
   "records": []
