@@ -41904,14 +41904,14 @@
     }
   ],
   "stale": true,
-  "staleReason": "429  {\"message\":\"Too Many Requests\"}",
-  "lastFetchAttemptAt": "2026-10-02T07:06:47.159Z",
+  "staleReason": "504 Gateway Timeout {\"message\": \"Endpoint request timed out\"}",
+  "lastFetchAttemptAt": "2026-10-02T13:49:18.650Z",
   "lastFetchAttempts": [
     {
       "path": "/costo-marginal-online/v4/findByDate",
       "startDate": "2026-09-26",
       "endDate": "2026-10-02",
-      "error": "429  {\"message\":\"Too Many Requests\"}"
+      "error": "504 Gateway Timeout {\"message\": \"Endpoint request timed out\"}"
     }
   ]
 }
