@@ -1,24 +1,15 @@
 {
   "id": "cmg-real",
   "ok": false,
-  "updatedAt": "2026-10-01T21:59:37.670Z",
-  "source": "/costo-marginal-real/v4/findByDate",
-  "range": {
-    "startDate": "2026-09-25",
-    "endDate": "2026-10-01"
-  },
+  "updatedAt": "2026-10-02T01:18:01.426Z",
+  "error": "504 Gateway Timeout {\"message\": \"Endpoint request timed out\"}",
   "attempts": [
     {
       "path": "/costo-marginal-real/v4/findByDate",
-      "startDate": "2026-09-25",
-      "endDate": "2026-10-01",
-      "rows": 0
+      "startDate": "2026-09-26",
+      "endDate": "2026-10-02",
+      "error": "504 Gateway Timeout {\"message\": \"Endpoint request timed out\"}"
     }
   ],
-  "rawCount": 0,
-  "sampleKeys": [],
-  "sampleRows": [],
-  "records": [],
-  "hours": [],
-  "history": []
+  "records": []
 }
