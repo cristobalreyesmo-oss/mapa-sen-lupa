@@ -41905,12 +41905,12 @@
   ],
   "stale": true,
   "staleReason": "429  {\"message\":\"Too Many Requests\"}",
-  "lastFetchAttemptAt": "2026-10-05T21:58:44.715Z",
+  "lastFetchAttemptAt": "2026-10-06T02:02:33.853Z",
   "lastFetchAttempts": [
     {
       "path": "/costo-marginal-online/v4/findByDate",
-      "startDate": "2026-09-29",
-      "endDate": "2026-10-05",
+      "startDate": "2026-09-30",
+      "endDate": "2026-10-06",
       "error": "429  {\"message\":\"Too Many Requests\"}"
     }
   ]
