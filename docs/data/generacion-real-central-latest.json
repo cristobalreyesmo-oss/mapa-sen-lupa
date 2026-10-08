@@ -1,9 +1,15 @@
 {
   "id": "generacion-real",
   "ok": false,
-  "updatedAt": "2026-10-07T22:16:01.577Z",
+  "updatedAt": "2026-10-08T02:06:02.978Z",
   "error": "502 Bad Gateway {\"message\": \"Internal server error\"}",
   "attempts": [
+    {
+      "path": "/generacion-real/v3/findByDate",
+      "startDate": "2026-10-08",
+      "endDate": "2026-10-08",
+      "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
+    },
     {
       "path": "/generacion-real/v3/findByDate",
       "startDate": "2026-10-07",
@@ -20,7 +26,7 @@
       "path": "/generacion-real/v3/findByDate",
       "startDate": "2026-10-05",
       "endDate": "2026-10-05",
-      "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
+      "error": "429  {\"message\":\"Too Many Requests\"}"
     },
     {
       "path": "/generacion-real/v3/findByDate",
@@ -32,18 +38,12 @@
       "path": "/generacion-real/v3/findByDate",
       "startDate": "2026-10-03",
       "endDate": "2026-10-03",
-      "error": "429  {\"message\":\"Too Many Requests\"}"
+      "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
     },
     {
       "path": "/generacion-real/v3/findByDate",
       "startDate": "2026-10-02",
       "endDate": "2026-10-02",
-      "error": "429  {\"message\":\"Too Many Requests\"}"
-    },
-    {
-      "path": "/generacion-real/v3/findByDate",
-      "startDate": "2026-10-01",
-      "endDate": "2026-10-01",
       "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
     }
   ],
