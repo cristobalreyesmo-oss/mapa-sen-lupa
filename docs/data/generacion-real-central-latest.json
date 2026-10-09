@@ -1,7 +1,7 @@
 {
   "id": "generacion-real",
   "ok": false,
-  "updatedAt": "2026-10-09T13:48:41.368Z",
+  "updatedAt": "2026-10-09T19:07:42.721Z",
   "error": "429  {\"message\":\"Too Many Requests\"}",
   "attempts": [
     {
