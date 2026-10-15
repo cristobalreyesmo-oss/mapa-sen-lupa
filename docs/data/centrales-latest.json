@@ -1,7 +1,7 @@
 {
   "id": "centrales",
   "ok": false,
-  "updatedAt": "2026-10-15T11:46:42.499Z",
+  "updatedAt": "2026-10-15T15:51:28.008Z",
   "error": "502 Bad Gateway {\"message\": \"Internal server error\"}",
   "attempts": [
     {
