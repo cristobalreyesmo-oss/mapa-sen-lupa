@@ -1,13 +1,13 @@
 {
   "id": "centrales",
   "ok": false,
-  "updatedAt": "2026-10-19T23:00:03.691Z",
+  "updatedAt": "2026-10-20T01:36:04.395Z",
   "error": "502 Bad Gateway {\"message\": \"Internal server error\"}",
   "attempts": [
     {
       "path": "/centrales/v4/findByDate",
-      "startDate": "2026-10-13",
-      "endDate": "2026-10-19",
+      "startDate": "2026-10-14",
+      "endDate": "2026-10-20",
       "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
     }
   ],
