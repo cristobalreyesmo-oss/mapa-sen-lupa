@@ -1,7 +1,7 @@
 {
   "id": "cmg-real",
   "ok": false,
-  "updatedAt": "2026-10-22T20:40:43.265Z",
+  "updatedAt": "2026-10-22T23:35:31.553Z",
   "error": "504 Gateway Timeout {\"message\": \"Endpoint request timed out\"}",
   "attempts": [
     {
