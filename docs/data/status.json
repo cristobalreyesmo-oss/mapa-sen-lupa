@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-22T12:27:07.504Z",
+  "generatedAt": "2026-10-22T17:26:17.306Z",
   "baseUrl": "https://sipub.api.coordinador.cl:443",
   "startDate": "2026-10-16",
   "endDate": "2026-10-22",
@@ -27,8 +27,6 @@
       "id": "cmg-online",
       "file": "data/cmg-online-latest.json",
       "ok": true,
-      "stale": true,
-      "error": "429  {\"message\":\"Too Many Requests\"}",
       "records": 1614,
       "rawCount": 2000,
       "sampleKeys": [
@@ -44,18 +42,18 @@
         "fecha_hora",
         "fecha_minuto"
       ],
-      "updatedAt": "2026-10-21T06:33:27.144Z",
+      "updatedAt": "2026-10-22T17:27:45.836Z",
       "source": "/costo-marginal-online/v4/findByDate",
       "range": {
-        "startDate": "2026-10-15",
-        "endDate": "2026-10-21"
+        "startDate": "2026-10-16",
+        "endDate": "2026-10-22"
       },
       "attempts": [
         {
           "path": "/costo-marginal-online/v4/findByDate",
           "startDate": "2026-10-16",
           "endDate": "2026-10-22",
-          "error": "429  {\"message\":\"Too Many Requests\"}"
+          "rows": 2000
         }
       ]
     },
@@ -78,14 +76,21 @@
       "id": "demanda-real",
       "file": "data/demanda-real-estimada.json",
       "ok": false,
-      "error": "504 Gateway Timeout {\"message\": \"Endpoint request timed out\"}",
       "records": 0,
+      "rawCount": 0,
+      "sampleKeys": [],
+      "updatedAt": "2026-10-22T17:28:28.930Z",
+      "source": "/demanda-real-estimada/v4/findByDate",
+      "range": {
+        "startDate": "2026-10-16",
+        "endDate": "2026-10-22"
+      },
       "attempts": [
         {
           "path": "/demanda-real-estimada/v4/findByDate",
           "startDate": "2026-10-16",
           "endDate": "2026-10-22",
-          "error": "504 Gateway Timeout {\"message\": \"Endpoint request timed out\"}"
+          "rows": 0
         }
       ]
     },
@@ -144,7 +149,7 @@
       "id": "generacion-real",
       "file": "data/generacion-real-central-latest.json",
       "ok": false,
-      "error": "502 Bad Gateway {\"message\": \"Internal server error\"}",
+      "error": "429  {\"message\":\"Too Many Requests\"}",
       "records": 0,
       "attempts": [
         {
@@ -187,7 +192,7 @@
           "path": "/generacion-real/v3/findByDate",
           "startDate": "2026-10-16",
           "endDate": "2026-10-16",
-          "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
+          "error": "429  {\"message\":\"Too Many Requests\"}"
         }
       ]
     },
