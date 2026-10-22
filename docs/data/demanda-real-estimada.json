@@ -1,24 +1,15 @@
 {
   "id": "demanda-real",
   "ok": false,
-  "updatedAt": "2026-10-22T06:45:21.700Z",
-  "source": "/demanda-real-estimada/v4/findByDate",
-  "range": {
-    "startDate": "2026-10-16",
-    "endDate": "2026-10-22"
-  },
+  "updatedAt": "2026-10-22T12:28:11.011Z",
+  "error": "504 Gateway Timeout {\"message\": \"Endpoint request timed out\"}",
   "attempts": [
     {
       "path": "/demanda-real-estimada/v4/findByDate",
       "startDate": "2026-10-16",
       "endDate": "2026-10-22",
-      "rows": 0
+      "error": "504 Gateway Timeout {\"message\": \"Endpoint request timed out\"}"
     }
   ],
-  "rawCount": 0,
-  "sampleKeys": [],
-  "records": [],
-  "hours": [],
-  "values": [],
-  "unit": "MWh"
+  "records": []
 }
