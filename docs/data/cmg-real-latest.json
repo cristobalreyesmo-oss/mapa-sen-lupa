@@ -41937,7 +41937,7 @@
   ],
   "stale": true,
   "staleReason": "504 Gateway Timeout {\"message\": \"Endpoint request timed out\"}",
-  "lastFetchAttemptAt": "2026-10-23T20:24:20.807Z",
+  "lastFetchAttemptAt": "2026-10-23T23:16:01.710Z",
   "lastFetchAttempts": [
     {
       "path": "/costo-marginal-real/v4/findByDate",
