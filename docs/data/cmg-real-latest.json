@@ -41934,5 +41934,16 @@
         }
       ]
     }
+  ],
+  "stale": true,
+  "staleReason": "504 Gateway Timeout {\"message\": \"Endpoint request timed out\"}",
+  "lastFetchAttemptAt": "2026-10-23T20:24:20.807Z",
+  "lastFetchAttempts": [
+    {
+      "path": "/costo-marginal-real/v4/findByDate",
+      "startDate": "2026-10-17",
+      "endDate": "2026-10-23",
+      "error": "504 Gateway Timeout {\"message\": \"Endpoint request timed out\"}"
+    }
   ]
 }
