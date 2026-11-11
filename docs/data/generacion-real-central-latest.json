@@ -1,7 +1,7 @@
 {
   "id": "generacion-real",
   "ok": false,
-  "updatedAt": "2026-11-11T17:26:56.829Z",
+  "updatedAt": "2026-11-11T23:33:54.852Z",
   "error": "502 Bad Gateway {\"message\": \"Internal server error\"}",
   "attempts": [
     {
