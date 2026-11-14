@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-14T08:11:55.875Z",
+  "generatedAt": "2026-11-14T15:00:51.784Z",
   "baseUrl": "https://sipub.api.coordinador.cl:443",
   "startDate": "2026-11-08",
   "endDate": "2026-11-14",
@@ -66,7 +66,7 @@
       "records": 0,
       "rawCount": 0,
       "sampleKeys": [],
-      "updatedAt": "2026-11-14T08:12:00.310Z",
+      "updatedAt": "2026-11-14T15:01:00.358Z",
       "source": "/costo-marginal-real/v4/findByDate",
       "range": {
         "startDate": "2026-11-08",
@@ -88,7 +88,7 @@
       "records": 0,
       "rawCount": 0,
       "sampleKeys": [],
-      "updatedAt": "2026-11-14T08:12:03.457Z",
+      "updatedAt": "2026-11-14T15:01:02.273Z",
       "source": "/demanda-real-estimada/v4/findByDate",
       "range": {
         "startDate": "2026-11-08",
@@ -158,7 +158,7 @@
       "id": "generacion-real",
       "file": "data/generacion-real-central-latest.json",
       "ok": false,
-      "error": "502 Bad Gateway {\"message\": \"Internal server error\"}",
+      "error": "429  {\"message\":\"Too Many Requests\"}",
       "records": 0,
       "attempts": [
         {
@@ -177,7 +177,7 @@
           "path": "/generacion-real/v3/findByDate",
           "startDate": "2026-11-12",
           "endDate": "2026-11-12",
-          "error": "429  {\"message\":\"Too Many Requests\"}"
+          "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
         },
         {
           "path": "/generacion-real/v3/findByDate",
@@ -189,7 +189,7 @@
           "path": "/generacion-real/v3/findByDate",
           "startDate": "2026-11-10",
           "endDate": "2026-11-10",
-          "error": "429  {\"message\":\"Too Many Requests\"}"
+          "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
         },
         {
           "path": "/generacion-real/v3/findByDate",
@@ -201,7 +201,7 @@
           "path": "/generacion-real/v3/findByDate",
           "startDate": "2026-11-08",
           "endDate": "2026-11-08",
-          "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
+          "error": "429  {\"message\":\"Too Many Requests\"}"
         }
       ]
     },
