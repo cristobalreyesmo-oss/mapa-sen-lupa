@@ -42045,12 +42045,12 @@
   ],
   "stale": true,
   "staleReason": "429  {\"message\":\"Too Many Requests\"}",
-  "lastFetchAttemptAt": "2026-11-15T21:43:41.964Z",
+  "lastFetchAttemptAt": "2026-11-16T01:23:28.833Z",
   "lastFetchAttempts": [
     {
       "path": "/costo-marginal-online/v4/findByDate",
-      "startDate": "2026-11-09",
-      "endDate": "2026-11-15",
+      "startDate": "2026-11-10",
+      "endDate": "2026-11-16",
       "error": "429  {\"message\":\"Too Many Requests\"}"
     }
   ]
