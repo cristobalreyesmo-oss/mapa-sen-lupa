@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-11-17T18:49:17.233Z",
+  "generatedAt": "2026-11-18T01:23:58.754Z",
   "baseUrl": "https://sipub.api.coordinador.cl:443",
-  "startDate": "2026-11-11",
-  "endDate": "2026-11-17",
+  "startDate": "2026-11-12",
+  "endDate": "2026-11-18",
   "cenWindowDays": 7,
   "globalWindow": {
-    "startDate": "2026-11-11",
-    "endDate": "2026-11-17"
+    "startDate": "2026-11-12",
+    "endDate": "2026-11-18"
   },
   "lookbackDays": 2,
   "cmgDays": 7,
@@ -27,6 +27,8 @@
       "id": "cmg-online",
       "file": "data/cmg-online-latest.json",
       "ok": true,
+      "stale": true,
+      "error": "429  {\"message\":\"Too Many Requests\"}",
       "records": 1622,
       "rawCount": 2000,
       "sampleKeys": [
@@ -51,9 +53,9 @@
       "attempts": [
         {
           "path": "/costo-marginal-online/v4/findByDate",
-          "startDate": "2026-11-11",
-          "endDate": "2026-11-17",
-          "rows": 2000
+          "startDate": "2026-11-12",
+          "endDate": "2026-11-18",
+          "error": "429  {\"message\":\"Too Many Requests\"}"
         }
       ]
     },
@@ -61,21 +63,14 @@
       "id": "cmg-real",
       "file": "data/cmg-real-latest.json",
       "ok": false,
+      "error": "429  {\"message\":\"Too Many Requests\"}",
       "records": 0,
-      "rawCount": 0,
-      "sampleKeys": [],
-      "updatedAt": "2026-11-17T18:49:33.956Z",
-      "source": "/costo-marginal-real/v4/findByDate",
-      "range": {
-        "startDate": "2026-11-11",
-        "endDate": "2026-11-17"
-      },
       "attempts": [
         {
           "path": "/costo-marginal-real/v4/findByDate",
-          "startDate": "2026-11-11",
-          "endDate": "2026-11-17",
-          "rows": 0
+          "startDate": "2026-11-12",
+          "endDate": "2026-11-18",
+          "error": "429  {\"message\":\"Too Many Requests\"}"
         }
       ]
     },
@@ -86,17 +81,17 @@
       "records": 0,
       "rawCount": 0,
       "sampleKeys": [],
-      "updatedAt": "2026-11-17T18:49:36.232Z",
+      "updatedAt": "2026-11-18T01:24:03.450Z",
       "source": "/demanda-real-estimada/v4/findByDate",
       "range": {
-        "startDate": "2026-11-11",
-        "endDate": "2026-11-17"
+        "startDate": "2026-11-12",
+        "endDate": "2026-11-18"
       },
       "attempts": [
         {
           "path": "/demanda-real-estimada/v4/findByDate",
-          "startDate": "2026-11-11",
-          "endDate": "2026-11-17",
+          "startDate": "2026-11-12",
+          "endDate": "2026-11-18",
           "rows": 0
         }
       ]
@@ -108,6 +103,12 @@
       "error": "502 Bad Gateway {\"message\": \"Internal server error\"}",
       "records": 0,
       "attempts": [
+        {
+          "path": "/potencia-transitada/v4/findByDate",
+          "startDate": "2026-11-18",
+          "endDate": "2026-11-18",
+          "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
+        },
         {
           "path": "/potencia-transitada/v4/findByDate",
           "startDate": "2026-11-17",
@@ -143,12 +144,6 @@
           "startDate": "2026-11-12",
           "endDate": "2026-11-12",
           "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
-        },
-        {
-          "path": "/potencia-transitada/v4/findByDate",
-          "startDate": "2026-11-11",
-          "endDate": "2026-11-11",
-          "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
         }
       ]
     },
@@ -159,6 +154,12 @@
       "error": "502 Bad Gateway {\"message\": \"Internal server error\"}",
       "records": 0,
       "attempts": [
+        {
+          "path": "/generacion-real/v3/findByDate",
+          "startDate": "2026-11-18",
+          "endDate": "2026-11-18",
+          "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
+        },
         {
           "path": "/generacion-real/v3/findByDate",
           "startDate": "2026-11-17",
@@ -194,12 +195,6 @@
           "startDate": "2026-11-12",
           "endDate": "2026-11-12",
           "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
-        },
-        {
-          "path": "/generacion-real/v3/findByDate",
-          "startDate": "2026-11-11",
-          "endDate": "2026-11-11",
-          "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
         }
       ]
     },
@@ -212,8 +207,8 @@
       "attempts": [
         {
           "path": "/centrales/v4/findByDate",
-          "startDate": "2026-11-11",
-          "endDate": "2026-11-17",
+          "startDate": "2026-11-12",
+          "endDate": "2026-11-18",
           "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
         }
       ]
