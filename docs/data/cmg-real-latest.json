@@ -1,7 +1,7 @@
 {
   "id": "cmg-real",
   "ok": false,
-  "updatedAt": "2026-11-21T07:06:58.583Z",
+  "updatedAt": "2026-11-21T15:18:22.401Z",
   "source": "/costo-marginal-real/v4/findByDate",
   "range": {
     "startDate": "2026-11-15",
