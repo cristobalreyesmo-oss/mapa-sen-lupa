@@ -1,17 +1,17 @@
 {
   "id": "demanda-real",
   "ok": false,
-  "updatedAt": "2026-11-23T21:47:07.000Z",
+  "updatedAt": "2026-11-24T05:38:25.615Z",
   "source": "/demanda-real-estimada/v4/findByDate",
   "range": {
-    "startDate": "2026-11-17",
-    "endDate": "2026-11-23"
+    "startDate": "2026-11-18",
+    "endDate": "2026-11-24"
   },
   "attempts": [
     {
       "path": "/demanda-real-estimada/v4/findByDate",
-      "startDate": "2026-11-17",
-      "endDate": "2026-11-23",
+      "startDate": "2026-11-18",
+      "endDate": "2026-11-24",
       "rows": 0
     }
   ],
