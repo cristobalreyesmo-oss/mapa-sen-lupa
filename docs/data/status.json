@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-24T05:38:16.876Z",
+  "generatedAt": "2026-11-24T16:22:13.350Z",
   "baseUrl": "https://sipub.api.coordinador.cl:443",
   "startDate": "2026-11-18",
   "endDate": "2026-11-24",
@@ -66,7 +66,7 @@
       "records": 0,
       "rawCount": 0,
       "sampleKeys": [],
-      "updatedAt": "2026-11-24T05:38:23.784Z",
+      "updatedAt": "2026-11-24T16:22:24.433Z",
       "source": "/costo-marginal-real/v4/findByDate",
       "range": {
         "startDate": "2026-11-18",
@@ -88,7 +88,7 @@
       "records": 0,
       "rawCount": 0,
       "sampleKeys": [],
-      "updatedAt": "2026-11-24T05:38:25.615Z",
+      "updatedAt": "2026-11-24T16:22:28.021Z",
       "source": "/demanda-real-estimada/v4/findByDate",
       "range": {
         "startDate": "2026-11-18",
@@ -195,7 +195,7 @@
           "path": "/generacion-real/v3/findByDate",
           "startDate": "2026-11-19",
           "endDate": "2026-11-19",
-          "error": "429  {\"message\":\"Too Many Requests\"}"
+          "error": "502 Bad Gateway {\"message\": \"Internal server error\"}"
         },
         {
           "path": "/generacion-real/v3/findByDate",
